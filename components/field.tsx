@@ -36,6 +36,38 @@ export function Field({ label, name, error, hint, prefix, className, ...props }:
   );
 }
 
+type SelectFieldProps = {
+  label: string;
+  name: string;
+  options: readonly { value: string; label: string }[];
+  placeholder?: string;
+  error?: string;
+} & Omit<ComponentProps<"select">, "name" | "children">;
+
+export function SelectField({ label, name, options, placeholder, error, className, ...props }: SelectFieldProps) {
+  const errorId = error ? `${name}-error` : undefined;
+  return (
+    <div className={className}>
+      <label htmlFor={name} className="mb-1.5 block text-sm font-medium text-slate-700">
+        {label}
+      </label>
+      <select id={name} name={name} aria-invalid={Boolean(error)} aria-describedby={errorId} className={inputClass} {...props}>
+        {placeholder !== undefined && <option value="">{placeholder}</option>}
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      {error && (
+        <p id={errorId} className="mt-1.5 text-sm text-red-600">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function FormError({ message }: { message?: string | null }) {
   if (!message) return null;
   return (

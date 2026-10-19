@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { LinkButton } from "@/components/button";
+import { StatusBadge } from "@/components/status-badge";
 import { getCurrentDealer } from "@/lib/dealer";
+import { carTitle } from "@/lib/format";
 import { t } from "@/lib/strings";
 
 export const metadata: Metadata = { title: t.dashboard.myCars };
@@ -47,16 +50,17 @@ export default async function AppHome() {
         ) : (
           <ul className="flex flex-col gap-3">
             {cars.map((car) => (
-              <li key={car.id} className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4">
-                <div className="min-w-0">
-                  <p className="font-semibold tracking-wide">{car.reg_number}</p>
-                  <p className="truncate text-sm text-slate-600">
-                    {[car.year, car.make, car.model].filter(Boolean).join(" ")}
-                  </p>
-                </div>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                  {t.dashboard.status[car.status]}
-                </span>
+              <li key={car.id}>
+                <Link
+                  href={`/app/cars/${car.id}`}
+                  className="flex min-h-16 items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 active:bg-slate-50"
+                >
+                  <div className="min-w-0">
+                    <p className="font-semibold tracking-wide">{car.reg_number}</p>
+                    <p className="truncate text-sm text-slate-600">{carTitle(car)}</p>
+                  </div>
+                  <StatusBadge status={car.status} />
+                </Link>
               </li>
             ))}
           </ul>
