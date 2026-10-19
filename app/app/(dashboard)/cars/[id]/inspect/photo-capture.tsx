@@ -45,8 +45,8 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
   const [view, setView] = useState<number | null>(startAt ?? (initialPhotos.length === 0 ? 0 : null));
   const [pickError, setPickError] = useState<string | null>(null);
 
-  // Compressed photos waiting for a successful upload, so "Try again" never needs the camera.
-  const pending = useRef(new Map<AngleKey, Blob>());
+  // Compressed photos (and their small report copies) waiting for a successful upload, so "Try again" never needs the camera.
+  const pending = useRef(new Map<AngleKey, { blob: Blob; small: Blob | null }>());
   // Object URLs we created and must revoke.
   const localUrls = useRef(new Set<string>());
 
@@ -84,10 +84,10 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
     });
   }
 
-  async function upload(key: AngleKey, blob: Blob) {
+  async function upload(key: AngleKey, blob: Blob, small: Blob | null) {
     setSlot(key, { status: "uploading" });
     try {
-      await uploadAnglePhoto(supabase, carId, key, blob, (attempt) => setSlot(key, { status: "uploading", retry: attempt }));
+      await uploadAnglePhoto(supabase, carId, key, blob, (attempt) => setSlot(key, { status: "uploading", retry: attempt }), small);
       pending.current.delete(key);
       setSlot(key, { status: "saved" });
     } catch (error) {
@@ -124,17 +124,20 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
       return;
     }
 
+    // The report copy. Without it the report just uses the full photo, so a failure here is fine.
+    const small = await compressImage(blob, { maxEdgePx: PHOTO.smallEdgePx, quality: PHOTO.smallJpegQuality }).catch(() => null);
+
     const url = URL.createObjectURL(blob);
     localUrls.current.add(url);
     if (previous?.url && localUrls.current.delete(previous.url)) URL.revokeObjectURL(previous.url);
-    pending.current.set(key, blob);
+    pending.current.set(key, { blob, small });
     setSlot(key, { status: "uploading", url });
-    void upload(key, blob);
+    void upload(key, blob, small);
   }
 
   function retry(key: AngleKey) {
-    const blob = pending.current.get(key);
-    if (blob) void upload(key, blob);
+    const item = pending.current.get(key);
+    if (item) void upload(key, item.blob, item.small);
   }
 
   function go(next: number | null) {

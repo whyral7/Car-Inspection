@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { PHOTO, STORAGE_BUCKETS } from "@/lib/config";
 import type { Database } from "@/lib/supabase/database.types";
-import { photoPath, type AngleKey } from "./angles";
+import { photoPath, smallPhotoPath, type AngleKey } from "./angles";
 
 export class TimeoutError extends Error {
   constructor(ms: number) {
@@ -70,6 +70,10 @@ export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions):
  * Stores one compressed photo at cars/{car_id}/{angle_key}.jpg and upserts its inspection_photos row.
  * Safe to repeat: the same path is overwritten and a retake resets the AI state for the new picture.
  * The file is uploaded once; if only the row write fails, a retry skips the upload.
+ *
+ * Then uploads `small` (the report copy) to cars/{car_id}/small/. That part is best effort: the photo
+ * is already saved, and the report falls back to the full photo when the small copy is missing or
+ * older than it.
  */
 export async function uploadAnglePhoto(
   supabase: SupabaseClient<Database>,
@@ -77,6 +81,7 @@ export async function uploadAnglePhoto(
   angleKey: AngleKey,
   blob: Blob,
   onRetry?: (attempt: number) => void,
+  small?: Blob | null,
 ) {
   const path = photoPath(carId, angleKey);
   let stored = false;
@@ -101,6 +106,19 @@ export async function uploadAnglePhoto(
     },
     { retries: PHOTO.uploadRetries, baseDelayMs: PHOTO.retryBaseDelayMs, onRetry: (attempt) => onRetry?.(attempt) },
   );
+
+  if (small) {
+    await withRetry(
+      async () => {
+        const { error } = await withTimeout(
+          supabase.storage.from(STORAGE_BUCKETS.inspectionPhotos).upload(smallPhotoPath(carId, angleKey), small, { contentType: "image/jpeg", upsert: true }),
+          PHOTO.uploadTimeoutMs,
+        );
+        if (error) throw error;
+      },
+      { retries: 1, baseDelayMs: PHOTO.retryBaseDelayMs },
+    ).catch((error: unknown) => console.warn("Small photo copy not uploaded; the report will use the full photo.", error));
+  }
 
   return path;
 }

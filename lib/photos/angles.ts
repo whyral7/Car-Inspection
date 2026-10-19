@@ -95,6 +95,11 @@ export function photoPath(carId: string, angleKey: AngleKey) {
   return `cars/${carId}/${angleKey}.jpg`;
 }
 
+/** The small copy used by the report gallery and PDF. */
+export function smallPhotoPath(carId: string, angleKey: AngleKey) {
+  return `cars/${carId}/small/${angleKey}.jpg`;
+}
+
 export type PhotoProgress = {
   /** Photos stored, out of ANGLES.length. */
   done: number;
