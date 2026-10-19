@@ -4,14 +4,17 @@ import { z } from "zod";
 import { PHOTO, STORAGE_BUCKETS } from "@/lib/config";
 import { getCurrentDealer } from "@/lib/dealer";
 import { carTitle } from "@/lib/format";
-import { isAngleKey } from "@/lib/photos/angles";
+import { ANGLES, isAngleKey } from "@/lib/photos/angles";
 import { t } from "@/lib/strings";
 import { PhotoCapture, type InitialPhoto } from "./photo-capture";
 
 export const metadata: Metadata = { title: t.photos.title };
 
-export default async function InspectPage({ params }: PageProps<"/app/cars/[id]/inspect">) {
+export default async function InspectPage({ params, searchParams }: PageProps<"/app/cars/[id]/inspect">) {
   const { id } = await params;
+  // ?angle=odometer opens straight on that photo, e.g. from "Retake photo" on the damage notes screen.
+  const { angle } = await searchParams;
+  const startAt = typeof angle === "string" && isAngleKey(angle) ? ANGLES.findIndex((a) => a.key === angle) : null;
   if (!z.uuid().safeParse(id).success) notFound();
 
   const { supabase } = await getCurrentDealer();
@@ -36,5 +39,5 @@ export default async function InspectPage({ params }: PageProps<"/app/cars/[id]/
   }
   const initialPhotos: InitialPhoto[] = photos.map((p) => ({ angleKey: p.angleKey, url: urlByPath.get(p.path) ?? null }));
 
-  return <PhotoCapture carId={car.id} regNumber={car.reg_number} carTitle={carTitle(car)} initialPhotos={initialPhotos} />;
+  return <PhotoCapture carId={car.id} regNumber={car.reg_number} carTitle={carTitle(car)} initialPhotos={initialPhotos} startAt={startAt} />;
 }

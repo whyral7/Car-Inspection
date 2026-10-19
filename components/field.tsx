@@ -76,3 +76,26 @@ export function FormError({ message }: { message?: string | null }) {
     </p>
   );
 }
+
+type TextAreaFieldProps = {
+  label: string;
+  name: string;
+  error?: string;
+} & Omit<ComponentProps<"textarea">, "name">;
+
+export function TextAreaField({ label, name, error, className, ...props }: TextAreaFieldProps) {
+  const errorId = error ? `${name}-error` : undefined;
+  return (
+    <div className={className}>
+      <label htmlFor={name} className="mb-1.5 block text-sm font-medium text-slate-700">
+        {label}
+      </label>
+      <textarea id={name} name={name} rows={2} aria-invalid={Boolean(error)} aria-describedby={errorId} className={`${inputClass} py-3`} {...props} />
+      {error && (
+        <p id={errorId} className="mt-1.5 text-sm text-red-600">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}

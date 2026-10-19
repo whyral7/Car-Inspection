@@ -29,11 +29,20 @@ function uploadErrorMessage(error: unknown) {
   return isRetryable(error) ? t.photos.errors.upload : t.photos.errors.rejected;
 }
 
-export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos }: { carId: string; carTitle: string; regNumber: string; initialPhotos: InitialPhoto[] }) {
+type Props = {
+  carId: string;
+  carTitle: string;
+  regNumber: string;
+  initialPhotos: InitialPhoto[];
+  /** Index of an angle to open first; otherwise a new car opens on photo 1 and a started one on the grid. */
+  startAt?: number | null;
+};
+
+export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startAt = null }: Props) {
   const [supabase] = useState(() => createClient());
   const [slots, setSlots] = useState<Slots>(() => Object.fromEntries(initialPhotos.map((p) => [p.angleKey, { status: "saved", url: p.url } satisfies Slot])));
   // null shows the overview grid; a number shows the guided screen for that angle.
-  const [view, setView] = useState<number | null>(initialPhotos.length === 0 ? 0 : null);
+  const [view, setView] = useState<number | null>(startAt ?? (initialPhotos.length === 0 ? 0 : null));
   const [pickError, setPickError] = useState<string | null>(null);
 
   // Compressed photos waiting for a successful upload, so "Try again" never needs the camera.
