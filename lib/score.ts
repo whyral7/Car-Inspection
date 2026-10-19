@@ -30,3 +30,12 @@ export function conditionScore({ findings, checklist }: ScoreInput): number {
 export function formatScore(score: number) {
   return score.toFixed(1);
 }
+
+export type ScoreBand = "good" | "fair" | "poor";
+
+/** Colour band for the score badge: 8.0 and up is good, 6.0 to 7.9 fair, below 6.0 needs work. */
+export function scoreBand(score: number): ScoreBand {
+  if (score >= 8) return "good";
+  if (score >= 6) return "fair";
+  return "poor";
+}
