@@ -185,7 +185,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
           {outOfCredits ? (
             <>
               <p className="text-sm font-medium text-amber-900">{t.report.noCredits}</p>
-              <LinkButton href="/app/credits">{t.report.buyCredits}</LinkButton>
+              <LinkButton href={`/app/credits?next=${encodeURIComponent(`/app/cars/${carId}/report`)}`}>{t.report.buyCredits}</LinkButton>
             </>
           ) : (
             <>
