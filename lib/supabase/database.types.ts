@@ -113,9 +113,7 @@ export type Database = {
       payments: Table<PaymentRow, "dealer_id" | "razorpay_order_id" | "amount_paise" | "credits">;
     };
     Views: { [_ in never]: never };
-    Functions: {
-      owns_car: { Args: { p_car_id: string }; Returns: boolean };
-    };
+    Functions: { [_ in never]: never };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };
   };

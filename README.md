@@ -57,7 +57,7 @@ The other keys are for later phases and can stay empty for Phase 1.
 
 ### 3. Create the database
 Pick one:
-- **Dashboard:** open **SQL Editor**, paste the contents of `supabase/migrations/20261019000000_init.sql` and run it.
+- **Dashboard:** open **SQL Editor** and run each file in `supabase/migrations/` in name order.
 - **CLI:** `npx supabase login`, `npx supabase link --project-ref <your-ref>`, then `npx supabase db push`.
 
 This creates all tables with Row Level Security, a trigger that gives each new dealer 3 free credits, and two storage buckets: `logos` (public) and `inspection-photos` (private).
