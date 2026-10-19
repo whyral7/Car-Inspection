@@ -6,7 +6,7 @@ Mobile-first PWA for small Indian used-car dealers: add a car, shoot 20 guided p
 
 See [CLAUDE.md](CLAUDE.md) for the product spec, data model and conventions.
 
-**Status:** Phase 2 (Add a car) done. Phase 1 gave phone OTP login, dealer onboarding with logo, "My cars" home with credits and an installable PWA. Phase 2 adds: add a car by number plate with RC lookup (mock provider) or manual entry, car detail page, and status badges on the car list.
+**Status:** Phase 3 (Photo checklist) done. Phase 1 gave phone OTP login, dealer onboarding with logo, "My cars" home with credits and an installable PWA. Phase 2 added: add a car by number plate with RC lookup (mock provider) or manual entry, car detail page, and status badges. Phase 3 adds: guided capture of the 20 photo angles (outline hint + tip for each), in-browser compression, upload with retries, a thumbnail grid with progress, retake and resume.
 
 ## Stack
 
@@ -23,9 +23,10 @@ app/                    routes (App Router)
   app/onboarding/       dealer profile + logo
   app/(dashboard)/      /app home and everything behind a completed profile
     cars/new/           add a car: number plate, RC lookup, details form
-    cars/[id]/          car detail with "Start inspection"
+    cars/[id]/          car detail with "Start / Continue inspection"
+    cars/[id]/inspect/  guided photo capture (server page + client PhotoCapture)
   manifest.ts           PWA manifest
-components/             shared UI
+components/             shared UI (angle-hint.tsx: SVG outline per photo angle)
 lib/
   strings.ts            every UI string (add Hindi here later)
   config.ts             app constants
@@ -35,6 +36,7 @@ lib/
   rc/                   RC lookup: one interface, mock + Surepass providers
   cars.ts, format.ts    fuel/transmission keys, date and title formatting
   images/compress.ts    in-browser image compression
+  photos/               the 20 angles, progress maths, upload with retry (+ tests)
 proxy.ts                session refresh + /app protection
 public/                 icons, service worker
 supabase/migrations/    SQL schema, RLS, storage buckets
@@ -77,7 +79,7 @@ Pick one:
 - **Dashboard:** open **SQL Editor** and run each file in `supabase/migrations/` in name order.
 - **CLI:** `npx supabase login`, `npx supabase link --project-ref <your-ref>`, then `npx supabase db push`.
 
-This creates all tables with Row Level Security, a trigger that gives each new dealer 3 free credits, and two storage buckets: `logos` (public) and `inspection-photos` (private).
+This creates all tables with Row Level Security, a trigger that gives each new dealer 3 free credits, and two storage buckets: `logos` (public) and `inspection-photos` (private). If you set the database up before Phase 3, run `20261019000200_photo_paths.sql` too: photo uploads fail without it.
 
 ### 4. Turn on phone login
 In Supabase go to **Authentication → Sign In / Providers → Phone** and enable it.
@@ -124,3 +126,4 @@ Chrome only offers **Install app** on HTTPS (or `localhost`), and the service wo
 - RLS is on for every table: a dealer only sees their own rows. Dealers can't change their own `credits`, insert payments or publish reports; column grants block it at the database level.
 - The service-role key is only used in server code (`lib/supabase/admin.ts`).
 - Logos are uploaded straight from the browser into the dealer's own folder (`logos/<dealer_id>/…`), which storage policies enforce.
+- Inspection photos are uploaded from the browser to the private `inspection-photos` bucket at `cars/<car_id>/<angle_key>.jpg`. The storage policy allows a path only when the car in it belongs to the signed-in dealer. Thumbnails use signed URLs that expire after 2 hours.
