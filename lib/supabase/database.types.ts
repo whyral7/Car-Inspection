@@ -99,6 +99,9 @@ export type PaymentRow = {
   amount_paise: number;
   credits: number;
   status: PaymentStatus;
+  pack_key: string | null;
+  paid_at: string | null;
+  failure_reason: string | null;
   created_at: string;
 };
 
@@ -157,6 +160,11 @@ export type Database = {
           p_hidden_sections: string[];
         };
         Returns: { slug: string; charged: boolean; credits: number };
+      };
+      // Service role only (Razorpay webhook).
+      apply_razorpay_payment: {
+        Args: { p_order_id: string; p_payment_id: string; p_amount_paise: number };
+        Returns: { status: "credited" | "duplicate" | "order_already_paid"; dealer_id: string; credits_added?: number; credits?: number };
       };
     };
     Enums: { [_ in never]: never };
