@@ -30,3 +30,22 @@ export const PHOTO = {
 } as const;
 
 export const OTP_RESEND_SECONDS = 30;
+
+export const AI = {
+  /** Photos analysed at the same time from the review screen. */
+  concurrency: 4,
+  /** Findings the model is less sure about than this are dropped (kept in the raw output). */
+  minConfidence: 0.5,
+  maxFindingsPerPhoto: 20,
+  maxTokens: 4096,
+  /**
+   * Thinking effort for the vision call. "low" keeps cost and latency down for a look-and-describe
+   * task; raise it if notes look careless. Set to null for models without effort (e.g. Haiku 4.5).
+   */
+  effort: "low" as "low" | "medium" | "high" | null,
+  /** Per API request; the SDK retries timeouts and 429/5xx this many extra times. */
+  requestTimeoutMs: 40_000,
+  apiRetries: 1,
+  /** Cap on model calls per photo per day, so a stuck retry loop can't run up the bill. */
+  maxCallsPerPhotoPerDay: 10,
+} as const;
