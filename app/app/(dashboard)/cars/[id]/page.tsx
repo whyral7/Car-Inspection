@@ -74,15 +74,22 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
       status: t.car.checklistProgress(checklist.done, checklist.total),
       done: checklist.complete,
     },
+    {
+      href: `/app/cars/${car.id}/report`,
+      title: t.car.stepReport,
+      status: car.status === "published" ? t.car.reportPublished : car.status === "inspected" ? t.car.reportReady : t.car.reportLocked,
+      done: car.status === "published",
+    },
   ];
-  // The main button points at the first unfinished step.
+  // The main button points at the first unfinished step. The checklist's "Finish inspection" moves a
+  // draft on to the report.
   const next = !photos.allRequiredDone
     ? { href: steps[0].href, label: photos.done === 0 ? t.car.startInspection : t.car.continueInspection }
     : !findingsDone
       ? { href: steps[1].href, label: t.car.reviewFindings }
-      : !checklist.complete
+      : !checklist.complete || car.status === "draft"
         ? { href: steps[2].href, label: t.car.fillChecklist }
-        : null;
+        : { href: steps[3].href, label: car.status === "published" ? t.car.viewReport : t.car.previewReport };
 
   const insuranceExpired = car.insurance_valid_upto ? isPastDate(car.insurance_valid_upto) : false;
   const rows: { label: string; value: string | null; warn?: boolean }[] = [
@@ -164,7 +171,7 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
       </section>
 
       <div className="flex flex-col gap-2">
-        {next ? <LinkButton href={next.href}>{next.label}</LinkButton> : <p className="text-center font-medium text-brand-800">✓ {t.car.inspectionDone}</p>}
+        <LinkButton href={next.href}>{next.label}</LinkButton>
         {photos.done === 0 && <p className="text-center text-sm text-slate-500">{t.car.inspectionHint}</p>}
       </div>
 
