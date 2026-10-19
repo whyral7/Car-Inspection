@@ -6,7 +6,7 @@ Mobile-first PWA for small Indian used-car dealers: add a car, shoot 20 guided p
 
 See [CLAUDE.md](CLAUDE.md) for the product spec, data model and conventions.
 
-**Status:** Phase 1 (Foundation) done: phone OTP login, dealer onboarding with logo, "My cars" home with credits, installable PWA.
+**Status:** Phase 2 (Add a car) done. Phase 1 gave phone OTP login, dealer onboarding with logo, "My cars" home with credits and an installable PWA. Phase 2 adds: add a car by number plate with RC lookup (mock provider) or manual entry, car detail page, and status badges on the car list.
 
 ## Stack
 
@@ -22,6 +22,8 @@ app/                    routes (App Router)
   auth/signout/         POST logout
   app/onboarding/       dealer profile + logo
   app/(dashboard)/      /app home and everything behind a completed profile
+    cars/new/           add a car: number plate, RC lookup, details form
+    cars/[id]/          car detail with "Start inspection"
   manifest.ts           PWA manifest
 components/             shared UI
 lib/
@@ -29,7 +31,9 @@ lib/
   config.ts             app constants
   env.ts, env.server.ts validated env access
   supabase/             browser, server, proxy and service-role clients + DB types
-  validation/           zod schemas (+ tests)
+  validation/           zod schemas (+ tests), incl. Indian number plate rules
+  rc/                   RC lookup: one interface, mock + Surepass providers
+  cars.ts, format.ts    fuel/transmission keys, date and title formatting
   images/compress.ts    in-browser image compression
 proxy.ts                session refresh + /app protection
 public/                 icons, service worker
@@ -53,7 +57,20 @@ Fill in `.env.local` from Supabase **Project Settings → API**:
 - `SUPABASE_SERVICE_ROLE_KEY`: `service_role` / secret key (server only, never expose)
 - `NEXT_PUBLIC_APP_URL`: `http://localhost:3000` for now
 
-The other keys are for later phases and can stay empty for Phase 1.
+- `RC_PROVIDER`: `mock` for realistic fake RC data (no key needed). Leave it empty to always use the manual form.
+
+The other keys are for later phases and can stay empty for now.
+
+### RC lookup
+`lib/rc/index.ts` picks a provider from `RC_PROVIDER`:
+
+| `RC_PROVIDER` | Behaviour |
+|---|---|
+| `mock` | Fake but realistic details, the same car every time for the same number. Numbers with **ZZ** as the letters (`MH12ZZ1234`, `22BH1234ZZ`) act as "not on record" so you can try the manual form. |
+| `surepass` | Calls Surepass RC Full with `RC_API_KEY`. Stub: verify the field mapping in `lib/rc/surepass.ts` against a sandbox response before going live. No key means manual entry. |
+| empty / `other` | Lookups off; the dealer types the details in. |
+
+Any lookup failure (timeout, provider error) falls back to the manual form. To add a provider, implement `RcProvider` in `lib/rc/<name>.ts` and add a case in `getRcProvider`.
 
 ### 3. Create the database
 Pick one:
