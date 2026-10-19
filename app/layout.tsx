@@ -20,6 +20,9 @@ export const metadata: Metadata = {
     apple: "/icons/apple-touch-icon.png",
   },
   formatDetection: { telephone: false },
+  // Pages set their own Open Graph title and description where they're worth sharing.
+  openGraph: { type: "website", siteName: APP_NAME, locale: "en_IN" },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {

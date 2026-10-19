@@ -22,5 +22,5 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   // Skip static assets, PWA files and images.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|icons/|sw.js|manifest.webmanifest|.*\\.(?:png|jpg|jpeg|svg|webp|ico)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|icons/|sw.js|manifest.webmanifest|robots.txt|sitemap.xml|api/razorpay/|.*\\.(?:png|jpg|jpeg|svg|webp|ico)$).*)"],
 };
