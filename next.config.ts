@@ -10,6 +10,12 @@ const lanOrigins = [
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: lanOrigins,
+  // The PDF and the link preview image read these fonts from disk at runtime. The PDF is also built
+  // after publishing, from the report screen's server action.
+  outputFileTracingIncludes: {
+    "/r/**": ["./assets/fonts/*.ttf"],
+    "/app/cars/**": ["./assets/fonts/*.ttf"],
+  },
   async headers() {
     return [
       {
