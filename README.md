@@ -6,11 +6,11 @@ Mobile-first PWA for small Indian used-car dealers: add a car, shoot 20 guided p
 
 See [CLAUDE.md](CLAUDE.md) for the product spec, data model and conventions.
 
-**Status:** Phase 5 (report, PDF, public link and WhatsApp sharing) done. Phase 1 gave phone OTP login, dealer onboarding with logo, "My cars" home with credits and an installable PWA. Phase 2 added: add a car by number plate with RC lookup (mock provider) or manual entry, car detail page, and status badges. Phase 3 added: guided capture of the 20 photo angles, in-browser compression, upload with retries, a thumbnail grid, retake and resume. Phase 4 adds: Claude vision checks every photo for visible damage (4 at a time), a review screen to accept, edit, delete or add notes, odometer prefill from the odometer photo, the 19-item checklist, a live condition score, and per-car token and cost logging. Phase 5 adds: a report preview where the dealer hides sections, publishing for 1 credit (blocked with a "Buy credits" button at 0), a public report page at `/r/<slug>` with a WhatsApp link preview image, a matching PDF stored in Supabase Storage, and "Share on WhatsApp".
+**Status:** Phase 6 (payments, landing page, deploy) done. Phase 6 adds: buying credit packs with Razorpay Checkout, a signed and idempotent Razorpay webhook that is the only thing that adds credits, a profile page with credit history, a public landing page with a sample report, pricing and WhatsApp contact, privacy/terms/refund/contact page templates, basic SEO (titles, Open Graph image, robots.txt, sitemap) and the deploy checklist below. Phase 1 gave phone OTP login, dealer onboarding with logo, "My cars" home with credits and an installable PWA. Phase 2 added: add a car by number plate with RC lookup (mock provider) or manual entry, car detail page, and status badges. Phase 3 added: guided capture of the 20 photo angles, in-browser compression, upload with retries, a thumbnail grid, retake and resume. Phase 4 adds: Claude vision checks every photo for visible damage (4 at a time), a review screen to accept, edit, delete or add notes, odometer prefill from the odometer photo, the 19-item checklist, a live condition score, and per-car token and cost logging. Phase 5 adds: a report preview where the dealer hides sections, publishing for 1 credit (blocked with a "Buy credits" button at 0), a public report page at `/r/<slug>` with a WhatsApp link preview image, a matching PDF stored in Supabase Storage, and "Share on WhatsApp".
 
 ## Stack
 
-Next.js 16 (App Router) · TypeScript (strict) · Tailwind CSS v4 · Supabase (phone OTP auth, Postgres, Storage, RLS) · Anthropic API (Claude vision) · zod · @react-pdf/renderer · vitest. Phase 6 adds Razorpay.
+Next.js 16 (App Router) · TypeScript (strict) · Tailwind CSS v4 · Supabase (phone OTP auth, Postgres, Storage, RLS) · Anthropic API (Claude vision) · zod · @react-pdf/renderer · Razorpay (REST API + Checkout, no SDK) · vitest.
 
 > Next.js 16 renamed `middleware.ts` to `proxy.ts`. Ours refreshes the Supabase session and protects `/app/*`.
 
@@ -18,6 +18,8 @@ Next.js 16 (App Router) · TypeScript (strict) · Tailwind CSS v4 · Supabase (p
 
 ```
 app/                    routes (App Router)
+  (site)/               public pages: landing (/), sample-report, privacy, terms, refunds, contact
+  robots.ts, sitemap.ts SEO
   login/                phone OTP login
   auth/signout/         POST logout
   app/onboarding/       dealer profile + logo
@@ -28,11 +30,13 @@ app/                    routes (App Router)
     cars/[id]/findings/ AI damage notes review + odometer confirm
     cars/[id]/checklist/ 19-item checklist, saved on every tap
     cars/[id]/report/   preview, hide sections, publish (1 credit), share link + PDF
-    credits/            credit packs (checkout comes in Phase 6)
+    credits/            buy credit packs with Razorpay Checkout (?next= returns to a report)
+    profile/            dealer details and credit history
   r/[slug]/             public report for buyers (no login)
     og.png/             1200x630 link preview image for WhatsApp
     pdf/                builds the PDF if the report changed, then redirects to a download link
   api/photos/[photoId]/analyse/  POST: analyse one photo with Claude, save notes, log tokens
+  api/razorpay/webhook/          POST: Razorpay webhook (signature-checked), adds credits
   manifest.ts           PWA manifest
 components/             shared UI (angle-hint.tsx: SVG outline per photo angle)
 lib/
@@ -52,6 +56,9 @@ lib/
   report/               view.ts (one report model for page, PDF and preview image, + tests), load.ts,
                         pdf.tsx + pdf-store.tsx (render and store PDFs), og-image.tsx, slug.ts, share.ts (wa.me/tel links)
   url.ts                public base URL for shared links
+  razorpay/             orders API (api.ts), Checkout loader (checkout.ts), webhook signature + parsing (+ tests)
+  credits/              packs and credit history (+ tests)
+  site.ts               site URL and WhatsApp contact link
 assets/fonts/           Geist (OFL) for the PDF and preview image
 proxy.ts                session refresh + /app protection
 public/                 icons, service worker
@@ -133,12 +140,26 @@ WhatsApp only previews public **HTTPS** links, so `localhost` and LAN IPs won't 
 4. Paste the link into any WhatsApp chat (e.g. "Message yourself") and wait for the preview to appear before sending.
 5. WhatsApp caches previews per link for a long time. If you fixed something, you won't see it on a link already shared: test with another report, or add `?v=2` to the link.
 
+### Payments (Razorpay)
+Packs and prices are `CREDIT_PACKS` in `lib/config.ts` (prices in paise). On **Buy credits** the server creates a Razorpay order and a `payments` row (`created`), and the browser opens Razorpay Checkout (loaded only when the dealer taps Pay). Checkout's own "success" proves nothing, so the page then waits for our database to say the order is paid, which only the webhook can do:
+
+1. Razorpay calls `POST /api/razorpay/webhook`. The route checks `X-Razorpay-Signature` (HMAC-SHA256 of the raw body with `RAZORPAY_WEBHOOK_SECRET`); anything else gets 400.
+2. `order.paid` / `payment.captured` call `apply_razorpay_payment`, a database function only the service role can run. It locks the order row, checks the amount, marks it paid and adds the credits in one transaction. The same payment arriving again (Razorpay retries, and sends both events) returns `duplicate` and changes nothing.
+3. `payment.failed` marks an open order failed; a later successful retry on the same order still credits.
+
+If the webhook is slow, the dealer sees "Payment received, credits in a minute or two" with a **Check again** button. Credit history on **Profile** is built from the signup bonus, paid orders and published reports.
+
+**Testing payments locally.** Razorpay can't reach `localhost`, so locally Checkout works but credits only arrive if you expose the app (e.g. `npx cloudflared tunnel --url http://localhost:3000`) and point a **test mode** webhook at `https://<tunnel>/api/razorpay/webhook`. In test mode pay with UPI ID `success@razorpay` (or `failure@razorpay`), or the test cards in Razorpay's docs.
+
+### Business details and legal pages
+`BUSINESS` in `lib/config.ts` fills the contact page, footer and legal templates. Replace every `[bracket]` and set `whatsapp` (digits with country code) so the "Chat on WhatsApp" buttons open a chat; until then they open `/contact`. The texts are in `lib/strings.ts` under `legal`: they are starting templates, have them reviewed before relying on them. `SAMPLE_REPORT_PATH` can point at one of your real published reports instead of the made-up sample.
+
 ### 3. Create the database
 Pick one:
 - **Dashboard:** open **SQL Editor** and run each file in `supabase/migrations/` in name order.
 - **CLI:** `npx supabase login`, `npx supabase link --project-ref <your-ref>`, then `npx supabase db push`.
 
-This creates all tables with Row Level Security, a trigger that gives each new dealer 3 free credits, and two storage buckets: `logos` (public) and `inspection-photos` (private). If you set the database up before Phase 3, run `20261019000200_photo_paths.sql` too: photo uploads fail without it. For Phase 4 run `20261019000300_ai_analysis.sql`: it adds the `ai_usage` table, the `save_photo_analysis` function and a version stamp on photos. For Phase 5 run `20261019000400_reports.sql`: it adds the `reports` bucket, the `publish_report` function and checks on report slugs and hidden sections.
+This creates all tables with Row Level Security, a trigger that gives each new dealer 3 free credits, and two storage buckets: `logos` (public) and `inspection-photos` (private). If you set the database up before Phase 3, run `20261019000200_photo_paths.sql` too: photo uploads fail without it. For Phase 4 run `20261019000300_ai_analysis.sql`: it adds the `ai_usage` table, the `save_photo_analysis` function and a version stamp on photos. For Phase 5 run `20261019000400_reports.sql`: it adds the `reports` bucket, the `publish_report` function and checks on report slugs and hidden sections. For Phase 6 run `20261019000500_payments.sql`: it adds `apply_razorpay_payment` and a few columns on `payments`.
 
 ### 4. Turn on phone login
 In Supabase go to **Authentication → Sign In / Providers → Phone** and enable it.
@@ -172,6 +193,56 @@ Chrome only offers **Install app** on HTTPS (or `localhost`), and the service wo
 - Deploy to Vercel (any preview URL works) and open it in Chrome → menu → **Install app**.
 - Or locally: `npm run build && npx next start -H 0.0.0.0`, then on the phone open `chrome://flags/#unsafely-treat-insecure-origin-as-secure`, add `http://<your-ip>:3000`, relaunch Chrome, and install.
 
+## Deploy to Vercel
+
+### 1. Before you deploy
+- [ ] Fill in `BUSINESS` in `lib/config.ts` (legal name, address, email, WhatsApp number, grievance officer) and read through the legal texts in `lib/strings.ts`. Commit and push.
+- [ ] Database: every file in `supabase/migrations/` is applied to your Supabase project (SQL editor, in name order, or `npx supabase db push`).
+- [ ] Merge your work into the branch Vercel will deploy (`master`).
+
+### 2. Create the Vercel project
+1. Sign in at [vercel.com](https://vercel.com) with GitHub and choose **Add New → Project**, then import this repository.
+2. Framework preset: **Next.js** (detected). Leave the build and output settings as they are. Pick a region near India, e.g. **Mumbai (bom1)**, under **Settings → Functions** after the first deploy.
+3. Before clicking **Deploy**, open **Environment Variables** and add these for **Production** (and **Preview** if you want preview deploys to work):
+
+| Variable | Value |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase **Project Settings → API** |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon / publishable key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (secret) |
+| `ANTHROPIC_API_KEY` | console.anthropic.com |
+| `ANTHROPIC_MODEL` | e.g. `claude-opus-5-5` (see [AI damage notes](#ai-damage-notes)) |
+| `RAZORPAY_KEY_ID` | Razorpay **Account & Settings → API keys** (`rzp_test_…` first, `rzp_live_…` later) |
+| `RAZORPAY_KEY_SECRET` | from the same screen |
+| `RAZORPAY_WEBHOOK_SECRET` | the secret you type when creating the webhook (step 4) |
+| `RC_PROVIDER` | `mock` until you have an RC provider, then e.g. `surepass` |
+| `RC_API_KEY` | your RC provider key (any placeholder while `mock`) |
+| `NEXT_PUBLIC_APP_URL` | your public URL, e.g. `https://carparakh.in` (no trailing slash) |
+
+Leave `RAZORPAY_API_URL` and `DEV_LAN_ORIGIN` unset. `NEXT_PUBLIC_*` values are baked in at build time: after changing one, **redeploy**.
+
+4. Click **Deploy** and open the `*.vercel.app` URL. Log in with your test number, check the landing page, sample report and `/robots.txt`.
+
+### 3. Connect your domain
+1. Vercel project → **Settings → Domains → Add**, enter `carparakh.in` (and `www.carparakh.in`; let Vercel redirect one to the other).
+2. At your domain registrar add the DNS records Vercel shows (usually an `A` record for the root to `76.76.21.21` and a `CNAME` for `www` to `cname.vercel-dns.com`). HTTPS is issued automatically once DNS resolves (minutes to a few hours).
+3. Set `NEXT_PUBLIC_APP_URL` to `https://<your-domain>` in Vercel and **redeploy**, so shared report links, the sitemap and link previews use your domain.
+4. Supabase → **Authentication → URL Configuration**: set **Site URL** to the same address.
+
+### 4. Point the Razorpay webhook at production
+1. Razorpay Dashboard → **Account & Settings → Webhooks → Add New Webhook** (do it in **Test mode** first, then again in **Live mode**: each mode has its own webhooks).
+2. Webhook URL: `https://<your-domain>/api/razorpay/webhook`
+3. Secret: a long random string (e.g. `openssl rand -hex 32`). Put the same value in Vercel as `RAZORPAY_WEBHOOK_SECRET` and redeploy.
+4. Active events: **order.paid**, **payment.captured**, **payment.failed**. Save.
+5. Test: buy the 10-report pack on the live site in test mode with UPI `success@razorpay`. Credits should appear within seconds; Vercel **Logs** show a `[razorpay] … -> credited` line. Razorpay's webhook page shows each delivery and its response.
+
+### 5. Going live
+- [ ] Complete Razorpay KYC and activation. Razorpay reviews your website: the contact, terms, privacy and refund pages must show your real details. Add your domain under **Account & Settings → Website and app details**.
+- [ ] Generate **live** API keys, put them in Vercel (`RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`), create the live webhook (step 4) and update `RAZORPAY_WEBHOOK_SECRET`. Redeploy.
+- [ ] Real SMS: configure an SMS provider with a DLT-registered sender and template in Supabase (**Authentication → Sign In / Providers → Phone**), and remove or limit the test phone numbers.
+- [ ] Make one real ₹999 purchase, check the credits and the history, then refund it from the Razorpay dashboard if you like.
+- [ ] Rotate any keys that were ever pasted into chats or tickets.
+
 ## Scripts
 | Command | What it does |
 |---|---|
@@ -188,4 +259,5 @@ Chrome only offers **Install app** on HTTPS (or `localhost`), and the service wo
 - Inspection photos are uploaded from the browser to the private `inspection-photos` bucket at `cars/<car_id>/<angle_key>.jpg`. The storage policy allows a path only when the car in it belongs to the signed-in dealer. Thumbnails use signed URLs that expire after 2 hours.
 - Claude is only called from the server (`app/api/photos/[photoId]/analyse`). The route reads the photo as the signed-in dealer, so RLS stops anyone analysing another dealer's photo. `ai_usage` and `ai_usage_by_car` have no dealer access at all; only the service role writes and reads them.
 - Publishing goes through `publish_report`, which only the service role can execute, so a dealer can't publish without spending a credit or with a made-up score. Dealers can change only `hidden_sections` on their own reports.
+- Credits are added only by the Razorpay webhook after the signature check, through `apply_razorpay_payment` (service role only), which locks the order, checks the amount and is idempotent on the payment. The browser can't add credits: Checkout's success callback only starts polling the order's status. Orders are created on the server with the secret key; only the public key id reaches the browser.
 - Public reports and their PDFs are read with the service role by slug, and only when `published_at` is set. Slugs are 10 random characters (about 10^15 possibilities). Photo links on the page expire after 24 hours and PDF download links after 5 minutes.
