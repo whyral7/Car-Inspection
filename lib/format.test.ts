@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { t } from "@/lib/strings";
-import { carTitle, formatDate, isPastDate } from "./format";
+import { carTitle, formatDate, formatRupees, isPastDate } from "./format";
 
 describe("format", () => {
   it("formats a calendar date without shifting the day", () => {
@@ -26,5 +26,14 @@ describe("format", () => {
     [11, "11th owner"],
   ])("owner ordinal %i", (n, expected) => {
     expect(t.cars.ownerOrdinal(n)).toBe(expected);
+  });
+});
+
+describe("formatRupees", () => {
+  it("drops paise for whole rupees and keeps two decimals otherwise", () => {
+    expect(formatRupees(99_900)).toBe("999");
+    expect(formatRupees(249_900)).toBe("2,499");
+    expect(formatRupees(10_000_000)).toBe("1,00,000");
+    expect(formatRupees(8_330)).toBe("83.30");
   });
 });

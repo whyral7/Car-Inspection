@@ -20,3 +20,11 @@ export function isPastDate(isoDate: string, now = new Date()) {
 export function carTitle(car: { year: number | null; make: string | null; model: string | null; variant?: string | null }) {
   return [car.year, car.make, car.model, car.variant].filter(Boolean).join(" ");
 }
+
+const rupeeFormat = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
+const rupeePaiseFormat = new Intl.NumberFormat("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+/** Rupees with Indian grouping, without the symbol: 249900 -> "2,499", 8330 -> "83.30". */
+export function formatRupees(paise: number) {
+  return paise % 100 === 0 ? rupeeFormat.format(paise / 100) : rupeePaiseFormat.format(paise / 100);
+}
