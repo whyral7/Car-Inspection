@@ -21,7 +21,7 @@ export default async function OnboardingPage() {
       <p className="mt-1 text-slate-600">{t.onboarding.subtitle}</p>
       <OnboardingForm
         dealerId={user.id}
-        cancelHref={editing ? "/app" : undefined}
+        cancelHref={editing ? "/app/profile" : undefined}
         initial={{
           owner_name: dealer.owner_name ?? "",
           business_name: dealer.business_name ?? "",

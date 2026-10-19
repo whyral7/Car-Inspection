@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { STORAGE_BUCKETS } from "@/lib/config";
-import { getCurrentDealer } from "@/lib/dealer";
+import { getCurrentDealer, isProfileComplete } from "@/lib/dealer";
 import { t } from "@/lib/strings";
 import { onboardingSchema, type OnboardingField } from "@/lib/validation/dealer";
 
@@ -39,5 +39,6 @@ export async function saveDealerProfile(formData: FormData): Promise<OnboardingS
     await supabase.storage.from(STORAGE_BUCKETS.logos).remove([dealer.logo_path]);
   }
 
-  redirect("/app");
+  // First-time setup goes on to My cars; editing goes back to the profile.
+  redirect(isProfileComplete(dealer) ? "/app/profile" : "/app");
 }

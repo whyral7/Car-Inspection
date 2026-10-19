@@ -16,7 +16,7 @@ export default async function DashboardLayout({ children }: LayoutProps<"/app">)
     <div className="flex flex-1 flex-col">
       <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 pt-[env(safe-area-inset-top)] backdrop-blur">
         <div className="mx-auto flex w-full max-w-2xl items-center gap-3 px-4 py-2">
-          <Link href="/app/onboarding" className="flex min-h-11 min-w-0 flex-1 items-center gap-3" aria-label={t.dashboard.editProfile}>
+          <Link href="/app/profile" className="flex min-h-11 min-w-0 flex-1 items-center gap-3" aria-label={t.profile.title}>
             {logo ? (
               // eslint-disable-next-line @next/next/no-img-element -- small public logo, no need for the image optimiser
               <img src={logo} alt="" className="size-9 shrink-0 rounded-lg border border-slate-200 object-contain" />
@@ -27,7 +27,9 @@ export default async function DashboardLayout({ children }: LayoutProps<"/app">)
             )}
             <span className="truncate font-semibold">{dealer.business_name}</span>
           </Link>
-          <CreditsBadge credits={dealer.credits} />
+          <Link href="/app/credits" className="flex min-h-11 items-center">
+            <CreditsBadge credits={dealer.credits} />
+          </Link>
           <LogoutButton />
         </div>
       </header>
