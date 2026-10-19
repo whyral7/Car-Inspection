@@ -6,9 +6,11 @@ import { z } from "zod";
 import { LinkButton } from "@/components/button";
 import { StatusBadge } from "@/components/status-badge";
 import { FUELS, TRANSMISSIONS, type Fuel, type Transmission } from "@/lib/cars";
+import { checklistProgress } from "@/lib/checklist";
 import { getCurrentDealer } from "@/lib/dealer";
 import { carTitle, formatDate, formatDateTime, isPastDate } from "@/lib/format";
-import { ANGLES } from "@/lib/photos/angles";
+import { photoProgress } from "@/lib/photos/angles";
+import { conditionScore, formatScore } from "@/lib/score";
 import { t } from "@/lib/strings";
 
 const getCar = cache(async (id: string) => {
@@ -33,9 +35,54 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
   const { id } = await params;
   const car = await getCar(id);
   const { supabase } = await getCurrentDealer();
-  const { count: photoCount, error: photoError } = await supabase.from("inspection_photos").select("id", { count: "exact", head: true }).eq("car_id", car.id);
-  if (photoError) throw photoError;
-  const photosTaken = photoCount ?? 0;
+  const [photosRes, findingsRes, checklistRes] = await Promise.all([
+    supabase.from("inspection_photos").select("angle_key, ai_status").eq("car_id", car.id),
+    supabase.from("findings").select("severity, accepted").eq("car_id", car.id),
+    supabase.from("checklist_items").select("item_key, result").eq("car_id", car.id),
+  ]);
+  if (photosRes.error) throw photosRes.error;
+  if (findingsRes.error) throw findingsRes.error;
+  if (checklistRes.error) throw checklistRes.error;
+
+  const photos = photoProgress(photosRes.data.map((p) => p.angle_key));
+  const findings = findingsRes.data;
+  const toReview = findings.filter((f) => !f.accepted).length;
+  // Every photo has been through the AI (an unclear photo counts; the dealer decides whether to retake).
+  const analysed = photos.done > 0 && photosRes.data.every((p) => p.ai_status === "done" || p.ai_status === "unclear");
+  const findingsDone = analysed && toReview === 0;
+  const checklist = checklistProgress(checklistRes.data.map((c) => c.item_key));
+  const started = photos.done > 0 || findings.length > 0 || checklist.done > 0;
+  const score = conditionScore({ findings, checklist: checklistRes.data });
+
+  const steps = [
+    {
+      href: `/app/cars/${car.id}/inspect`,
+      title: t.car.stepPhotos,
+      status: t.car.photosTaken(photos.done, photos.total),
+      done: photos.allRequiredDone,
+    },
+    {
+      href: `/app/cars/${car.id}/findings`,
+      title: t.car.stepFindings,
+      status: toReview > 0 ? t.car.findingsToReview(toReview) : findings.length > 0 ? t.car.findingsAccepted(findings.length) : t.car.findingsNone,
+      done: findingsDone,
+      warn: toReview > 0,
+    },
+    {
+      href: `/app/cars/${car.id}/checklist`,
+      title: t.car.stepChecklist,
+      status: t.car.checklistProgress(checklist.done, checklist.total),
+      done: checklist.complete,
+    },
+  ];
+  // The main button points at the first unfinished step.
+  const next = !photos.allRequiredDone
+    ? { href: steps[0].href, label: photos.done === 0 ? t.car.startInspection : t.car.continueInspection }
+    : !findingsDone
+      ? { href: steps[1].href, label: t.car.reviewFindings }
+      : !checklist.complete
+        ? { href: steps[2].href, label: t.car.fillChecklist }
+        : null;
 
   const insuranceExpired = car.insurance_valid_upto ? isPastDate(car.insurance_valid_upto) : false;
   const rows: { label: string; value: string | null; warn?: boolean }[] = [
@@ -43,6 +90,7 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
     { label: t.cars.transmission, value: isTransmission(car.transmission) ? t.cars.transmissions[car.transmission] : car.transmission },
     { label: t.cars.year, value: car.year?.toString() ?? null },
     { label: t.cars.owners, value: car.owners ? t.cars.ownerOrdinal(car.owners) : null },
+    { label: t.car.odometer, value: car.odometer_km !== null ? t.car.km(car.odometer_km) : null },
     {
       label: t.cars.insurance,
       value: car.insurance_valid_upto && `${formatDate(car.insurance_valid_upto)}${insuranceExpired ? ` (${t.car.expired})` : ""}`,
@@ -78,10 +126,46 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
         </dl>
       </section>
 
+      {started && (
+        <section className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5" aria-label={`${t.car.score} ${formatScore(score)} ${t.car.scoreOutOf}`}>
+          <p className="shrink-0 text-4xl font-bold text-brand-800">
+            {formatScore(score)}
+            <span className="text-base font-medium text-slate-500">{t.car.scoreOutOf}</span>
+          </p>
+          <div>
+            <h2 className="font-semibold">{t.car.score}</h2>
+            <p className="text-sm text-slate-500">{t.car.scoreHint}</p>
+          </div>
+        </section>
+      )}
+
+      <section className="rounded-2xl border border-slate-200 bg-white">
+        <h2 className="px-5 pt-4 pb-1 font-semibold">{t.car.steps}</h2>
+        <ol className="divide-y divide-slate-100">
+          {steps.map((step, i) => (
+            <li key={step.href}>
+              <Link href={step.href} className="flex min-h-16 items-center gap-3 px-5 py-3 active:bg-slate-50">
+                <span
+                  className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                    step.done ? "bg-brand-700 text-white" : step.warn ? "bg-amber-100 text-amber-800" : "bg-slate-100 text-slate-700"
+                  }`}
+                >
+                  {step.done ? "✓" : i + 1}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-medium">{step.title}</span>
+                  <span className={`block text-sm ${step.warn ? "text-amber-800" : "text-slate-500"}`}>{step.status}</span>
+                </span>
+                <span aria-hidden="true" className="text-slate-400">›</span>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      </section>
+
       <div className="flex flex-col gap-2">
-        <LinkButton href={`/app/cars/${car.id}/inspect`}>{car.status === "draft" && photosTaken === 0 ? t.car.startInspection : t.car.continueInspection}</LinkButton>
-        {photosTaken > 0 && <p className="text-center text-sm font-medium text-slate-700">{t.car.photosTaken(photosTaken, ANGLES.length)}</p>}
-        <p className="text-center text-sm text-slate-500">{t.car.inspectionHint}</p>
+        {next ? <LinkButton href={next.href}>{next.label}</LinkButton> : <p className="text-center font-medium text-brand-800">✓ {t.car.inspectionDone}</p>}
+        {photos.done === 0 && <p className="text-center text-sm text-slate-500">{t.car.inspectionHint}</p>}
       </div>
 
       <p className="text-center text-xs text-slate-500">{t.disclaimer}</p>
