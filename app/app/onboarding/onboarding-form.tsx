@@ -121,11 +121,22 @@ export function OnboardingForm({ dealerId, initial, cancelHref }: { dealerId: st
     });
   }
 
+  // Clear a field's error as soon as the dealer edits it.
+  function clearFieldError(name: string) {
+    if (!state.fieldErrors?.[name as keyof typeof errors]) return;
+    setState((s) => ({ ...s, fieldErrors: { ...s.fieldErrors, [name]: undefined } }));
+  }
+
   const busy = uploading || isPending;
   const errors = state.fieldErrors ?? {};
 
   return (
-    <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-5" noValidate>
+    <form
+      onSubmit={onSubmit}
+      onInput={(e) => clearFieldError((e.target as HTMLInputElement).name)}
+      className="mt-6 flex flex-col gap-5"
+      noValidate
+    >
       <Field label={t.onboarding.ownerName} name="owner_name" autoComplete="name" defaultValue={initial.owner_name} error={errors.owner_name} required />
       <Field
         label={t.onboarding.businessName}

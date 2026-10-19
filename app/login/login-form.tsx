@@ -152,7 +152,7 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
         <Button
           type="button"
           variant="ghost"
-          className="px-2"
+          className="px-2 text-sm whitespace-nowrap"
           onClick={() => {
             setStep("phone");
             setError(null);
@@ -161,7 +161,7 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
         >
           {t.login.changeNumber}
         </Button>
-        <Button type="button" variant="ghost" className="px-2" disabled={resendIn > 0 || pending} onClick={() => sendOtp(phone)}>
+        <Button type="button" variant="ghost" className="px-2 text-sm whitespace-nowrap" disabled={resendIn > 0 || pending} onClick={() => sendOtp(phone)}>
           {resendIn > 0 ? t.login.resendIn(resendIn) : t.login.resend}
         </Button>
       </div>

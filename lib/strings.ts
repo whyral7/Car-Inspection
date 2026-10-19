@@ -75,6 +75,8 @@ export const en = {
     emptyBody: "Add your first car to start an inspection. It takes about 10 minutes.",
     credits: "Report credits",
     creditsLeft: (n: number) => (n === 1 ? "1 report left" : `${n} reports left`),
+    creditsShort: (n: number) => (n === 1 ? "1 credit" : `${n} credits`),
+    creditsHint: "1 credit = 1 published report",
     editProfile: "Edit profile",
     status: {
       draft: "Draft",

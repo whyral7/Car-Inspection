@@ -20,7 +20,7 @@ export default async function AppHome() {
           <p className="text-sm text-brand-100">{t.dashboard.credits}</p>
           <p className="text-3xl font-bold">{dealer.credits}</p>
         </div>
-        <p className="text-right text-sm text-brand-100">{t.dashboard.creditsLeft(dealer.credits)}</p>
+        <p className="max-w-[45%] text-right text-sm text-brand-100">{t.dashboard.creditsHint}</p>
       </section>
 
       <section>
