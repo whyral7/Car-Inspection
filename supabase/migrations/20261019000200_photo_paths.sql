@@ -14,7 +14,6 @@ $$;
 revoke execute on function private.photo_car_id(text) from public, anon;
 grant execute on function private.photo_car_id(text) to authenticated;
 
-drop policy photos_rw_own on storage.objects;
-create policy photos_rw_own on storage.objects for all to authenticated
+alter policy photos_rw_own on storage.objects
   using (bucket_id = 'inspection-photos' and private.owns_car(private.photo_car_id(name)))
   with check (bucket_id = 'inspection-photos' and private.owns_car(private.photo_car_id(name)));

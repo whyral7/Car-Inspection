@@ -5,7 +5,8 @@ import { serverEnv } from "@/lib/env.server";
 // Razorpay REST API over fetch (no SDK needed for one call). Keys stay on the server.
 // https://razorpay.com/docs/api/orders/create/
 
-const API = "https://api.razorpay.com/v1";
+// RAZORPAY_API_URL is only for pointing local end-to-end tests at a stand-in server. Leave it unset.
+const API = process.env.RAZORPAY_API_URL || "https://api.razorpay.com/v1";
 const TIMEOUT_MS = 15_000;
 
 const orderSchema = z.object({
