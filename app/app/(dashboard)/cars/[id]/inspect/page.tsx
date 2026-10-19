@@ -1,16 +1,40 @@
-import { LinkButton } from "@/components/button";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { z } from "zod";
+import { PHOTO, STORAGE_BUCKETS } from "@/lib/config";
+import { getCurrentDealer } from "@/lib/dealer";
+import { carTitle } from "@/lib/format";
+import { isAngleKey } from "@/lib/photos/angles";
 import { t } from "@/lib/strings";
+import { PhotoCapture, type InitialPhoto } from "./photo-capture";
 
-// Placeholder so "Start inspection" works. Replaced in Phase 3.
+export const metadata: Metadata = { title: t.photos.title };
+
 export default async function InspectPage({ params }: PageProps<"/app/cars/[id]/inspect">) {
   const { id } = await params;
-  return (
-    <div className="flex flex-col items-center gap-4 py-12 text-center">
-      <h1 className="text-xl font-bold">{t.comingSoon.title}</h1>
-      <p className="text-slate-600">{t.comingSoon.body}</p>
-      <LinkButton href={`/app/cars/${id}`} variant="secondary">
-        {t.common.back}
-      </LinkButton>
-    </div>
-  );
+  if (!z.uuid().safeParse(id).success) notFound();
+
+  const { supabase } = await getCurrentDealer();
+  // RLS limits both queries to the dealer's own cars.
+  const { data: car, error: carError } = await supabase.from("cars").select("id, reg_number, make, model, variant, year").eq("id", id).maybeSingle();
+  if (carError) throw carError;
+  if (!car) notFound();
+
+  const { data: rows, error: photosError } = await supabase.from("inspection_photos").select("angle_key, storage_path").eq("car_id", id);
+  if (photosError) throw photosError;
+  const photos = rows.flatMap((r) => (isAngleKey(r.angle_key) ? [{ angleKey: r.angle_key, path: r.storage_path }] : []));
+
+  // The bucket is private, so thumbnails go through short-lived signed URLs.
+  const urlByPath = new Map<string, string>();
+  if (photos.length > 0) {
+    const { data: signed, error: signError } = await supabase.storage.from(STORAGE_BUCKETS.inspectionPhotos).createSignedUrls(
+      photos.map((p) => p.path),
+      PHOTO.signedUrlSeconds,
+    );
+    if (signError) throw signError;
+    for (const s of signed) if (s.path && s.signedUrl) urlByPath.set(s.path, s.signedUrl);
+  }
+  const initialPhotos: InitialPhoto[] = photos.map((p) => ({ angleKey: p.angleKey, url: urlByPath.get(p.path) ?? null }));
+
+  return <PhotoCapture carId={car.id} regNumber={car.reg_number} carTitle={carTitle(car)} initialPhotos={initialPhotos} />;
 }

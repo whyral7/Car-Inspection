@@ -8,6 +8,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { FUELS, TRANSMISSIONS, type Fuel, type Transmission } from "@/lib/cars";
 import { getCurrentDealer } from "@/lib/dealer";
 import { carTitle, formatDate, formatDateTime, isPastDate } from "@/lib/format";
+import { ANGLES } from "@/lib/photos/angles";
 import { t } from "@/lib/strings";
 
 const getCar = cache(async (id: string) => {
@@ -31,6 +32,10 @@ const isTransmission = (v: string | null): v is Transmission => (TRANSMISSIONS a
 export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
   const { id } = await params;
   const car = await getCar(id);
+  const { supabase } = await getCurrentDealer();
+  const { count: photoCount, error: photoError } = await supabase.from("inspection_photos").select("id", { count: "exact", head: true }).eq("car_id", car.id);
+  if (photoError) throw photoError;
+  const photosTaken = photoCount ?? 0;
 
   const insuranceExpired = car.insurance_valid_upto ? isPastDate(car.insurance_valid_upto) : false;
   const rows: { label: string; value: string | null; warn?: boolean }[] = [
@@ -74,7 +79,8 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
       </section>
 
       <div className="flex flex-col gap-2">
-        <LinkButton href={`/app/cars/${car.id}/inspect`}>{car.status === "draft" ? t.car.startInspection : t.car.continueInspection}</LinkButton>
+        <LinkButton href={`/app/cars/${car.id}/inspect`}>{car.status === "draft" && photosTaken === 0 ? t.car.startInspection : t.car.continueInspection}</LinkButton>
+        {photosTaken > 0 && <p className="text-center text-sm font-medium text-slate-700">{t.car.photosTaken(photosTaken, ANGLES.length)}</p>}
         <p className="text-center text-sm text-slate-500">{t.car.inspectionHint}</p>
       </div>
 
