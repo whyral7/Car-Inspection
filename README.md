@@ -6,11 +6,11 @@ Mobile-first PWA for small Indian used-car dealers: add a car, shoot 20 guided p
 
 See [CLAUDE.md](CLAUDE.md) for the product spec, data model and conventions.
 
-**Status:** Phase 4 (AI damage notes, checklist and score) done. Phase 1 gave phone OTP login, dealer onboarding with logo, "My cars" home with credits and an installable PWA. Phase 2 added: add a car by number plate with RC lookup (mock provider) or manual entry, car detail page, and status badges. Phase 3 added: guided capture of the 20 photo angles, in-browser compression, upload with retries, a thumbnail grid, retake and resume. Phase 4 adds: Claude vision checks every photo for visible damage (4 at a time), a review screen to accept, edit, delete or add notes, odometer prefill from the odometer photo, the 19-item checklist, a live condition score, and per-car token and cost logging.
+**Status:** Phase 5 (report, PDF, public link and WhatsApp sharing) done. Phase 1 gave phone OTP login, dealer onboarding with logo, "My cars" home with credits and an installable PWA. Phase 2 added: add a car by number plate with RC lookup (mock provider) or manual entry, car detail page, and status badges. Phase 3 added: guided capture of the 20 photo angles, in-browser compression, upload with retries, a thumbnail grid, retake and resume. Phase 4 adds: Claude vision checks every photo for visible damage (4 at a time), a review screen to accept, edit, delete or add notes, odometer prefill from the odometer photo, the 19-item checklist, a live condition score, and per-car token and cost logging. Phase 5 adds: a report preview where the dealer hides sections, publishing for 1 credit (blocked with a "Buy credits" button at 0), a public report page at `/r/<slug>` with a WhatsApp link preview image, a matching PDF stored in Supabase Storage, and "Share on WhatsApp".
 
 ## Stack
 
-Next.js 16 (App Router) · TypeScript (strict) · Tailwind CSS v4 · Supabase (phone OTP auth, Postgres, Storage, RLS) · Anthropic API (Claude vision) · zod · vitest. Later phases add @react-pdf/renderer and Razorpay.
+Next.js 16 (App Router) · TypeScript (strict) · Tailwind CSS v4 · Supabase (phone OTP auth, Postgres, Storage, RLS) · Anthropic API (Claude vision) · zod · @react-pdf/renderer · vitest. Phase 6 adds Razorpay.
 
 > Next.js 16 renamed `middleware.ts` to `proxy.ts`. Ours refreshes the Supabase session and protects `/app/*`.
 
@@ -27,6 +27,11 @@ app/                    routes (App Router)
     cars/[id]/inspect/  guided photo capture (server page + client PhotoCapture); ?angle=<key> opens one photo
     cars/[id]/findings/ AI damage notes review + odometer confirm
     cars/[id]/checklist/ 19-item checklist, saved on every tap
+    cars/[id]/report/   preview, hide sections, publish (1 credit), share link + PDF
+    credits/            credit packs (checkout comes in Phase 6)
+  r/[slug]/             public report for buyers (no login)
+    og.png/             1200x630 link preview image for WhatsApp
+    pdf/                builds the PDF if the report changed, then redirects to a download link
   api/photos/[photoId]/analyse/  POST: analyse one photo with Claude, save notes, log tokens
   manifest.ts           PWA manifest
 components/             shared UI (angle-hint.tsx: SVG outline per photo angle)
@@ -44,6 +49,10 @@ lib/
   score.ts              condition score (+ tests)
   checklist.ts, findings.ts  checklist items and finding vocabulary
   concurrency.ts        run N tasks at a time (+ tests)
+  report/               view.ts (one report model for page, PDF and preview image, + tests), load.ts,
+                        pdf.tsx + pdf-store.tsx (render and store PDFs), og-image.tsx, slug.ts, share.ts (wa.me/tel links)
+  url.ts                public base URL for shared links
+assets/fonts/           Geist (OFL) for the PDF and preview image
 proxy.ts                session refresh + /app protection
 public/                 icons, service worker
 supabase/migrations/    SQL schema, RLS, storage buckets
@@ -105,12 +114,31 @@ Prices live in `lib/ai/pricing.ts`; an unknown model is logged with `cost_usd` e
 ### Condition score
 `lib/score.ts`, exactly as in CLAUDE.md: start at 10, minus 0.3 / 0.8 / 1.5 per accepted minor / moderate / major note, minus 0.3 per checklist "Attention" and 1.0 per "Fail", clamped to 1.0-10.0 and rounded to one decimal. Unaccepted notes don't count. It's calculated in tenths so there's no floating point drift. The car page shows it live; **Finish inspection** on the checklist (all 19 answered) marks the car Inspected.
 
+### Reports
+**Preview and publish** (`/app/cars/<id>/report`, opened from the car page once the checklist is finished). The dealer sees exactly what buyers will see and can switch off Photos, Damage notes, Checklist or Documents. Only accepted damage notes appear; the score always counts everything. **Publish report** costs 1 credit: the server works out the score from the dealer's own rows, then `publish_report` (a database function only the service role can run) takes the credit, creates the report with a random 10-character slug and marks the car Published in one transaction. Two cars racing for the last credit, or a double tap, can't spend more than one. Publishing again is free and keeps the same link. With 0 credits the button becomes **Buy credits** (packs from `CREDIT_PACKS` in `lib/config.ts`).
+
+**Live report.** `/r/<slug>` reads the car's current notes, checklist and photos, so fixes after publishing show straight away without another credit. Hidden sections are removed on the server and never sent to the buyer's browser. The page is `noindex`.
+
+**Photos.** Each new photo also uploads a 640 px copy to `cars/<id>/small/` (about 60 KB) for the gallery and PDF; tapping opens the full photo. Photos taken before Phase 5 have no small copy, so the report uses the full one.
+
+**PDF.** Stored privately in the `reports` bucket at `<car_id>/<content hash>.pdf`. It's built in the background right after publishing, and `/r/<slug>/pdf` rebuilds it only when something on the report changed, then redirects to a 5-minute download link. Bump `REPORT.pdfVersion` after changing the layout.
+
+**Share links** use `NEXT_PUBLIC_APP_URL`, or the address the page was opened on when that's empty. Set it to your real public URL (e.g. `https://carparakh.vercel.app`) in Vercel, otherwise shared links point wherever the dealer happened to open the app.
+
+### Checking the WhatsApp link preview
+WhatsApp only previews public **HTTPS** links, so `localhost` and LAN IPs won't work.
+1. Get a public URL: deploy to Vercel (preview deployments are fine), or run `npm run build && npm start` and expose it with a tunnel such as `npx cloudflared tunnel --url http://localhost:3000`. Set `NEXT_PUBLIC_APP_URL` to that URL and restart (or leave it empty so links follow the address you open).
+2. Publish a report and tap **Copy link**.
+3. Check the tags first: open `https://<your-url>/r/<slug>/og.png` (a 1200x630 card with the score), then paste the report link into [opengraph.xyz](https://www.opengraph.xyz) or the [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) (WhatsApp uses the same Open Graph tags). You should see the title "<car> · Condition 8.4/10", the description and the card.
+4. Paste the link into any WhatsApp chat (e.g. "Message yourself") and wait for the preview to appear before sending.
+5. WhatsApp caches previews per link for a long time. If you fixed something, you won't see it on a link already shared: test with another report, or add `?v=2` to the link.
+
 ### 3. Create the database
 Pick one:
 - **Dashboard:** open **SQL Editor** and run each file in `supabase/migrations/` in name order.
 - **CLI:** `npx supabase login`, `npx supabase link --project-ref <your-ref>`, then `npx supabase db push`.
 
-This creates all tables with Row Level Security, a trigger that gives each new dealer 3 free credits, and two storage buckets: `logos` (public) and `inspection-photos` (private). If you set the database up before Phase 3, run `20261019000200_photo_paths.sql` too: photo uploads fail without it. For Phase 4 run `20261019000300_ai_analysis.sql`: it adds the `ai_usage` table, the `save_photo_analysis` function and a version stamp on photos.
+This creates all tables with Row Level Security, a trigger that gives each new dealer 3 free credits, and two storage buckets: `logos` (public) and `inspection-photos` (private). If you set the database up before Phase 3, run `20261019000200_photo_paths.sql` too: photo uploads fail without it. For Phase 4 run `20261019000300_ai_analysis.sql`: it adds the `ai_usage` table, the `save_photo_analysis` function and a version stamp on photos. For Phase 5 run `20261019000400_reports.sql`: it adds the `reports` bucket, the `publish_report` function and checks on report slugs and hidden sections.
 
 ### 4. Turn on phone login
 In Supabase go to **Authentication → Sign In / Providers → Phone** and enable it.
@@ -159,3 +187,5 @@ Chrome only offers **Install app** on HTTPS (or `localhost`), and the service wo
 - Logos are uploaded straight from the browser into the dealer's own folder (`logos/<dealer_id>/…`), which storage policies enforce.
 - Inspection photos are uploaded from the browser to the private `inspection-photos` bucket at `cars/<car_id>/<angle_key>.jpg`. The storage policy allows a path only when the car in it belongs to the signed-in dealer. Thumbnails use signed URLs that expire after 2 hours.
 - Claude is only called from the server (`app/api/photos/[photoId]/analyse`). The route reads the photo as the signed-in dealer, so RLS stops anyone analysing another dealer's photo. `ai_usage` and `ai_usage_by_car` have no dealer access at all; only the service role writes and reads them.
+- Publishing goes through `publish_report`, which only the service role can execute, so a dealer can't publish without spending a credit or with a made-up score. Dealers can change only `hidden_sections` on their own reports.
+- Public reports and their PDFs are read with the service role by slug, and only when `published_at` is set. Slugs are 10 random characters (about 10^15 possibilities). Photo links on the page expire after 24 hours and PDF download links after 5 minutes.
