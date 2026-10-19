@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { getCurrentDealer } from "@/lib/dealer";
+import { getCurrentProfile } from "@/lib/profile";
 import { t } from "@/lib/strings";
 import type { FindingRow } from "@/lib/supabase/database.types";
 import { findingInputSchema, odometerSchema, type FindingField } from "@/lib/validation/finding";
@@ -15,14 +15,14 @@ export type ActionResult = { ok: true } | { ok: false; error: string };
 export async function setFindingsAccepted(findingIds: string[], accepted: boolean): Promise<ActionResult> {
   const ids = z.array(id).min(1).max(500).safeParse(findingIds);
   if (!ids.success) return { ok: false, error: t.common.somethingWrong };
-  const { supabase } = await getCurrentDealer();
+  const { supabase } = await getCurrentProfile();
   const { error } = await supabase.from("findings").update({ accepted }).in("id", ids.data);
   return error ? { ok: false, error: t.findings.errors.save } : { ok: true };
 }
 
 export async function deleteFinding(findingId: string): Promise<ActionResult> {
   if (!id.safeParse(findingId).success) return { ok: false, error: t.common.somethingWrong };
-  const { supabase } = await getCurrentDealer();
+  const { supabase } = await getCurrentProfile();
   const { error } = await supabase.from("findings").delete().eq("id", findingId);
   return error ? { ok: false, error: t.findings.errors.save } : { ok: true };
 }
@@ -49,7 +49,7 @@ export async function saveFinding(input: FindingFormInput & { carId: string; pho
     return { ok: false, fieldErrors };
   }
 
-  const { supabase } = await getCurrentDealer();
+  const { supabase } = await getCurrentProfile();
   const { carId, photoId, findingId } = ids.data;
 
   if (findingId) {
@@ -74,7 +74,7 @@ export async function confirmOdometer(carId: string, km: string | number): Promi
   if (!id.safeParse(carId).success) return { ok: false, error: t.common.somethingWrong };
   const parsed = odometerSchema.safeParse(km);
   if (!parsed.success) return { ok: false, error: t.findings.errors.odometer };
-  const { supabase } = await getCurrentDealer();
+  const { supabase } = await getCurrentProfile();
   const { data, error } = await supabase.from("cars").update({ odometer_km: parsed.data }).eq("id", carId).select("id");
   if (error || data.length === 0) return { ok: false, error: t.findings.errors.save };
   return { ok: true, km: parsed.data };

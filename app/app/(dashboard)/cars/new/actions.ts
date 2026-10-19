@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { getCurrentDealer } from "@/lib/dealer";
+import { getCurrentProfile } from "@/lib/profile";
 import { lookupRc } from "@/lib/rc";
 import { t } from "@/lib/strings";
 import type { Json } from "@/lib/supabase/database.types";
@@ -42,7 +42,7 @@ const emptyValues: CarFormValues = {
 
 /** Validates the number, checks for a duplicate and, unless `manual`, looks it up on the RC provider. */
 export async function lookupRegNumber(input: string, manual = false): Promise<LookupState> {
-  const { supabase } = await getCurrentDealer();
+  const { supabase } = await getCurrentProfile();
 
   const parsed = regNumberSchema.safeParse(input);
   if (!parsed.success) return { error: t.cars.errors.regNumber };
@@ -81,7 +81,7 @@ export type CreateCarState = {
 };
 
 export async function createCar(input: CarFormValues & { reg_number: string; rc_raw: Record<string, unknown> | null }): Promise<CreateCarState> {
-  const { supabase } = await getCurrentDealer();
+  const { supabase } = await getCurrentProfile();
 
   const parsed = newCarSchema.safeParse(input);
   if (!parsed.success) {

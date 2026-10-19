@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { LinkButton } from "@/components/button";
 import { FREE_CREDITS } from "@/lib/config";
 import { buildCreditHistory, totalBought, totalUsed, type CreditEntry } from "@/lib/credits/history";
-import { getCurrentDealer } from "@/lib/dealer";
 import { carTitle, formatDateTime, formatRupees } from "@/lib/format";
+import { displayName, getCurrentProfile } from "@/lib/profile";
 import { formatPhone } from "@/lib/report/share";
 import { logoUrl } from "@/lib/storage";
 import { t } from "@/lib/strings";
@@ -22,7 +22,7 @@ function entryLabel(entry: CreditEntry) {
 }
 
 export default async function ProfilePage() {
-  const { supabase, dealer } = await getCurrentDealer();
+  const { supabase, profile } = await getCurrentProfile();
   // RLS limits both to this dealer's rows.
   const [paymentsRes, reportsRes, carsRes] = await Promise.all([
     supabase
@@ -39,7 +39,7 @@ export default async function ProfilePage() {
 
   const cars = new Map(carsRes.data.map((c) => [c.id, c]));
   const history = buildCreditHistory({
-    dealerCreatedAt: dealer.created_at,
+    dealerCreatedAt: profile.created_at,
     freeCredits: FREE_CREDITS,
     payments: paymentsRes.data,
     reports: reportsRes.data.map((r) => {
@@ -48,8 +48,10 @@ export default async function ProfilePage() {
     }),
   });
 
-  const logo = logoUrl(dealer.logo_path);
-  const phone = formatPhone(dealer.phone);
+  const isDealer = profile.user_type === "dealer";
+  const logo = isDealer ? logoUrl(profile.logo_path) : null;
+  const name = displayName(profile);
+  const phone = formatPhone(profile.phone);
 
   return (
     <div className="flex flex-col gap-6">
@@ -60,27 +62,37 @@ export default async function ProfilePage() {
             <img src={logo} alt="" className="size-14 shrink-0 rounded-xl border border-slate-200 object-contain" />
           ) : (
             <span className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-brand-700 text-xl font-bold text-white">
-              {dealer.business_name?.charAt(0).toUpperCase()}
+              {name.charAt(0).toUpperCase()}
             </span>
           )}
           <div className="min-w-0">
-            <h1 className="truncate text-xl font-bold">{dealer.business_name}</h1>
-            {dealer.city && <p className="text-slate-600">{dealer.city}</p>}
+            <h1 className="truncate text-xl font-bold">{name}</h1>
+            {profile.city && <p className="text-slate-600">{profile.city}</p>}
           </div>
         </div>
         <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-          <dt className="text-slate-500">{t.profile.owner}</dt>
-          <dd>{dealer.owner_name}</dd>
+          {profile.user_type && (
+            <>
+              <dt className="text-slate-500">{t.profile.userType}</dt>
+              <dd>{t.onboarding.userTypes[profile.user_type]}</dd>
+            </>
+          )}
+          {profile.owner_name && profile.owner_name !== name && (
+            <>
+              <dt className="text-slate-500">{t.profile.owner}</dt>
+              <dd>{profile.owner_name}</dd>
+            </>
+          )}
           {phone && (
             <>
               <dt className="text-slate-500">{t.profile.phone}</dt>
               <dd>{phone}</dd>
             </>
           )}
-          {dealer.address && (
+          {isDealer && profile.address && (
             <>
               <dt className="text-slate-500">{t.profile.address}</dt>
-              <dd className="whitespace-pre-line">{dealer.address}</dd>
+              <dd className="whitespace-pre-line">{profile.address}</dd>
             </>
           )}
         </dl>
@@ -91,7 +103,7 @@ export default async function ProfilePage() {
 
       <section className="rounded-2xl bg-brand-700 p-5 text-white">
         <p className="text-sm text-brand-100">{t.profile.creditsTitle}</p>
-        <p className="text-3xl font-bold">{t.profile.balance(dealer.credits)}</p>
+        <p className="text-3xl font-bold">{t.profile.balance(profile.credits)}</p>
         <p className="mt-1 text-sm text-brand-100">
           {t.profile.bought(totalBought(history))} · {t.profile.used(totalUsed(history))}
         </p>

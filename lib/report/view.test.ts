@@ -4,7 +4,7 @@ import { applyHidden, buildReportView, hiddenSectionsSchema, parseHiddenSections
 const input = (patch: Partial<ReportInput> = {}): ReportInput => ({
   slug: "k7m2p9xa4c",
   publishedAt: "2026-10-19T06:30:00Z",
-  dealer: { business_name: "Sharma Motors", owner_name: "Ravi Sharma", phone: "919876543210", city: "Pune", address: "FC Road", logoUrl: null },
+  dealer: { user_type: "dealer", business_name: "Sharma Motors", owner_name: "Ravi Sharma", phone: "919876543210", city: "Pune", address: "FC Road", logoUrl: null },
   car: {
     reg_number: "MH12AB1234",
     make: "Maruti Suzuki",
@@ -93,6 +93,48 @@ describe("buildReportView", () => {
     expect(view.checklist).not.toBeNull();
     expect(view.score).toBe(6.6);
     expect(view.hidden).toEqual(["photos", "findings"]);
+  });
+
+  it("shows a dealer's business name, owner, address and logo", () => {
+    const base = input();
+    const view = buildReportView(input({ dealer: { ...base.dealer, logoUrl: "https://img/logo.png" } }), [], now);
+    expect(view.dealer).toEqual({
+      userType: "dealer",
+      name: "Sharma Motors",
+      ownerName: "Ravi Sharma",
+      city: "Pune",
+      address: "FC Road",
+      phone: "919876543210",
+      logoUrl: "https://img/logo.png",
+    });
+  });
+
+  it("uses a dealer's own name when they haven't set a business name", () => {
+    const base = input();
+    const view = buildReportView(input({ dealer: { ...base.dealer, business_name: null } }), [], now);
+    expect(view.dealer).toMatchObject({ name: "Ravi Sharma", ownerName: null });
+  });
+
+  it.each(["car_owner", "buyer"] as const)("shows only the person's name and city for a %s", (user_type) => {
+    const base = input();
+    // Leftover dealer details (e.g. after switching type) never reach the report.
+    const view = buildReportView(input({ dealer: { ...base.dealer, user_type, logoUrl: "https://img/logo.png" } }), [], now);
+    expect(view.dealer).toEqual({ userType: user_type, name: "Ravi Sharma", ownerName: null, city: "Pune", address: null, phone: "919876543210", logoUrl: null });
+  });
+
+  it("treats a profile from before user types as a dealer", () => {
+    const base = input();
+    const view = buildReportView(input({ dealer: { ...base.dealer, user_type: null } }), [], now);
+    expect(view.dealer).toMatchObject({ userType: "dealer", name: "Sharma Motors" });
+  });
+
+  it("says who typed in the car details when they didn't come from the RC", () => {
+    const base = input();
+    const rcRow = (user_type: "dealer" | "car_owner" | "buyer") =>
+      buildReportView(input({ dealer: { ...base.dealer, user_type }, car: { ...base.car, fromRc: false } }), [], now).documents?.rows[0].value;
+    expect(rcRow("dealer")).toBe("Entered by the dealer");
+    expect(rcRow("car_owner")).toBe("Entered by the owner");
+    expect(rcRow("buyer")).toBe("Entered by hand");
   });
 });
 

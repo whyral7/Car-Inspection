@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { PHOTO, STORAGE_BUCKETS } from "@/lib/config";
-import { getCurrentDealer } from "@/lib/dealer";
 import { carTitle } from "@/lib/format";
 import { ANGLES, isAngleKey } from "@/lib/photos/angles";
+import { getCurrentProfile } from "@/lib/profile";
 import { t } from "@/lib/strings";
 import { PhotoCapture, type InitialPhoto } from "./photo-capture";
 
@@ -17,7 +17,7 @@ export default async function InspectPage({ params, searchParams }: PageProps<"/
   const startAt = typeof angle === "string" && isAngleKey(angle) ? ANGLES.findIndex((a) => a.key === angle) : null;
   if (!z.uuid().safeParse(id).success) notFound();
 
-  const { supabase } = await getCurrentDealer();
+  const { supabase } = await getCurrentProfile();
   // RLS limits both queries to the dealer's own cars.
   const { data: car, error: carError } = await supabase.from("cars").select("id, reg_number, make, model, variant, year").eq("id", id).maybeSingle();
   if (carError) throw carError;

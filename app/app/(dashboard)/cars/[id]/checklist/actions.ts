@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { CHECKLIST_KEYS, checklistProgress } from "@/lib/checklist";
-import { getCurrentDealer } from "@/lib/dealer";
+import { getCurrentProfile } from "@/lib/profile";
 import { t } from "@/lib/strings";
 import { checklistItemSchema } from "@/lib/validation/finding";
 
@@ -16,7 +16,7 @@ export async function saveChecklistItem(carId: string, input: { item_key: string
   const parsed = checklistItemSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? t.common.somethingWrong };
 
-  const { supabase } = await getCurrentDealer();
+  const { supabase } = await getCurrentProfile();
   const { error } = await supabase.from("checklist_items").upsert({ car_id: carId, ...parsed.data }, { onConflict: "car_id,item_key" });
   return error ? { ok: false, error: t.checklist.saveFailed } : { ok: true };
 }
@@ -24,7 +24,7 @@ export async function saveChecklistItem(carId: string, input: { item_key: string
 /** Marks a draft car as inspected once every checklist item has an answer. */
 export async function finishInspection(carId: string): Promise<ChecklistActionResult> {
   if (!z.uuid().safeParse(carId).success) return { ok: false, error: t.common.somethingWrong };
-  const { supabase } = await getCurrentDealer();
+  const { supabase } = await getCurrentProfile();
 
   const { data: items, error } = await supabase.from("checklist_items").select("item_key").eq("car_id", carId).in("item_key", [...CHECKLIST_KEYS]);
   if (error) return { ok: false, error: t.common.somethingWrong };

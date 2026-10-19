@@ -2,19 +2,20 @@
 
 import { redirect } from "next/navigation";
 import { STORAGE_BUCKETS } from "@/lib/config";
-import { getCurrentDealer, isProfileComplete } from "@/lib/dealer";
+import { getCurrentProfile, isProfileComplete } from "@/lib/profile";
 import { t } from "@/lib/strings";
-import { onboardingSchema, type OnboardingField } from "@/lib/validation/dealer";
+import { onboardingSchema, type OnboardingField } from "@/lib/validation/profile";
 
 export type OnboardingState = {
   fieldErrors?: Partial<Record<OnboardingField, string>>;
   formError?: string;
 };
 
-export async function saveDealerProfile(formData: FormData): Promise<OnboardingState> {
-  const { supabase, user, dealer } = await getCurrentDealer();
+export async function saveProfile(formData: FormData): Promise<OnboardingState> {
+  const { supabase, user, profile } = await getCurrentProfile();
 
   const parsed = onboardingSchema(user.id).safeParse({
+    user_type: formData.get("user_type") ?? "",
     owner_name: formData.get("owner_name") ?? "",
     business_name: formData.get("business_name") ?? "",
     city: formData.get("city") ?? "",
@@ -31,14 +32,15 @@ export async function saveDealerProfile(formData: FormData): Promise<OnboardingS
     return { fieldErrors };
   }
 
-  const { error } = await supabase.from("dealers").update(parsed.data).eq("id", user.id);
+  const { error } = await supabase.from("profiles").update(parsed.data).eq("id", user.id);
   if (error) return { formError: t.common.somethingWrong };
 
-  // Best effort: remove the previous logo file once it's been replaced or removed.
-  if (dealer.logo_path && dealer.logo_path !== parsed.data.logo_path) {
-    await supabase.storage.from(STORAGE_BUCKETS.logos).remove([dealer.logo_path]);
+  // Best effort: remove the previous logo file once it's been replaced or removed (or the user is no
+  // longer a dealer).
+  if (profile.logo_path && profile.logo_path !== parsed.data.logo_path) {
+    await supabase.storage.from(STORAGE_BUCKETS.logos).remove([profile.logo_path]);
   }
 
   // First-time setup goes on to My cars; editing goes back to the profile.
-  redirect(isProfileComplete(dealer) ? "/app/profile" : "/app");
+  redirect(isProfileComplete(profile) ? "/app/profile" : "/app");
 }

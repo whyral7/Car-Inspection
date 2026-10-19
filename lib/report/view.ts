@@ -7,7 +7,8 @@ import { formatDate, formatDateTime, carTitle, isPastDate } from "@/lib/format";
 import { ANGLES, isAngleKey, type AngleKey } from "@/lib/photos/angles";
 import { conditionScore, formatScore, scoreBand, type ScoreBand } from "@/lib/score";
 import { t } from "@/lib/strings";
-import type { CarRow, ChecklistResult, FindingRow, FindingType, Severity } from "@/lib/supabase/database.types";
+import type { CarRow, ChecklistResult, FindingRow, FindingType, Severity, UserType } from "@/lib/supabase/database.types";
+import { displayName } from "@/lib/user-type";
 
 export const REPORT_SECTIONS = ["photos", "findings", "checklist", "documents"] as const;
 export type ReportSection = (typeof REPORT_SECTIONS)[number];
@@ -26,7 +27,9 @@ export function parseHiddenSections(value: readonly string[] | null | undefined)
 export type ReportInput = {
   slug: string | null;
   publishedAt: string | null;
+  /** The profile that shared the report: a dealer, a car owner or a buyer. */
   dealer: {
+    user_type: UserType | null;
     business_name: string | null;
     owner_name: string | null;
     phone: string | null;
@@ -61,7 +64,19 @@ export type ReportView = {
   slug: string | null;
   /** "19 Oct 2026", or null before the first publish. */
   publishedOn: string | null;
-  dealer: { name: string; ownerName: string | null; city: string | null; address: string | null; phone: string | null; logoUrl: string | null };
+  /**
+   * Whoever shared the report. `name` is a dealer's business name, otherwise the person's name, and
+   * `ownerName` is set only when it differs from `name`. Address and logo are for dealers only.
+   */
+  dealer: {
+    userType: UserType;
+    name: string;
+    ownerName: string | null;
+    city: string | null;
+    address: string | null;
+    phone: string | null;
+    logoUrl: string | null;
+  };
   car: { regNumber: string; title: string; details: DetailRow[] };
   score: number;
   /** Always one decimal, e.g. "8.0". */
@@ -91,6 +106,10 @@ function checkItem(key: ChecklistKey, row: ReportInput["checklist"][number]): Re
  */
 export function buildReportView(input: ReportInput, hidden: readonly ReportSection[] = [], now = new Date()): ReportView {
   const { car, dealer } = input;
+  // Everyone who signed up before user types existed was a dealer.
+  const userType = dealer.user_type ?? "dealer";
+  const isDealer = userType === "dealer";
+  const name = displayName({ ...dealer, user_type: userType });
 
   const photos: ReportPhoto[] = input.photos
     .filter((p): p is typeof p & { angle_key: AngleKey } => isAngleKey(p.angle_key))
@@ -129,7 +148,7 @@ export function buildReportView(input: ReportInput, hidden: readonly ReportSecti
 
   const documentKeys = CHECKLIST_GROUPS.find((g) => g.key === "documents")?.items ?? [];
   const insuranceExpired = car.insurance_valid_upto ? isPastDate(car.insurance_valid_upto, now) : false;
-  const documentRows: DetailRow[] = [{ label: t.publicReport.rcSource, value: car.fromRc ? t.publicReport.rcVerified : t.publicReport.rcManual }];
+  const documentRows: DetailRow[] = [{ label: t.publicReport.rcSource, value: car.fromRc ? t.publicReport.rcVerified : t.publicReport.rcManual[userType] }];
   if (car.insurance_valid_upto) {
     documentRows.push({
       label: t.publicReport.insurance,
@@ -153,12 +172,13 @@ export function buildReportView(input: ReportInput, hidden: readonly ReportSecti
     slug: input.slug,
     publishedOn: input.publishedAt ? formatDateTime(input.publishedAt) : null,
     dealer: {
-      name: dealer.business_name ?? "",
-      ownerName: dealer.owner_name,
+      userType,
+      name,
+      ownerName: dealer.owner_name && dealer.owner_name !== name ? dealer.owner_name : null,
       city: dealer.city,
-      address: dealer.address,
+      address: isDealer ? dealer.address : null,
       phone: dealer.phone,
-      logoUrl: dealer.logoUrl,
+      logoUrl: isDealer ? dealer.logoUrl : null,
     },
     car: { regNumber: car.reg_number, title: carTitle(car), details },
     score,

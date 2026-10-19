@@ -84,15 +84,18 @@ export function ScoreBadge({ view, className = "" }: { view: Pick<View, "scoreTe
   );
 }
 
-/** "Call dealer" and "WhatsApp dealer". In the dealer's preview they are shown but do nothing. */
+/** "Call dealer" and "WhatsApp dealer" (or owner). In the sharer's own preview they are shown but do nothing. */
 export function ContactButtons({ view, preview = false }: { view: View; preview?: boolean }) {
-  const call = telHref(view.dealer.phone);
-  const chat = whatsappChatUrl(view.dealer.phone, t.publicReport.dealerMessage(view.car.title || view.car.regNumber, view.car.regNumber));
+  const { userType, phone } = view.dealer;
+  const message = t.publicReport.contactMessage(view.car.title || view.car.regNumber, view.car.regNumber, userType !== "buyer");
+  const call = telHref(phone);
+  const chat = whatsappChatUrl(phone, message);
   if (!call || !chat) return null;
+  const labels = t.publicReport.contact[userType];
   const base = "flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl px-3 text-base font-semibold";
   const buttons = [
-    { href: call, label: t.publicReport.callDealer, icon: "📞", style: "border border-slate-300 bg-white text-slate-900 active:bg-slate-100" },
-    { href: chat, label: t.publicReport.whatsappDealer, icon: "💬", style: "bg-[#128c7e] text-white active:bg-[#075e54]" },
+    { href: call, label: labels.call, icon: "📞", style: "border border-slate-300 bg-white text-slate-900 active:bg-slate-100" },
+    { href: chat, label: labels.whatsapp, icon: "💬", style: "bg-[#128c7e] text-white active:bg-[#075e54]" },
   ];
   return (
     <div className="flex gap-2">

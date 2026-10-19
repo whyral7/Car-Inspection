@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LinkButton } from "@/components/button";
 import { StatusBadge } from "@/components/status-badge";
-import { getCurrentDealer } from "@/lib/dealer";
 import { carTitle } from "@/lib/format";
+import { getCurrentProfile } from "@/lib/profile";
 import { t } from "@/lib/strings";
 
 export const metadata: Metadata = { title: t.dashboard.myCars };
 
 export default async function AppHome() {
-  const { supabase, dealer } = await getCurrentDealer();
+  const { supabase, profile } = await getCurrentProfile();
   const { data: cars, error } = await supabase
     .from("cars")
     .select("id, reg_number, make, model, year, status")
@@ -21,7 +21,7 @@ export default async function AppHome() {
       <section className="flex items-center justify-between rounded-2xl bg-brand-700 p-5 text-white">
         <div>
           <p className="text-sm text-brand-100">{t.dashboard.credits}</p>
-          <p className="text-3xl font-bold">{dealer.credits}</p>
+          <p className="text-3xl font-bold">{profile.credits}</p>
         </div>
         <p className="max-w-[45%] text-right text-sm text-brand-100">{t.dashboard.creditsHint}</p>
       </section>

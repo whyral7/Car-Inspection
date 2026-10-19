@@ -3,8 +3,8 @@
 import { z } from "zod";
 import { APP_NAME } from "@/lib/config";
 import { findPack, packKeySchema } from "@/lib/credits/packs";
-import { getCurrentDealer } from "@/lib/dealer";
 import { serverEnv } from "@/lib/env.server";
+import { getCurrentProfile } from "@/lib/profile";
 import { createOrder } from "@/lib/razorpay/api";
 import { t } from "@/lib/strings";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -36,14 +36,14 @@ export async function createCreditOrder(packKey: string): Promise<OrderResult> {
   const pack = key.success ? findPack(key.data) : null;
   if (!pack) return { ok: false, error: t.common.somethingWrong };
 
-  const { dealer } = await getCurrentDealer();
+  const { profile } = await getCurrentProfile();
   const admin = createAdminClient();
 
   const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
   const { count, error: countError } = await admin
     .from("payments")
     .select("id", { count: "exact", head: true })
-    .eq("dealer_id", dealer.id)
+    .eq("dealer_id", profile.id)
     .gte("created_at", since);
   if (countError) return { ok: false, error: t.credits.errors.start };
   if ((count ?? 0) >= MAX_ORDERS_PER_HOUR) return { ok: false, error: t.credits.errors.tooMany };
@@ -52,17 +52,17 @@ export async function createCreditOrder(packKey: string): Promise<OrderResult> {
   try {
     const order = await createOrder({
       amountPaise: pack.pricePaise,
-      receipt: `cp_${Date.now().toString(36)}_${dealer.id.slice(0, 8)}`,
-      notes: { dealer_id: dealer.id, pack_key: pack.key, credits: String(pack.credits) },
+      receipt: `cp_${Date.now().toString(36)}_${profile.id.slice(0, 8)}`,
+      notes: { dealer_id: profile.id, pack_key: pack.key, credits: String(pack.credits) },
     });
     orderId = order.id;
   } catch (error) {
-    console.error(`[razorpay] dealer=${dealer.id} order for ${pack.key} failed`, error);
+    console.error(`[razorpay] dealer=${profile.id} order for ${pack.key} failed`, error);
     return { ok: false, error: t.credits.errors.start };
   }
 
   const { error } = await admin.from("payments").insert({
-    dealer_id: dealer.id,
+    dealer_id: profile.id,
     razorpay_order_id: orderId,
     amount_paise: pack.pricePaise,
     credits: pack.credits,
@@ -70,7 +70,7 @@ export async function createCreditOrder(packKey: string): Promise<OrderResult> {
     status: "created",
   });
   if (error) {
-    console.error(`[razorpay] dealer=${dealer.id} order=${orderId} could not be saved`, error);
+    console.error(`[razorpay] dealer=${profile.id} order=${orderId} could not be saved`, error);
     return { ok: false, error: t.credits.errors.start };
   }
 
@@ -82,15 +82,15 @@ export async function createCreditOrder(packKey: string): Promise<OrderResult> {
     credits: pack.credits,
     name: APP_NAME,
     description: t.credits.checkoutDescription(pack.credits),
-    prefill: { name: dealer.owner_name ?? "", contact: dealer.phone ? `+${dealer.phone.replace(/^\+/, "")}` : "" },
+    prefill: { name: profile.owner_name ?? "", contact: profile.phone ? `+${profile.phone.replace(/^\+/, "")}` : "" },
   };
 }
 
 /** The dealer's own order and current balance, read with RLS. Polled after Checkout closes. */
 export async function getOrderStatus(orderId: string): Promise<OrderStatus> {
-  // getCurrentDealer reads the dealer row fresh on every request, so `credits` is the live balance.
-  const { supabase, dealer } = await getCurrentDealer();
-  const credits = dealer.credits;
+  // getCurrentProfile reads the profile row fresh on every request, so `credits` is the live balance.
+  const { supabase, profile } = await getCurrentProfile();
+  const credits = profile.credits;
   if (!z.string().regex(/^order_[A-Za-z0-9]+$/).safeParse(orderId).success) {
     return { status: "unknown", credits, creditsAdded: 0, failureReason: null };
   }

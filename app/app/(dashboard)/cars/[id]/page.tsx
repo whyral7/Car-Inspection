@@ -7,15 +7,15 @@ import { LinkButton } from "@/components/button";
 import { StatusBadge } from "@/components/status-badge";
 import { FUELS, TRANSMISSIONS, type Fuel, type Transmission } from "@/lib/cars";
 import { checklistProgress } from "@/lib/checklist";
-import { getCurrentDealer } from "@/lib/dealer";
 import { carTitle, formatDate, formatDateTime, isPastDate } from "@/lib/format";
 import { photoProgress } from "@/lib/photos/angles";
+import { getCurrentProfile } from "@/lib/profile";
 import { conditionScore, formatScore } from "@/lib/score";
 import { t } from "@/lib/strings";
 
 const getCar = cache(async (id: string) => {
   if (!z.uuid().safeParse(id).success) notFound();
-  const { supabase } = await getCurrentDealer();
+  const { supabase } = await getCurrentProfile();
   // RLS limits this to the dealer's own cars, so someone else's id is simply not found.
   const { data: car, error } = await supabase.from("cars").select("*").eq("id", id).maybeSingle();
   if (error) throw error;
@@ -34,7 +34,7 @@ const isTransmission = (v: string | null): v is Transmission => (TRANSMISSIONS a
 export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
   const { id } = await params;
   const car = await getCar(id);
-  const { supabase } = await getCurrentDealer();
+  const { supabase } = await getCurrentProfile();
   const [photosRes, findingsRes, checklistRes] = await Promise.all([
     supabase.from("inspection_photos").select("angle_key, ai_status").eq("car_id", car.id),
     supabase.from("findings").select("severity, accepted").eq("car_id", car.id),

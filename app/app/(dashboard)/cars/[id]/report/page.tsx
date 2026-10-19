@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
-import { getCurrentDealer } from "@/lib/dealer";
+import { getCurrentProfile } from "@/lib/profile";
 import { loadReport } from "@/lib/report/load";
 import { reportUrl } from "@/lib/report/share";
 import { buildReportView, parseHiddenSections } from "@/lib/report/view";
@@ -15,7 +15,7 @@ export default async function ReportPage({ params }: PageProps<"/app/cars/[id]/r
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();
 
-  const { supabase, dealer } = await getCurrentDealer();
+  const { supabase, profile } = await getCurrentProfile();
   // Read as the dealer, so RLS limits it to their own car.
   const loaded = await loadReport(supabase, id);
   if (!loaded) notFound();
@@ -27,7 +27,7 @@ export default async function ReportPage({ params }: PageProps<"/app/cars/[id]/r
       carId={loaded.car.id}
       ready={loaded.car.status !== "draft"}
       unreviewed={loaded.unreviewed}
-      credits={dealer.credits}
+      credits={profile.credits}
       // The full report goes to the browser; the preview hides sections as the dealer toggles them.
       view={buildReportView(loaded.input)}
       initialHidden={parseHiddenSections(loaded.report?.hidden_sections)}

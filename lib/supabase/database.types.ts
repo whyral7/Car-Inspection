@@ -10,6 +10,7 @@ export type Severity = "minor" | "moderate" | "major";
 export type FindingSource = "ai" | "dealer";
 export type ChecklistResult = "ok" | "attention" | "fail" | "na";
 export type PaymentStatus = "created" | "paid" | "failed";
+export type UserType = "car_owner" | "buyer" | "dealer";
 
 type Table<Row, Required extends keyof Row, Updatable extends keyof Row = keyof Row> = {
   Row: Row;
@@ -18,8 +19,10 @@ type Table<Row, Required extends keyof Row, Updatable extends keyof Row = keyof 
   Relationships: [];
 };
 
-export type DealerRow = {
+export type ProfileRow = {
   id: string;
+  /** null until the user answers "I am a" at signup. */
+  user_type: UserType | null;
   owner_name: string | null;
   business_name: string | null;
   phone: string | null;
@@ -127,8 +130,8 @@ export type AiUsageRow = {
 export type Database = {
   public: {
     Tables: {
-      // Dealers may only update their profile columns (column grants in the migration).
-      dealers: Table<DealerRow, "id", "owner_name" | "business_name" | "city" | "address" | "logo_path">;
+      // Users may only update their profile columns (column grants in the migrations).
+      profiles: Table<ProfileRow, "id", "user_type" | "owner_name" | "business_name" | "city" | "address" | "logo_path">;
       cars: Table<CarRow, "reg_number">;
       inspection_photos: Table<InspectionPhotoRow, "car_id" | "angle_key" | "storage_path">;
       findings: Table<FindingRow, "car_id" | "type" | "severity" | "source">;

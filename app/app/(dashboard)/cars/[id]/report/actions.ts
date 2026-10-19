@@ -2,7 +2,7 @@
 
 import { after } from "next/server";
 import { z } from "zod";
-import { getCurrentDealer } from "@/lib/dealer";
+import { getCurrentProfile } from "@/lib/profile";
 import { ensureReportPdf } from "@/lib/report/pdf-store";
 import { generateSlug } from "@/lib/report/slug";
 import { hiddenSectionsSchema } from "@/lib/report/view";
@@ -33,7 +33,7 @@ export async function publishReport(carId: string, hiddenSections: string[]): Pr
   const hidden = hiddenSectionsSchema.safeParse(hiddenSections);
   if (!hidden.success) return { ok: false, error: t.common.somethingWrong };
 
-  const { supabase, dealer } = await getCurrentDealer();
+  const { supabase, profile } = await getCurrentProfile();
   const [carRes, findingsRes, checklistRes] = await Promise.all([
     supabase.from("cars").select("id, status").eq("id", carId).maybeSingle(),
     supabase.from("findings").select("severity, accepted").eq("car_id", carId),
@@ -49,7 +49,7 @@ export async function publishReport(carId: string, hiddenSections: string[]): Pr
   // A new slug can collide with an existing one (about 1 in 10^15). Try another.
   for (let attempt = 0; attempt < 3; attempt++) {
     const { data, error } = await admin.rpc("publish_report", {
-      p_dealer_id: dealer.id,
+      p_dealer_id: profile.id,
       p_car_id: carId,
       p_slug: generateSlug(),
       p_score: score,
@@ -74,7 +74,7 @@ export async function saveHiddenSections(carId: string, hiddenSections: string[]
   const hidden = hiddenSectionsSchema.safeParse(hiddenSections);
   if (!hidden.success) return { ok: false, error: t.common.somethingWrong };
 
-  const { supabase } = await getCurrentDealer();
+  const { supabase } = await getCurrentProfile();
   // RLS and the column grant let a dealer change only hidden_sections on their own reports.
   const { data, error } = await supabase.from("reports").update({ hidden_sections: hidden.data }).eq("car_id", carId).select("car_id");
   if (error || data.length === 0) return { ok: false, error: t.report.errors.sections };

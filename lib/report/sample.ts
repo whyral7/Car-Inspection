@@ -12,6 +12,7 @@ const sampleInput: ReportInput = {
   slug: null,
   publishedAt: "2026-10-18T06:30:00.000Z",
   dealer: {
+    user_type: "dealer",
     business_name: "Sharma Motors",
     owner_name: "Rajesh Sharma",
     phone: null, // no contact buttons on the sample

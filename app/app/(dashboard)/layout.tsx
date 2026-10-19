@@ -2,15 +2,16 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CreditsBadge } from "@/components/credits-badge";
 import { LogoutButton } from "@/components/logout-button";
-import { getCurrentDealer, isProfileComplete } from "@/lib/dealer";
+import { displayName, getCurrentProfile, isProfileComplete } from "@/lib/profile";
 import { logoUrl } from "@/lib/storage";
 import { t } from "@/lib/strings";
 
 export default async function DashboardLayout({ children }: LayoutProps<"/app">) {
-  const { dealer } = await getCurrentDealer();
-  if (!isProfileComplete(dealer)) redirect("/app/onboarding");
+  const { profile } = await getCurrentProfile();
+  if (!isProfileComplete(profile)) redirect("/app/onboarding");
 
-  const logo = logoUrl(dealer.logo_path);
+  const logo = profile.user_type === "dealer" ? logoUrl(profile.logo_path) : null;
+  const name = displayName(profile);
 
   return (
     <div className="flex flex-1 flex-col">
@@ -22,13 +23,13 @@ export default async function DashboardLayout({ children }: LayoutProps<"/app">)
               <img src={logo} alt="" className="size-9 shrink-0 rounded-lg border border-slate-200 object-contain" />
             ) : (
               <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-700 text-sm font-bold text-white">
-                {dealer.business_name?.charAt(0).toUpperCase()}
+                {name.charAt(0).toUpperCase()}
               </span>
             )}
-            <span className="truncate font-semibold">{dealer.business_name}</span>
+            <span className="truncate font-semibold">{name}</span>
           </Link>
           <Link href="/app/credits" className="flex min-h-11 items-center">
-            <CreditsBadge credits={dealer.credits} />
+            <CreditsBadge credits={profile.credits} />
           </Link>
           <LogoutButton />
         </div>

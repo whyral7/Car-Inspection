@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { isChecklistKey, type ChecklistKey } from "@/lib/checklist";
-import { getCurrentDealer } from "@/lib/dealer";
 import { carTitle } from "@/lib/format";
+import { getCurrentProfile } from "@/lib/profile";
 import { t } from "@/lib/strings";
 import type { ChecklistResult } from "@/lib/supabase/database.types";
 import { ChecklistForm } from "./checklist-form";
@@ -14,7 +14,7 @@ export default async function ChecklistPage({ params }: PageProps<"/app/cars/[id
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();
 
-  const { supabase } = await getCurrentDealer();
+  const { supabase } = await getCurrentProfile();
   // RLS limits both queries to the dealer's own cars.
   const { data: car, error: carError } = await supabase.from("cars").select("id, reg_number, make, model, variant, year, status").eq("id", id).maybeSingle();
   if (carError) throw carError;

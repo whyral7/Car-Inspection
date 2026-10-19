@@ -37,8 +37,8 @@ export async function loadReport(client: Client, carId: string, { signUrls = tru
   if (!car) return null;
 
   const bucket = client.storage.from(STORAGE_BUCKETS.inspectionPhotos);
-  const [dealerRes, photosRes, findingsRes, checklistRes, reportRes, mainList, smallList] = await Promise.all([
-    client.from("dealers").select("business_name, owner_name, phone, city, address, logo_path").eq("id", car.dealer_id).single(),
+  const [profileRes, photosRes, findingsRes, checklistRes, reportRes, mainList, smallList] = await Promise.all([
+    client.from("profiles").select("user_type, business_name, owner_name, phone, city, address, logo_path").eq("id", car.dealer_id).single(),
     client.from("inspection_photos").select("id, angle_key, storage_path, updated_at").eq("car_id", carId),
     client.from("findings").select("type, location, severity, note, accepted, photo_id").eq("car_id", carId).order("created_at"),
     client.from("checklist_items").select("item_key, result, note").eq("car_id", carId),
@@ -46,8 +46,10 @@ export async function loadReport(client: Client, carId: string, { signUrls = tru
     bucket.list(`cars/${carId}`, { limit: 100 }),
     bucket.list(`cars/${carId}/small`, { limit: 100 }),
   ]);
-  for (const res of [dealerRes, photosRes, findingsRes, checklistRes, reportRes]) if (res.error) throw res.error;
-  const dealer = dealerRes.data!;
+  for (const res of [profileRes, photosRes, findingsRes, checklistRes, reportRes]) if (res.error) throw res.error;
+  const profile = profileRes.data!;
+  // Logos are for dealers only. A logo left over from before switching type is never shown.
+  const logoPath = profile.user_type === "dealer" || profile.user_type === null ? profile.logo_path : null;
 
   // A small copy is used only when it was uploaded after the current full photo. A retake whose
   // small copy failed to upload would otherwise show the old picture.
@@ -74,7 +76,7 @@ export async function loadReport(client: Client, carId: string, { signUrls = tru
   const input: ReportInput = {
     slug: reportRes.data?.slug ?? null,
     publishedAt: reportRes.data?.published_at ?? null,
-    dealer: { ...dealer, logoUrl: logoUrl(dealer.logo_path) },
+    dealer: { ...profile, logoUrl: logoUrl(logoPath) },
     car: { ...car, fromRc: car.rc_raw !== null },
     photos: photos.flatMap((p) => {
       if (!signUrls) return [{ id: p.id, angle_key: p.angleKey, url: p.path, thumbUrl: p.smallPath }];
@@ -90,7 +92,7 @@ export async function loadReport(client: Client, carId: string, { signUrls = tru
     report: reportRes.data,
     input,
     images: photos.map((p) => ({ angleKey: p.angleKey, path: p.smallPath ?? p.path, version: p.version })),
-    logoPath: dealer.logo_path,
+    logoPath,
     unreviewed: findingsRes.data!.filter((f) => !f.accepted).length,
   };
 }
