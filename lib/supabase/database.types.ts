@@ -147,6 +147,17 @@ export type Database = {
         };
         Returns: boolean;
       };
+      // Service role only (lib/report/publish.ts).
+      publish_report: {
+        Args: {
+          p_dealer_id: string;
+          p_car_id: string;
+          p_slug: string;
+          p_score: number;
+          p_hidden_sections: string[];
+        };
+        Returns: { slug: string; charged: boolean; credits: number };
+      };
     };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };

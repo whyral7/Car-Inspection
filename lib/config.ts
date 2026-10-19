@@ -7,6 +7,7 @@ export const FREE_CREDITS = 3;
 export const STORAGE_BUCKETS = {
   logos: "logos",
   inspectionPhotos: "inspection-photos",
+  reports: "reports",
 } as const;
 
 export const LOGO = {
@@ -27,6 +28,9 @@ export const PHOTO = {
   maxBytes: 5 * 1024 * 1024,
   /** How long thumbnails on the inspect screen stay valid before the page needs a refresh. */
   signedUrlSeconds: 2 * 60 * 60,
+  /** Small copy uploaded next to each photo for the report gallery and PDF (about 60 KB). */
+  smallEdgePx: 640,
+  smallJpegQuality: 0.75,
 } as const;
 
 export const OTP_RESEND_SECONDS = 30;
@@ -49,3 +53,20 @@ export const AI = {
   /** Cap on model calls per photo per day, so a stuck retry loop can't run up the bill. */
   maxCallsPerPhotoPerDay: 10,
 } as const;
+
+export const REPORT = {
+  /** Random characters in a public link (/r/<slug>): 32^10 is about 10^15, far too many to guess. */
+  slugLength: 10,
+  /** Photo links on the public report and the preview. The page makes fresh ones on every visit. */
+  photoUrlSeconds: 24 * 60 * 60,
+  /** PDF download links. /r/<slug>/pdf makes a fresh one on every tap. */
+  pdfUrlSeconds: 5 * 60,
+  /** Bump when the PDF layout changes, so stored PDFs are rebuilt on the next download. */
+  pdfVersion: 1,
+} as const;
+
+/** Prepaid report credit packs. Prices in paise (Rs 999 = 99900). */
+export const CREDIT_PACKS = [
+  { key: "pack_10", credits: 10, pricePaise: 99_900 },
+  { key: "pack_30", credits: 30, pricePaise: 249_900 },
+] as const;
