@@ -246,7 +246,7 @@ function Tile({ angle, slot, onOpen }: { angle: Angle; slot: Slot | undefined; o
           // eslint-disable-next-line @next/next/no-img-element -- private signed URL or local blob, not optimisable
           <img src={slot.url} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
         ) : (
-          <AngleHint angle={angle} className="size-full p-2 text-slate-300" />
+          <AngleHint angle={angle} className="size-full p-2 text-slate-400" />
         )}
         <span className="absolute top-1 left-1 flex size-6 items-center justify-center rounded-full bg-slate-900/70 text-xs font-semibold text-white">{angle.number}</span>
         <TileBadge status={status} />
