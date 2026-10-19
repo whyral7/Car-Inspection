@@ -70,3 +70,24 @@ export const CREDIT_PACKS = [
   { key: "pack_10", credits: 10, pricePaise: 99_900 },
   { key: "pack_30", credits: 30, pricePaise: 249_900 },
 ] as const;
+
+/**
+ * Your business details for the landing, contact and legal pages. Replace every [bracket] before going
+ * live: Razorpay reviews these pages (contact details, terms, privacy, refunds) when activating live payments.
+ */
+export const BUSINESS = {
+  legalName: "[Your registered business name]",
+  address: "[Registered address, City, State, PIN code]",
+  /** Courts of this city have jurisdiction under the terms. */
+  city: "[City]",
+  email: "[support@yourdomain.com]",
+  /** WhatsApp number for "Chat on WhatsApp", digits with country code (e.g. "919876543210"). Empty: those buttons open /contact. */
+  whatsapp: "",
+  supportHours: "[Monday to Saturday, 10 am to 7 pm IST]",
+  /** Named contact for privacy complaints (required under India's DPDP Act). */
+  grievanceOfficer: "[Name of grievance officer]",
+  legalUpdated: "19 October 2026",
+} as const;
+
+/** Public sample report linked from the landing page. Set to a real published slug (e.g. "/r/abcd1234ef") to show your own. */
+export const SAMPLE_REPORT_PATH = "/sample-report";
