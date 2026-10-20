@@ -5,7 +5,7 @@
 type LegalBusiness = { legalName: string; address: string; city: string; email: string; grievanceOfficer: string };
 
 export const en = {
-  appName: "CarParakh",
+  appName: "Treadmark",
   tagline: "Trusted inspection reports for used cars, ready to share on WhatsApp.",
   disclaimer: "Visual and documented inspection. Not a mechanical certification.",
 
@@ -20,7 +20,7 @@ export const en = {
 
   home: {
     login: "Log in with phone",
-    metaTitle: "CarParakh: inspection reports for used-car dealers",
+    metaTitle: "Treadmark: inspection reports for used-car dealers",
     metaDescription:
       "Shoot 20 guided photos, get AI damage notes and share a branded used-car inspection report on WhatsApp in about 10 minutes. Start free with 3 reports.",
     nav: { login: "Log in", pricing: "Pricing" },
@@ -59,7 +59,7 @@ export const en = {
     bestValue: "Best value",
     contactBody: "Message us on WhatsApp and we'll help you get your first report out.",
     whatsapp: "Chat on WhatsApp",
-    whatsappMessage: "Hi, I'm a used-car dealer and I'd like to know more about CarParakh.",
+    whatsappMessage: "Hi, I'm a used-car dealer and I'd like to know more about Treadmark.",
     finalTitle: "Your next car could have a report in 10 minutes",
   },
 
@@ -87,7 +87,7 @@ export const en = {
     privacy: {
       title: "Privacy policy",
       intro: (b: LegalBusiness) =>
-        `${b.legalName} ("we", "us") runs CarParakh, an app that helps used-car dealers create and share inspection reports. This policy explains what personal data we collect, why, and the choices you have. It is written to follow India's Digital Personal Data Protection Act, 2023.`,
+        `${b.legalName} ("we", "us") runs Treadmark, an app that helps used-car dealers create and share inspection reports. This policy explains what personal data we collect, why, and the choices you have. It is written to follow India's Digital Personal Data Protection Act, 2023.`,
       sections: (b: LegalBusiness) => [
         {
           heading: "What we collect",
@@ -153,12 +153,12 @@ export const en = {
     terms: {
       title: "Terms of use",
       intro: (b: LegalBusiness) =>
-        `These terms are an agreement between you and ${b.legalName} for the use of CarParakh. By creating an account or using the app you accept them. If you do not agree, please do not use the app.`,
+        `These terms are an agreement between you and ${b.legalName} for the use of Treadmark. By creating an account or using the app you accept them. If you do not agree, please do not use the app.`,
       sections: (b: LegalBusiness) => [
         {
           heading: "The service",
           body: [
-            "CarParakh gives used-car dealers tools to photograph a car, record its visible condition, and share an inspection report with buyers. It is meant for business use by dealers aged 18 or over.",
+            "Treadmark gives used-car dealers tools to photograph a car, record its visible condition, and share an inspection report with buyers. It is meant for business use by dealers aged 18 or over.",
           ],
         },
         {
@@ -227,7 +227,7 @@ export const en = {
     refunds: {
       title: "Refund and cancellation policy",
       intro: (b: LegalBusiness) =>
-        `CarParakh sells prepaid report credits, a digital service from ${b.legalName}. Credits are added to your account straight after payment; nothing is shipped.`,
+        `Treadmark sells prepaid report credits, a digital service from ${b.legalName}. Credits are added to your account straight after payment; nothing is shipped.`,
       sections: (b: LegalBusiness) => [
         {
           heading: "Unused packs",
@@ -671,7 +671,7 @@ export const en = {
     downloadPdf: "Download PDF",
     inspectedBy: "Inspected and shared by",
     publishedOn: (date: string) => `Report date: ${date}`,
-    madeWith: "Made with CarParakh",
+    madeWith: "Made with Treadmark",
     notFoundTitle: "Report not available",
     notFoundBody: "This link doesn't open a report. It may have been mistyped or removed. Ask the person who sent it to share it again.",
     photoViewer: "Photo viewer",

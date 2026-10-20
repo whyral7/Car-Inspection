@@ -1,4 +1,4 @@
-# CarParakh: project guide
+# Treadmark: project guide
 
 ## Product
 A mobile-first PWA for anyone inspecting a used car in India: car owners, people buying a car, and small used-car dealers. At signup the user picks "I am a: Car owner / Buying a car / Dealer". A user adds a car by registration number, shoots a guided set of 20 photos, gets AI damage notes, fills a short checklist, and shares an inspection report (PDF + public link) on WhatsApp. Dealers can brand reports with an optional business name, address and logo (shown only for dealers). Users buy prepaid report credits.

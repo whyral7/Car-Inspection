@@ -34,7 +34,7 @@ describe("contact links", () => {
   });
 
   it("joins the base URL and slug without double slashes", () => {
-    expect(reportUrl("https://carparakh.in/", "k7m2p9xa4c")).toBe("https://carparakh.in/r/k7m2p9xa4c");
+    expect(reportUrl("https://treadmark.in/", "k7m2p9xa4c")).toBe("https://treadmark.in/r/k7m2p9xa4c");
     expect(reportUrl("http://localhost:3000", "k7m2p9xa4c")).toBe("http://localhost:3000/r/k7m2p9xa4c");
   });
 });

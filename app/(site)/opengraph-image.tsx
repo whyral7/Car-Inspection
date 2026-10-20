@@ -20,7 +20,7 @@ export default async function Image() {
       <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: BRAND[50], padding: "64px 72px", fontFamily: "Geist", color: INK[900] }}>
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
           <div style={{ width: 72, height: 72, borderRadius: 18, background: BRAND[700], color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, fontWeight: 700 }}>
-            CP
+            T
           </div>
           <div style={{ fontSize: 40, fontWeight: 700, color: BRAND[700] }}>{t.appName}</div>
         </div>

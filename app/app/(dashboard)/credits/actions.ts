@@ -52,7 +52,7 @@ export async function createCreditOrder(packKey: string): Promise<OrderResult> {
   try {
     const order = await createOrder({
       amountPaise: pack.pricePaise,
-      receipt: `cp_${Date.now().toString(36)}_${profile.id.slice(0, 8)}`,
+      receipt: `tm_${Date.now().toString(36)}_${profile.id.slice(0, 8)}`,
       notes: { dealer_id: profile.id, pack_key: pack.key, credits: String(pack.credits) },
     });
     orderId = order.id;

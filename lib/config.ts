@@ -1,4 +1,4 @@
-export const APP_NAME = "CarParakh";
+export const APP_NAME = "Treadmark";
 export const THEME_COLOR = "#0f766e";
 export const BACKGROUND_COLOR = "#ffffff";
 

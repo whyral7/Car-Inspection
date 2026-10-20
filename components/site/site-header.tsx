@@ -8,7 +8,7 @@ export function SiteHeader() {
       <nav className="mx-auto flex w-full max-w-5xl items-center gap-2 px-4 py-2">
         <Link href="/" className="mr-auto flex min-h-11 items-center gap-2 text-lg font-bold text-brand-700">
           <span aria-hidden className="flex size-8 items-center justify-center rounded-lg bg-brand-700 text-sm text-white">
-            CP
+            T
           </span>
           {t.appName}
         </Link>

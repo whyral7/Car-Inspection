@@ -1,4 +1,4 @@
-# CarParakh
+# Treadmark
 
 Mobile-first PWA for anyone inspecting a used car in India (car owners, buyers and small used-car dealers): add a car, shoot 20 guided photos, get AI damage notes, fill a checklist and share an inspection report on WhatsApp. Dealers can brand it with their business name and logo.
 
@@ -130,7 +130,7 @@ Prices live in `lib/ai/pricing.ts`; an unknown model is logged with `cost_usd` e
 
 **PDF.** Stored privately in the `reports` bucket at `<car_id>/<content hash>.pdf`. It's built in the background right after publishing, and `/r/<slug>/pdf` rebuilds it only when something on the report changed, then redirects to a 5-minute download link. Bump `REPORT.pdfVersion` after changing the layout.
 
-**Share links** use `NEXT_PUBLIC_APP_URL`, or the address the page was opened on when that's empty. Set it to your real public URL (e.g. `https://carparakh.vercel.app`) in Vercel, otherwise shared links point wherever the dealer happened to open the app.
+**Share links** use `NEXT_PUBLIC_APP_URL`, or the address the page was opened on when that's empty. Set it to your real public URL (e.g. `https://treadmark.vercel.app`) in Vercel, otherwise shared links point wherever the dealer happened to open the app.
 
 ### Checking the WhatsApp link preview
 WhatsApp only previews public **HTTPS** links, so `localhost` and LAN IPs won't work.
@@ -217,14 +217,14 @@ Chrome only offers **Install app** on HTTPS (or `localhost`), and the service wo
 | `RAZORPAY_WEBHOOK_SECRET` | the secret you type when creating the webhook (step 4) |
 | `RC_PROVIDER` | `mock` until you have an RC provider, then e.g. `surepass` |
 | `RC_API_KEY` | your RC provider key (any placeholder while `mock`) |
-| `NEXT_PUBLIC_APP_URL` | your public URL, e.g. `https://carparakh.in` (no trailing slash) |
+| `NEXT_PUBLIC_APP_URL` | your public URL, e.g. `https://treadmark.in` (no trailing slash) |
 
 Leave `RAZORPAY_API_URL` and `DEV_LAN_ORIGIN` unset. `NEXT_PUBLIC_*` values are baked in at build time: after changing one, **redeploy**.
 
 4. Click **Deploy** and open the `*.vercel.app` URL. Log in with your test number, check the landing page, sample report and `/robots.txt`.
 
 ### 3. Connect your domain
-1. Vercel project → **Settings → Domains → Add**, enter `carparakh.in` (and `www.carparakh.in`; let Vercel redirect one to the other).
+1. Vercel project → **Settings → Domains → Add**, enter `treadmark.in` (and `www.treadmark.in`; let Vercel redirect one to the other).
 2. At your domain registrar add the DNS records Vercel shows (usually an `A` record for the root to `76.76.21.21` and a `CNAME` for `www` to `cname.vercel-dns.com`). HTTPS is issued automatically once DNS resolves (minutes to a few hours).
 3. Set `NEXT_PUBLIC_APP_URL` to `https://<your-domain>` in Vercel and **redeploy**, so shared report links, the sitemap and link previews use your domain.
 4. Supabase → **Authentication → URL Configuration**: set **Site URL** to the same address.
