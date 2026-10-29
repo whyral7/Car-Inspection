@@ -110,6 +110,17 @@ export type PaymentRow = {
 
 export type AiUsageOutcome = "ok" | "invalid_json" | "refused" | "api_error";
 
+export type PriceEstimateRow = {
+  car_id: string;
+  market_low_inr: number;
+  market_high_inr: number;
+  summary: string | null;
+  comparables: Json;
+  city: string | null;
+  model: string;
+  searched_at: string;
+};
+
 export type AiUsageRow = {
   id: number;
   dealer_id: string;
@@ -124,6 +135,8 @@ export type AiUsageRow = {
   cache_creation_input_tokens: number;
   cache_read_input_tokens: number;
   cost_usd: number | null;
+  purpose: "photo_analysis" | "price_estimate";
+  web_search_requests: number;
   created_at: string;
 };
 
@@ -140,6 +153,8 @@ export type Database = {
       payments: Table<PaymentRow, "dealer_id" | "razorpay_order_id" | "amount_paise" | "credits">;
       // Service role only (no RLS policies for dealers).
       ai_usage: Table<AiUsageRow, "dealer_id" | "model" | "attempt" | "outcome">;
+      // Dealers read their own; only the service role writes.
+      price_estimates: Table<PriceEstimateRow, "car_id" | "market_low_inr" | "market_high_inr" | "model">;
     };
     Views: { [_ in never]: never };
     Functions: {
