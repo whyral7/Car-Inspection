@@ -132,6 +132,17 @@ Prices live in `lib/ai/pricing.ts`; an unknown model is logged with `cost_usd` e
 
 **Share links** use `NEXT_PUBLIC_APP_URL`, or the address the page was opened on when that's empty. Set it to your real public URL (e.g. `https://treadmark.vercel.app`) in Vercel, otherwise shared links point wherever the dealer happened to open the app.
 
+### Price estimate
+On the report screen, **Estimate market price** asks Claude (`ANTHROPIC_MODEL`) to research current Indian used-car listings with live web search (`web_search_20260209`, up to 5 searches) for the same make, model, variant, fuel and year, near the user's city. Claude finishes by calling a strict `submit_price_estimate` tool with a range for the car **in average condition**, a short summary and the listings it used. The server keeps only listing links that actually appeared in the search results, then stores the range in `price_estimates` (only the service role writes it).
+
+When the report is shown, `lib/price/estimate.ts` adjusts that range for the car's live condition score: about 2% per point above or below 7.5, capped at +5% / -15%, rounded to ₹5,000 or ₹10,000. Because the adjustment uses the current score, editing notes or the checklist later moves the range without a new search. "Price estimate" is a report section like Photos: shown by default once an estimate exists, and the owner can switch it off.
+
+**Cost and limits.** One estimate takes 20-60 seconds and costs about US$0.25 (≈₹20) on `claude-opus-5-5`: roughly 40,000 input tokens of search results plus $0.01 per search. It's free for users, capped at 3 per car per day (`PRICE` in `lib/config.ts`). Each call is logged in `ai_usage` with `purpose = 'price_estimate'` and its search count:
+```sql
+select car_id, count(*) filter (where attempt = 1) as estimates, sum(web_search_requests) as searches, round(sum(cost_usd), 3) as usd
+from ai_usage where purpose = 'price_estimate' group by car_id;
+```
+
 ### Checking the WhatsApp link preview
 WhatsApp only previews public **HTTPS** links, so `localhost` and LAN IPs won't work.
 1. Get a public URL: deploy to Vercel (preview deployments are fine), or run `npm run build && npm start` and expose it with a tunnel such as `npx cloudflared tunnel --url http://localhost:3000`. Set `NEXT_PUBLIC_APP_URL` to that URL and restart (or leave it empty so links follow the address you open).
@@ -159,7 +170,7 @@ Pick one:
 - **Dashboard:** open **SQL Editor** and run each file in `supabase/migrations/` in name order.
 - **CLI:** `npx supabase login`, `npx supabase link --project-ref <your-ref>`, then `npx supabase db push`.
 
-This creates all tables with Row Level Security, a trigger that gives each new user 3 free credits, and two storage buckets: `logos` (public) and `inspection-photos` (private). If you set the database up before Phase 3, run `20261019000200_photo_paths.sql` too: photo uploads fail without it. For Phase 4 run `20261019000300_ai_analysis.sql`: it adds the `ai_usage` table, the `save_photo_analysis` function and a version stamp on photos. For Phase 5 run `20261019000400_reports.sql`: it adds the `reports` bucket, the `publish_report` function and checks on report slugs and hidden sections. For Phase 6 run `20261019000500_payments.sql`: it adds `apply_razorpay_payment` and a few columns on `payments`. Then run `20261019000600_profiles.sql`: it renames `dealers` to `profiles`, adds `user_type` (existing users who finished signup become `dealer`) and updates the functions that used the old table. Deploy the app code together with this migration: the old code reads `dealers` and the new code reads `profiles`.
+This creates all tables with Row Level Security, a trigger that gives each new user 3 free credits, and two storage buckets: `logos` (public) and `inspection-photos` (private). If you set the database up before Phase 3, run `20261019000200_photo_paths.sql` too: photo uploads fail without it. For Phase 4 run `20261019000300_ai_analysis.sql`: it adds the `ai_usage` table, the `save_photo_analysis` function and a version stamp on photos. For Phase 5 run `20261019000400_reports.sql`: it adds the `reports` bucket, the `publish_report` function and checks on report slugs and hidden sections. For Phase 6 run `20261019000500_payments.sql`: it adds `apply_razorpay_payment` and a few columns on `payments`. Then run `20261019000600_profiles.sql`: it renames `dealers` to `profiles`, adds `user_type` (existing users who finished signup become `dealer`) and updates the functions that used the old table. Deploy the app code together with this migration: the old code reads `dealers` and the new code reads `profiles`. Finally, for the price estimate, run `20261020000700_price_estimates.sql`.
 
 ### 4. Turn on phone login
 In Supabase go to **Authentication → Sign In / Providers → Phone** and enable it.
