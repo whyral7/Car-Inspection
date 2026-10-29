@@ -39,7 +39,8 @@ export function inspectionState({ status, photos, findings, checklist }: Inspect
   const checklistState = checklistProgress(checklist.map((c) => c.item_key));
   const finished = status !== "draft";
 
-  const next: InspectionStep = !photoState.allRequiredDone ? "photos" : !findingsDone ? "findings" : !finished ? "checklist" : "report";
+  // Once the checklist is finished the report is next, even if a photo is still unchecked.
+  const next: InspectionStep = finished ? "report" : !photoState.allRequiredDone ? "photos" : !findingsDone ? "findings" : "checklist";
   const stepsDone = [photoState.allRequiredDone, findingsDone, finished && checklistState.complete, status === "published"].filter(Boolean).length;
 
   const value = conditionScore({ findings, checklist });

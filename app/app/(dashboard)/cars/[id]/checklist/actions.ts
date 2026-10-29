@@ -23,6 +23,21 @@ export async function saveChecklistItem(carId: string, input: { item_key: string
   return error ? { ok: false, error: t.checklist.saveFailed } : { ok: true };
 }
 
+/** Saves several answers at once ("Mark the rest OK", or answers sent after being offline). */
+export async function saveChecklistItems(carId: string, inputs: { item_key: string; result: string; note: string | null }[]): Promise<ChecklistActionResult> {
+  const t = await getT();
+  if (!z.uuid().safeParse(carId).success) return { ok: false, error: t.common.somethingWrong };
+  const parsed = z.array(checklistItemSchema).min(1).max(CHECKLIST_KEYS.length).safeParse(inputs);
+  if (!parsed.success) return { ok: false, error: t.common.somethingWrong };
+
+  const { supabase } = await getCurrentProfile();
+  const { error } = await supabase.from("checklist_items").upsert(
+    parsed.data.map((item) => ({ car_id: carId, ...item })),
+    { onConflict: "car_id,item_key" },
+  );
+  return error ? { ok: false, error: t.checklist.saveFailed } : { ok: true };
+}
+
 /** Marks a draft car as inspected once every checklist item has an answer. */
 export async function finishInspection(carId: string): Promise<ChecklistActionResult> {
   const t = await getT();

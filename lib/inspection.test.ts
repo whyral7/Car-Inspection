@@ -37,6 +37,11 @@ describe("inspectionState", () => {
     expect(started.score).toEqual({ value: 10, band: "good", provisional: true });
   });
 
+  it("goes to the report once finished, even with a photo the AI couldn't check", () => {
+    const failedPhoto = [...photos(11), { angle_key: "dashboard", ai_status: "failed" as const }];
+    expect(inspectionState({ ...base, status: "inspected", photos: failedPhoto, checklist: checklist(19) }).next).toBe("report");
+  });
+
   it("goes to the report once the inspection is finished", () => {
     const done = inspectionState({ ...base, status: "inspected", photos: photos(20), checklist: checklist(19) });
     expect(done.next).toBe("report");

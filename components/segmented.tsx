@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, type KeyboardEvent } from "react";
+import { useRef, type KeyboardEvent, type ReactNode } from "react";
 
 export type SegmentOption<V extends string> = {
   value: V;
   label: string;
+  icon?: ReactNode;
   /** Classes for the selected state, e.g. "bg-red-600 text-white border-red-600". */
   selectedClass?: string;
 };
@@ -19,6 +20,7 @@ export function Segmented<V extends string>({
   onChange,
   disabled,
   className = "",
+  columns,
 }: {
   label: string;
   options: readonly SegmentOption<V>[];
@@ -26,6 +28,8 @@ export function Segmented<V extends string>({
   onChange: (value: V) => void;
   disabled?: boolean;
   className?: string;
+  /** Grid column classes, e.g. "grid-cols-2 min-[400px]:grid-cols-4". Default: one row. */
+  columns?: string;
 }) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -41,7 +45,12 @@ export function Segmented<V extends string>({
   const focusIndex = Math.max(0, options.findIndex((o) => o.value === value));
 
   return (
-    <div role="radiogroup" aria-label={label} className={`grid gap-1.5 ${className}`} style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}>
+    <div
+      role="radiogroup"
+      aria-label={label}
+      className={`grid gap-1.5 ${columns ?? ""} ${className}`}
+      style={columns ? undefined : { gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
+    >
       {options.map((o, i) => {
         const selected = o.value === value;
         return (
@@ -61,7 +70,10 @@ export function Segmented<V extends string>({
               selected ? (o.selectedClass ?? defaultSelected) : "border-slate-300 bg-white text-ink active:bg-slate-100"
             }`}
           >
-            {o.label}
+            <span className="inline-flex items-center justify-center gap-1.5">
+              {o.icon}
+              {o.label}
+            </span>
           </button>
         );
       })}

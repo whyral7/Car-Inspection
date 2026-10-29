@@ -45,6 +45,9 @@
 
 html {
   -webkit-tap-highlight-color: transparent;
+  /* Keep focused or scrolled-to items clear of the sticky header and bottom action bar. */
+  scroll-padding-top: 5rem;
+  scroll-padding-bottom: 11rem;
 }
 
 body {
