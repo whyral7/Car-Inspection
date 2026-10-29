@@ -2,8 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Button } from "@/components/ui";
-import { Field, FormError } from "@/components/ui";
+import { Button, Card, Field, FormError, TextButton } from "@/components/ui";
 import { OTP_RESEND_SECONDS } from "@/lib/config";
 import { useT } from "@/components/i18n-provider";
 import { errorText } from "@/lib/i18n";
@@ -124,70 +123,73 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
 
   if (step === "phone") {
     return (
-      <form onSubmit={onPhoneSubmit} className="mt-8 flex flex-col gap-5" noValidate>
-        <div>
-          <h1 className="text-title font-bold">{t.login.title}</h1>
-          <p className="mt-1 text-ink-muted">{t.login.subtitle}</p>
+      <form onSubmit={onPhoneSubmit} className="flex animate-fade-in flex-col gap-6" noValidate>
+        <div className="flex flex-col gap-2">
+          <h1 className="text-title">{t.login.title}</h1>
+          <p className="text-ink-muted">{t.login.subtitle}</p>
         </div>
-        <Field
-          label={t.login.phoneLabel}
-          name="phone"
-          prefix="+91"
-          type="tel"
-          inputMode="numeric"
-          autoComplete="tel-national"
-          placeholder={t.login.phonePlaceholder}
-          maxLength={14}
-          value={phoneInput}
-          onChange={(e) => setPhoneInput(e.target.value)}
-          error={fieldError}
-          autoFocus
-          required
-        />
-        <FormError message={error} />
-        <Button type="submit" loading={pending}>
-          {t.login.sendOtp}
-        </Button>
+        <Card className="flex flex-col gap-6">
+          <Field
+            label={t.login.phoneLabel}
+            name="phone"
+            prefix="+91"
+            type="tel"
+            inputMode="numeric"
+            autoComplete="tel-national"
+            placeholder={t.login.phonePlaceholder}
+            maxLength={14}
+            value={phoneInput}
+            onChange={(e) => setPhoneInput(e.target.value)}
+            error={fieldError}
+            enterKeyHint="send"
+            autoFocus
+            required
+          />
+          <FormError message={error} />
+          <Button type="submit" loading={pending} size="lg">
+            {t.login.sendOtp}
+          </Button>
+        </Card>
       </form>
     );
   }
 
   return (
-    <form onSubmit={onOtpSubmit} className="mt-8 flex flex-col gap-5" noValidate>
-      <div>
-        <h1 className="text-title font-bold">{t.login.otpTitle}</h1>
-        <p className="mt-1 text-ink-muted">{t.login.otpSentTo(formatPhone(phone))}</p>
+    <form onSubmit={onOtpSubmit} className="flex animate-fade-in flex-col gap-6" noValidate>
+      <div className="flex flex-col gap-2">
+        <h1 className="text-title">{t.login.otpTitle}</h1>
+        <p className="text-ink-muted tabular">{t.login.otpSentTo(formatPhone(phone))}</p>
       </div>
-      <Field
-        ref={otpRef}
-        label={t.login.otpLabel}
-        name="otp"
-        type="text"
-        inputMode="numeric"
-        autoComplete="one-time-code"
-        pattern="[0-9]*"
-        maxLength={6}
-        className="[&_input]:text-center [&_input]:text-title [&_input]:tracking-[0.5em]"
-        value={otp}
-        onChange={(e) => {
-          const code = e.target.value.replace(/\D/g, "").slice(0, 6);
-          setOtp(code);
-          setError(null);
-          // Six digits is a complete code: verify without another tap.
-          if (code.length === 6) void verify(code);
-        }}
-        error={fieldError}
-        required
-      />
-      <FormError message={error} />
-      <Button type="submit" loading={pending}>
-        {t.login.verify}
-      </Button>
-      <div className="flex items-center justify-between gap-2">
-        <Button
-          type="button"
-          variant="ghost"
-          className="px-2 text-small whitespace-nowrap"
+      <Card className="flex flex-col gap-6">
+        <Field
+          ref={otpRef}
+          label={t.login.otpLabel}
+          name="otp"
+          type="text"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          pattern="[0-9]*"
+          maxLength={6}
+          enterKeyHint="done"
+          className="[&_input]:min-h-14 [&_input]:text-center [&_input]:text-title [&_input]:tracking-[0.5em] [&_input]:tabular"
+          value={otp}
+          onChange={(e) => {
+            const code = e.target.value.replace(/\D/g, "").slice(0, 6);
+            setOtp(code);
+            setError(null);
+            // Six digits is a complete code: verify without another tap.
+            if (code.length === 6) void verify(code);
+          }}
+          error={fieldError}
+          required
+        />
+        <FormError message={error} />
+        <Button type="submit" loading={pending} size="lg">
+          {t.login.verify}
+        </Button>
+      </Card>
+      <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+        <TextButton
           onClick={() => {
             setStep("phone");
             setError(null);
@@ -195,10 +197,10 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
           }}
         >
           {t.login.changeNumber}
-        </Button>
-        <Button type="button" variant="ghost" className="px-2 text-small whitespace-nowrap" disabled={resendIn > 0 || pending} onClick={() => sendOtp(phone)}>
+        </TextButton>
+        <TextButton disabled={resendIn > 0 || pending} onClick={() => sendOtp(phone)} className="tabular">
           {resendIn > 0 ? t.login.resendIn(resendIn) : t.login.resend}
-        </Button>
+        </TextButton>
       </div>
     </form>
   );

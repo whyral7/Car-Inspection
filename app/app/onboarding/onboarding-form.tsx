@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition, type ChangeEvent, type FormEvent } from "react";
-import { Button, LinkButton } from "@/components/ui";
-import { Field, FormError, focusFirstError, inputClass } from "@/components/ui";
 import { TagIcon } from "@/components/icons";
-import { Segmented } from "@/components/ui";
+import { Button, Card, Field, FieldMessage, FormError, Label, LinkButton, Segmented, StickyBar, TextAreaField, buttonClass, focusFirstError, useToast } from "@/components/ui";
+import { clearDraft, useFormDraft } from "@/lib/draft";
 import { LOGO, STORAGE_BUCKETS } from "@/lib/config";
 import { compressImage } from "@/lib/images/compress";
 import { useT } from "@/components/i18n-provider";
@@ -45,6 +44,17 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
   // Path already uploaded in this session, so a retry after a validation error doesn't upload again.
   const uploadedPath = useRef<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const toast = useToast();
+  const draftKey = `profile:${profileId}`;
+  useFormDraft(draftKey, formRef, () => {
+    const form = formRef.current;
+    if (form) {
+      setBusinessName(String(new FormData(form).get("business_name") ?? ""));
+      setCity(String(new FormData(form).get("city") ?? ""));
+    }
+    toast.show({ tone: "info", message: t.common.draftRestored });
+  });
 
   const objectUrl = useRef<string | null>(null);
 
@@ -153,9 +163,14 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
     formData.set("logo_path", logoPath ?? "");
 
     startTransition(async () => {
-      // On success the action redirects, so a returned value means there's something to show.
-      const result = await saveProfile(formData);
-      setState(result);
+      try {
+        // On success the action redirects, so a returned value means there's something to show.
+        const result = await saveProfile(formData);
+        setState(result);
+        if (!result.formError && !result.fieldErrors) clearDraft(draftKey);
+      } catch {
+        setState({ formError: navigator.onLine ? t.common.somethingWrong : t.common.offline });
+      }
     });
   }
 
@@ -170,53 +185,55 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
 
   return (
     <form
+      ref={formRef}
       onSubmit={onSubmit}
       onInput={(e) => clearFieldError((e.target as HTMLInputElement).name)}
-      className="mt-6 flex flex-col gap-5"
+      className="flex flex-1 flex-col gap-6"
       noValidate
     >
-      <div>
-        <p className="mb-1.5 block text-small font-medium text-ink">{t.onboarding.userType}</p>
-        <Segmented
-          label={t.onboarding.userType}
-          options={userTypeOptions(t)}
-          value={userType}
-          onChange={(value) => {
-            setUserType(value);
-            clearFieldError("user_type");
-          }}
+      <Card className="flex flex-col gap-6">
+        <div>
+          <p className="mb-2 text-small font-medium">{t.onboarding.userType}</p>
+          <Segmented
+            label={t.onboarding.userType}
+            options={userTypeOptions(t)}
+            value={userType}
+            columns="grid-cols-1 min-[380px]:grid-cols-3"
+            onChange={(value) => {
+              setUserType(value);
+              clearFieldError("user_type");
+            }}
+          />
+          <FieldMessage error={errors.user_type} hint={userType ? t.onboarding.userTypeHints[userType] : t.onboarding.userTypeChoose} />
+        </div>
+        <Field
+          label={t.onboarding.ownerName}
+          name="owner_name"
+          autoComplete="name"
+          autoCapitalize="words"
+          enterKeyHint="next"
+          defaultValue={initial.owner_name}
+          error={errors.owner_name}
+          autoFocus={!initial.owner_name}
+          required
         />
-        {errors.user_type ? (
-          <p className="mt-1.5 text-small font-medium text-danger-700">{errors.user_type}</p>
-        ) : (
-          <p className="mt-1.5 text-small text-ink-muted">{userType ? t.onboarding.userTypeHints[userType] : t.onboarding.userTypeChoose}</p>
-        )}
-      </div>
-      <Field
-        label={t.onboarding.ownerName}
-        name="owner_name"
-        autoComplete="name"
-        autoCapitalize="words"
-        defaultValue={initial.owner_name}
-        error={errors.owner_name}
-        autoFocus={!initial.owner_name}
-        required
-      />
-      <Field
-        label={t.onboarding.city}
-        name="city"
-        autoComplete="address-level2"
-        autoCapitalize="words"
-        defaultValue={initial.city}
-        onChange={(e) => setCity(e.target.value)}
-        error={errors.city}
-        required
-      />
+        <Field
+          label={t.onboarding.city}
+          name="city"
+          autoComplete="address-level2"
+          autoCapitalize="words"
+          enterKeyHint="done"
+          defaultValue={initial.city}
+          onChange={(e) => setCity(e.target.value)}
+          error={errors.city}
+          required
+        />
+      </Card>
 
       {/* Hidden rather than removed, so switching type and back keeps what was typed. */}
-      <section hidden={!isDealer} aria-labelledby="dealer-details" className="flex flex-col gap-5 rounded-card border border-line bg-surface p-4">
-        <div>
-          <h2 id="dealer-details" className="font-semibold">
+      <section hidden={!isDealer} aria-labelledby="dealer-details" className="flex flex-col gap-6 rounded-card bg-surface p-4 shadow-card sm:p-6">
+        <div className="flex flex-col gap-1">
+          <h2 id="dealer-details" className="text-heading">
             {t.onboarding.dealerDetails}
           </h2>
           <p className="text-small text-ink-muted">{t.onboarding.dealerDetailsHint}</p>
@@ -229,62 +246,48 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
           onChange={(e) => setBusinessName(e.target.value)}
           error={errors.business_name}
         />
-        <div>
-          <label htmlFor="address" className="mb-1.5 block text-small font-medium text-ink-muted">
-            {t.onboarding.address}
-          </label>
-          <textarea
-            id="address"
-            name="address"
-            rows={3}
-            autoComplete="street-address"
-            defaultValue={initial.address}
-            aria-invalid={Boolean(errors.address)}
-            className={`${inputClass} py-3`}
-          />
-          {errors.address && <p className="mt-1.5 text-small font-medium text-danger-700">{errors.address}</p>}
-        </div>
+        <TextAreaField label={t.onboarding.address} name="address" rows={3} autoComplete="street-address" defaultValue={initial.address} error={errors.address} />
 
         <div>
-          <p className="mb-1.5 block text-small font-medium text-ink-muted">{t.onboarding.logo}</p>
+          <Label htmlFor="logo_file">{t.onboarding.logo}</Label>
           <div className="flex items-center gap-4">
-            <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-control border border-line bg-surface">
+            <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-control bg-canvas ring-1 ring-line">
               {preview ? (
                 // eslint-disable-next-line @next/next/no-img-element -- blob: previews can't go through next/image
-                <img src={preview} alt="" className="size-full object-contain" />
+                <img src={preview} alt="" className="size-full animate-fade-in object-contain" />
               ) : (
                 <TagIcon size={28} className="text-ink-subtle" />
               )}
             </div>
             <div className="flex flex-col items-start gap-1">
-              <label className="inline-flex min-h-12 cursor-pointer items-center rounded-control border border-line bg-surface px-4 font-semibold active:bg-sunken">
+              <label className={`${buttonClass("secondary", "cursor-pointer has-focus-visible:outline-2 has-focus-visible:outline-brand-700", false, "sm")}`}>
                 {preview ? t.onboarding.changeLogo : t.onboarding.chooseLogo}
-                <input ref={fileInput} type="file" name="logo_file" accept={LOGO.mimeTypes.join(",")} onChange={onLogoChange} className="sr-only" />
+                <input ref={fileInput} id="logo_file" type="file" name="logo_file" accept={LOGO.mimeTypes.join(",")} onChange={onLogoChange} className="sr-only" />
               </label>
               {preview && (
-                <button type="button" onClick={removeLogo} className="min-h-11 px-1 text-small font-medium text-ink-muted">
+                <button type="button" onClick={removeLogo} className="min-h-11 rounded-chip px-2 text-small font-medium text-ink-muted transition-colors hover:bg-sunken">
                   {t.onboarding.removeLogo}
                 </button>
               )}
             </div>
           </div>
-          <p className={`mt-1.5 text-small ${logoError || errors.logo_path ? "font-medium text-danger-700" : "text-ink-muted"}`}>
-            {logoError ?? errors.logo_path ?? t.onboarding.logoHint}
-          </p>
+          <FieldMessage error={logoError ?? errors.logo_path} hint={t.onboarding.logoHint} />
         </div>
 
         <ReportHeaderPreview logo={preview} name={businessName || t.onboarding.businessName} city={city} />
       </section>
 
       <FormError message={state.formError} />
-      <Button type="submit" loading={busy}>
-        {uploading ? t.onboarding.uploading : t.onboarding.submit}
-      </Button>
-      {cancelHref && (
-        <LinkButton href={cancelHref} variant="secondary">
-          {t.common.back}
-        </LinkButton>
-      )}
+      <StickyBar className={cancelHref ? "!flex-row" : ""}>
+        {cancelHref && (
+          <LinkButton href={cancelHref} variant="secondary" onClick={() => clearDraft(draftKey)} className="flex-1">
+            {t.common.back}
+          </LinkButton>
+        )}
+        <Button type="submit" loading={busy} className={cancelHref ? "flex-[2]" : ""}>
+          {uploading ? t.onboarding.uploading : t.onboarding.submit}
+        </Button>
+      </StickyBar>
     </form>
   );
 }
@@ -294,13 +297,13 @@ function ReportHeaderPreview({ logo, name, city }: { logo: string | null; name: 
   const t = useT();
   return (
     <div>
-      <p className="mb-1.5 text-small font-medium text-ink">{t.onboarding.previewTitle}</p>
-      <div className="flex items-center gap-3 rounded-control border border-dashed border-line bg-canvas p-3">
+      <p className="mb-2 text-small font-medium">{t.onboarding.previewTitle}</p>
+      <div className="flex items-center gap-4 rounded-control bg-canvas p-4">
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element -- blob: preview
-          <img src={logo} alt="" className="size-11 shrink-0 rounded-chip border border-line bg-surface object-contain" />
+          <img src={logo} alt="" className="size-12 shrink-0 rounded-control bg-surface object-contain ring-1 ring-line" />
         ) : (
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-chip bg-brand-700 font-bold text-white">{name.trim().charAt(0).toUpperCase() || "?"}</span>
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-control bg-brand-700 font-semibold text-white">{name.trim().charAt(0).toUpperCase() || "?"}</span>
         )}
         <div className="min-w-0">
           <p className="font-bold break-words">{name}</p>
