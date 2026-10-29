@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { useT } from "@/components/i18n-provider";
-import { CheckIcon, ShareIcon } from "@/components/icons";
+import { ShareIcon } from "@/components/icons";
+import { useToast } from "@/components/ui";
 
 /**
  * Opens the phone's share sheet (WhatsApp, SMS, email…) with the report link, or copies the link
@@ -10,7 +10,7 @@ import { CheckIcon, ShareIcon } from "@/components/icons";
  */
 export function ShareButton({ url, title, text, className = "", label }: { url: string; title: string; text?: string; className?: string; label?: string }) {
   const t = useT();
-  const [copied, setCopied] = useState(false);
+  const toast = useToast();
 
   async function share() {
     if (typeof navigator.share === "function") {
@@ -24,8 +24,7 @@ export function ShareButton({ url, title, text, className = "", label }: { url: 
     }
     try {
       await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+      toast.show({ tone: "success", message: t.report.copied });
     } catch {
       window.prompt(t.report.copyLink, url);
     }
@@ -33,8 +32,8 @@ export function ShareButton({ url, title, text, className = "", label }: { url: 
 
   return (
     <button type="button" onClick={() => void share()} className={`inline-flex min-h-11 items-center justify-center gap-2 font-semibold ${className}`}>
-      {copied ? <CheckIcon size={18} /> : <ShareIcon size={18} />}
-      {copied ? t.report.copied : (label ?? t.publicReport.share)}
+      <ShareIcon size={18} />
+      {label ?? t.publicReport.share}
     </button>
   );
 }

@@ -534,6 +534,7 @@ export const hi: Strings = {
     previewLabel: "झलक",
     publish: "रिपोर्ट पब्लिश करें",
     publishCost: (credits: number) => `आपके ${credits} क्रेडिट में से 1 लगेगा। पब्लिश के बाद बदलाव मुफ़्त हैं।`,
+    publishConfirm: "यह रिपोर्ट पब्लिश करें?",
     publishing: "पब्लिश हो रही है…",
     noCredits: "आपके क्रेडिट खत्म हो गए। यह रिपोर्ट पब्लिश करने के लिए क्रेडिट खरीदें।",
     buyCredits: "क्रेडिट खरीदें",

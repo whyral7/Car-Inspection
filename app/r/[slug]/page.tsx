@@ -52,13 +52,13 @@ export default async function PublicReportPage({ params }: PageProps<"/r/[slug]"
 
   return (
     <>
-      <main className={`mx-auto w-full max-w-2xl flex-1 px-4 pt-[calc(1rem+env(safe-area-inset-top))] ${canContact ? "pb-28" : "pb-6"}`}>
+      <main className={`mx-auto w-full max-w-2xl flex-1 px-4 pt-[calc(1.5rem+env(safe-area-inset-top))] ${canContact ? "pb-32" : "pb-8"}`}>
         <ReportView view={view} t={t} pdfHref={reportPdfPath(slug)} shareUrl={reportUrl(await appBaseUrl(), slug)} />
       </main>
       {canContact && (
         // Always in reach while the buyer scrolls through the photos.
-        <aside aria-label={t.publicReport.contactBar} className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-surface shadow-[0_-2px_8px_rgb(15_23_42/0.06)]">
-          <div className="mx-auto w-full max-w-2xl px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+        <aside aria-label={t.publicReport.contactBar} className="fixed inset-x-0 bottom-0 z-10 bg-surface shadow-bar">
+          <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
             <ContactButtons view={view} t={t} />
           </div>
         </aside>

@@ -535,6 +535,7 @@ export const en = {
     previewLabel: "Preview",
     publish: "Publish report",
     publishCost: (credits: number) => `Uses 1 of your ${credits === 1 ? "1 credit" : `${credits} credits`}. Edits after publishing are free.`,
+    publishConfirm: "Publish this report?",
     publishing: "Publishing…",
     noCredits: "You have no credits left. Buy credits to publish this report.",
     buyCredits: "Buy credits",

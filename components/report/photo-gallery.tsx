@@ -112,7 +112,7 @@ export function PhotoGallery({ photos }: { photos: ReportPhoto[] }) {
       <ul className="grid grid-cols-3 gap-1.5 sm:grid-cols-4">
         {photos.map((p, i) => (
           <li key={p.key}>
-            <button type="button" onClick={() => viewer.open(i)} className="block w-full overflow-hidden rounded-chip bg-sunken focus-visible:outline-2 focus-visible:outline-brand-700">
+            <button type="button" onClick={() => viewer.open(i)} className="block w-full overflow-hidden rounded-control bg-sunken focus-visible:outline-2 focus-visible:outline-brand-700">
               {/* eslint-disable-next-line @next/next/no-img-element -- signed storage URLs; the small copy is already sized for this grid */}
               <img src={p.thumbUrl} alt={p.label} width={640} height={480} loading="lazy" decoding="async" className="aspect-[4/3] w-full object-cover" />
             </button>
