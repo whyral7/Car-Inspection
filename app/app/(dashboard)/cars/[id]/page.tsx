@@ -113,18 +113,18 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
         ← {t.car.backToCars}
       </Link>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5">
+      <section className="rounded-2xl border border-line bg-white p-5">
         <div className="flex items-start justify-between gap-3">
           <p className="min-w-0 truncate text-2xl font-bold tracking-widest">{car.reg_number}</p>
           <StatusBadge status={car.status} t={t} />
         </div>
         <h1 className="mt-1 text-lg text-slate-700">{carTitle(car)}</h1>
-        <p className="mt-1 text-xs text-slate-500">{car.rc_raw ? t.car.fromRc : t.car.enteredManually}</p>
+        <p className="mt-1 text-xs text-slate-600">{car.rc_raw ? t.car.fromRc : t.car.enteredManually}</p>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5">
+      <section className="rounded-2xl border border-line bg-white p-5">
         <h2 className="mb-2 font-semibold">{t.car.details}</h2>
-        <dl className="divide-y divide-slate-100">
+        <dl className="divide-y divide-line">
           {rows.map((row) => (
             <div key={row.label} className="flex justify-between gap-4 py-2.5 text-sm">
               <dt className="text-slate-600">{row.label}</dt>
@@ -135,21 +135,21 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
       </section>
 
       {started && (
-        <section className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5" aria-label={`${t.car.score} ${formatScore(score)} ${t.car.scoreOutOf}`}>
+        <section className="flex items-center gap-4 rounded-2xl border border-line bg-white p-5" aria-label={`${t.car.score} ${formatScore(score)} ${t.car.scoreOutOf}`}>
           <p className="shrink-0 text-4xl font-bold text-brand-800">
             {formatScore(score)}
-            <span className="text-base font-medium text-slate-500">{t.car.scoreOutOf}</span>
+            <span className="text-base font-medium text-slate-600">{t.car.scoreOutOf}</span>
           </p>
           <div>
             <h2 className="font-semibold">{t.car.score}</h2>
-            <p className="text-sm text-slate-500">{t.car.scoreHint}</p>
+            <p className="text-sm text-slate-600">{t.car.scoreHint}</p>
           </div>
         </section>
       )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white">
+      <section className="rounded-2xl border border-line bg-white">
         <h2 className="px-5 pt-4 pb-1 font-semibold">{t.car.steps}</h2>
-        <ol className="divide-y divide-slate-100">
+        <ol className="divide-y divide-line">
           {steps.map((step, i) => (
             <li key={step.href}>
               <Link href={step.href} className="flex min-h-16 items-center gap-3 px-5 py-3 active:bg-slate-50">
@@ -162,7 +162,7 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block font-medium">{step.title}</span>
-                  <span className={`block text-sm ${step.warn ? "text-amber-800" : "text-slate-500"}`}>{step.status}</span>
+                  <span className={`block text-sm ${step.warn ? "text-amber-800" : "text-slate-600"}`}>{step.status}</span>
                 </span>
                 <span aria-hidden="true" className="text-slate-400">›</span>
               </Link>
@@ -173,10 +173,10 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
 
       <div className="flex flex-col gap-2">
         <LinkButton href={next.href}>{next.label}</LinkButton>
-        {photos.done === 0 && <p className="text-center text-sm text-slate-500">{t.car.inspectionHint}</p>}
+        {photos.done === 0 && <p className="text-center text-sm text-slate-600">{t.car.inspectionHint}</p>}
       </div>
 
-      <p className="text-center text-xs text-slate-500">{t.disclaimer}</p>
+      <p className="text-center text-xs text-slate-600">{t.disclaimer}</p>
     </div>
   );
 }

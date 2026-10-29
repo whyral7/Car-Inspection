@@ -18,7 +18,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 py-10">
       <p className="text-xl font-bold text-brand-700">{t.appName}</p>
       <LoginForm nextPath={nextPath} />
-      <p className="mt-6 text-center text-sm text-slate-500">
+      <p className="mt-6 text-center text-sm text-slate-600">
         {t.login.agree}{" "}
         <Link href="/terms" className="font-medium text-brand-700 underline">
           {t.login.terms}
@@ -29,7 +29,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
         </Link>
         .
       </p>
-      <p className="mt-auto pt-10 text-center text-sm text-slate-500">{t.disclaimer}</p>
+      <p className="mt-auto pt-10 text-center text-sm text-slate-600">{t.disclaimer}</p>
     </main>
   );
 }

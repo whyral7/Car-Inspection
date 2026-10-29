@@ -11,7 +11,7 @@ export function LegalPage({ title, intro, sections }: { title: string; intro: st
         ← {legal.back}
       </Link>
       <h1 className="mt-2 text-2xl font-bold">{title}</h1>
-      <p className="mt-1 text-sm text-slate-500">{legal.updated(BUSINESS.legalUpdated)}</p>
+      <p className="mt-1 text-sm text-slate-600">{legal.updated(BUSINESS.legalUpdated)}</p>
       <p className="mt-4 leading-relaxed text-slate-700">{intro}</p>
       {sections.map((section) => (
         <section key={section.heading} className="mt-6">

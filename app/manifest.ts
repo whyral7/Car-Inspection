@@ -16,6 +16,10 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: THEME_COLOR,
     lang: "en-IN",
     categories: ["business", "productivity"],
+    shortcuts: [
+      { name: t.cars.addTitle, short_name: t.dashboard.addCar, url: "/app/cars/new", icons: [{ src: "/icons/icon-192.png", sizes: "192x192" }] },
+      { name: t.dashboard.myCars, url: "/app", icons: [{ src: "/icons/icon-192.png", sizes: "192x192" }] },
+    ],
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
       { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },

@@ -11,7 +11,7 @@ const links = [
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)]">
+    <footer className="border-t border-line bg-white pb-[env(safe-area-inset-bottom)]">
       {/* Bottom padding keeps the last line clear of the floating WhatsApp button. */}
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 pt-8 pb-24">
         <ul className="flex flex-wrap gap-x-5 gap-y-1">
@@ -23,8 +23,8 @@ export function SiteFooter() {
             </li>
           ))}
         </ul>
-        <p className="text-xs text-slate-500">{t.disclaimer}</p>
-        <p className="text-xs text-slate-500">{t.site.footer.rights(new Date().getFullYear(), BUSINESS.legalName)}</p>
+        <p className="text-xs text-slate-600">{t.disclaimer}</p>
+        <p className="text-xs text-slate-600">{t.site.footer.rights(new Date().getFullYear(), BUSINESS.legalName)}</p>
       </div>
     </footer>
   );

@@ -4,7 +4,7 @@ import { en as t } from "@/lib/strings";
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 pt-[env(safe-area-inset-top)] backdrop-blur">
+    <header className="sticky top-0 z-20 border-b border-line bg-white pt-[env(safe-area-inset-top)]">
       <nav className="mx-auto flex w-full max-w-5xl items-center gap-2 px-4 py-2">
         <Link href="/" className="mr-auto flex min-h-11 items-center gap-2 text-lg font-bold text-brand-700">
           <span aria-hidden className="flex size-8 items-center justify-center rounded-lg bg-brand-700 text-sm text-white">

@@ -22,7 +22,7 @@ type Item = {
 type Items = Record<ChecklistKey, Item>;
 
 const resultOptions = (t: Strings): readonly SegmentOption<ChecklistResult>[] => [
-  { value: "ok", label: t.checklist.results.ok, selectedClass: "border-emerald-600 bg-emerald-600 text-white" },
+  { value: "ok", label: t.checklist.results.ok, selectedClass: "border-emerald-700 bg-emerald-700 text-white" },
   { value: "attention", label: t.checklist.results.attention, selectedClass: "border-amber-500 bg-amber-400 text-amber-950" },
   { value: "fail", label: t.checklist.results.fail, selectedClass: "border-red-600 bg-red-600 text-white" },
   { value: "na", label: t.checklist.results.na, selectedClass: "border-slate-600 bg-slate-600 text-white" },
@@ -118,7 +118,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
         <p className="mt-2 text-sm text-slate-600">{t.checklist.subtitle}</p>
       </header>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4" aria-label={t.checklist.progress(progress.done, progress.total)}>
+      <section className="rounded-2xl border border-line bg-white p-4" aria-label={t.checklist.progress(progress.done, progress.total)}>
         <p className="text-2xl font-bold">{t.checklist.progress(progress.done, progress.total)}</p>
         <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-valuemin={0} aria-valuemax={progress.total} aria-valuenow={progress.done}>
           <div className="h-full rounded-full bg-brand-600 transition-[width]" style={{ width: `${(progress.done / progress.total) * 100}%` }} />
@@ -126,9 +126,9 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
       </section>
 
       {CHECKLIST_GROUPS.map((group) => (
-        <section key={group.key} className="rounded-2xl border border-slate-200 bg-white">
+        <section key={group.key} className="rounded-2xl border border-line bg-white">
           <h2 className="border-b border-slate-100 px-4 py-3 font-semibold">{t.checklist.groups[group.key]}</h2>
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-line">
             {group.items.map((key) => (
               <li key={key} className="p-4">
                 <ChecklistRow
@@ -146,7 +146,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
         </section>
       ))}
 
-      <div className="sticky bottom-0 -mx-4 flex flex-col gap-2 border-t border-slate-200 bg-white/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur">
+      <div className="sticky bottom-0 -mx-4 flex flex-col gap-2 border-t border-line bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
         <p aria-live="polite" className={`text-center text-sm ${progress.complete ? "text-brand-800" : "text-slate-600"}`}>
           {progress.complete ? (finished ? t.checklist.finished : t.checklist.allDone) : t.checklist.finishHint(progress.total - progress.done)}
         </p>
@@ -183,7 +183,7 @@ function ChecklistRow({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="font-medium">{label}</p>
-          <p className="text-sm text-slate-500">{hint}</p>
+          <p className="text-sm text-slate-600">{hint}</p>
         </div>
         <SaveState state={item.save} onRetry={onRetry} />
       </div>
@@ -209,7 +209,7 @@ function ChecklistRow({
 
 function SaveState({ state, onRetry }: { state: Item["save"]; onRetry: () => void }) {
   const t = useT();
-  if (state === "saving") return <span className="shrink-0 text-xs text-slate-500">{t.checklist.saving}</span>;
+  if (state === "saving") return <span className="shrink-0 text-xs text-slate-600">{t.checklist.saving}</span>;
   if (state === "saved") return <span className="shrink-0 text-xs text-brand-700">✓ {t.checklist.saved}</span>;
   if (state === "error")
     return (

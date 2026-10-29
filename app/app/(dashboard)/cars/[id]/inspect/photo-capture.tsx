@@ -200,7 +200,7 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
         ))}
       </ul>
 
-      <div className="sticky bottom-0 -mx-4 flex flex-col gap-2 border-t border-slate-200 bg-white/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur">
+      <div className="sticky bottom-0 -mx-4 flex flex-col gap-2 border-t border-line bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
         <p className={`text-center text-sm ${progress.allRequiredDone ? "text-brand-800" : "text-slate-600"}`}>
           {!nextAngle ? t.photos.allDone : progress.allRequiredDone ? t.photos.allRequiredDone : t.photos.missingRequired(progress.requiredTotal - progress.requiredDone)}
         </p>
@@ -224,7 +224,7 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
 function ProgressCard({ progress }: { progress: ReturnType<typeof photoProgress> }) {
   const t = useT();
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-4" aria-label={t.photos.progress(progress.done, progress.total)}>
+    <section className="rounded-2xl border border-line bg-white p-4" aria-label={t.photos.progress(progress.done, progress.total)}>
       <div className="flex items-baseline justify-between gap-3">
         <p className="text-2xl font-bold">{t.photos.progress(progress.done, progress.total)}</p>
         <p className={`text-sm font-medium ${progress.allRequiredDone ? "text-brand-700" : "text-slate-600"}`}>
@@ -247,7 +247,7 @@ function Tile({ angle, slot, onOpen }: { angle: Angle; slot: Slot | undefined; o
   const { label } = t.photos.angles[angle.key];
   const status = slot?.status;
   const border =
-    status === "failed" ? "border-red-400" : status ? "border-slate-200" : angle.required ? "border-amber-300" : "border-dashed border-slate-300";
+    status === "failed" ? "border-red-400" : status ? "border-line" : angle.required ? "border-amber-300" : "border-dashed border-slate-300";
   const statusText = status ? t.photos.status[status === "processing" ? "processing" : status] : angle.required ? t.photos.required : t.photos.optional;
 
   return (
@@ -330,14 +330,14 @@ function GuideScreen({ angle, slot, progress, pickError, onPick, onRetry, onPrev
         <p className="mt-1 text-slate-600">{tip}</p>
       </div>
 
-      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-line bg-white">
         {slot?.url ? (
           // eslint-disable-next-line @next/next/no-img-element -- private signed URL or local blob, not optimisable
           <img src={slot.url} alt={label} decoding="async" className="size-full object-contain bg-slate-900" />
         ) : (
           <>
             <AngleHint angle={angle} className="size-full p-6 text-slate-400" />
-            <p className="absolute inset-x-0 bottom-2 text-center text-xs text-slate-500">{t.photos.noPhotoYet}</p>
+            <p className="absolute inset-x-0 bottom-2 text-center text-xs text-slate-600">{t.photos.noPhotoYet}</p>
           </>
         )}
       </div>

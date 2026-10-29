@@ -167,12 +167,12 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
       <Field label={t.onboarding.city} name="city" autoComplete="address-level2" defaultValue={initial.city} error={errors.city} required />
 
       {/* Hidden rather than removed, so switching type and back keeps what was typed. */}
-      <section hidden={!isDealer} aria-labelledby="dealer-details" className="flex flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-4">
+      <section hidden={!isDealer} aria-labelledby="dealer-details" className="flex flex-col gap-5 rounded-2xl border border-line bg-white p-4">
         <div>
           <h2 id="dealer-details" className="font-semibold">
             {t.onboarding.dealerDetails}
           </h2>
-          <p className="text-sm text-slate-500">{t.onboarding.dealerDetailsHint}</p>
+          <p className="text-sm text-slate-600">{t.onboarding.dealerDetailsHint}</p>
         </div>
         <Field
           label={t.onboarding.businessName}
@@ -214,13 +214,13 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
                 <input ref={fileInput} type="file" name="logo_file" accept={LOGO.mimeTypes.join(",")} onChange={onLogoChange} className="sr-only" />
               </label>
               {preview && (
-                <button type="button" onClick={removeLogo} className="min-h-11 px-1 text-sm font-medium text-slate-500">
+                <button type="button" onClick={removeLogo} className="min-h-11 px-1 text-sm font-medium text-slate-600">
                   {t.onboarding.removeLogo}
                 </button>
               )}
             </div>
           </div>
-          <p className={`mt-1.5 text-sm ${logoError || errors.logo_path ? "text-red-600" : "text-slate-500"}`}>
+          <p className={`mt-1.5 text-sm ${logoError || errors.logo_path ? "text-red-600" : "text-slate-600"}`}>
             {logoError ?? errors.logo_path ?? t.onboarding.logoHint}
           </p>
         </div>

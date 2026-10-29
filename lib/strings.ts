@@ -13,6 +13,29 @@ export const en = {
     back: "Back",
     somethingWrong: "Something went wrong. Please try again.",
     offline: "You seem to be offline. Check your internet and try again.",
+    offlineBanner: "You're offline. Photos and checklist answers are kept on this phone and sent when you're back online.",
+    serverError: "Something went wrong on our side. Please try again in a minute.",
+    retry: "Try again",
+    goHome: "Go to My cars",
+    goToSite: "Go to the home page",
+    close: "Close",
+    cancel: "Cancel",
+    language: "Language",
+    languageNames: { en: "English", hi: "हिन्दी" },
+  },
+
+  install: {
+    title: "Add Treadmark to your home screen",
+    body: "Open it in one tap, like any other app. It takes no space.",
+    action: "Add to home screen",
+  },
+
+  errorPage: {
+    title: "Something went wrong",
+    notFoundTitle: "We couldn't find that",
+    notFoundBody: "This car or page isn't in your account. It may have been deleted, or the link is wrong.",
+    pageNotFoundTitle: "Page not found",
+    pageNotFoundBody: "The link may be mistyped or the page has moved.",
   },
 
   home: {
@@ -507,6 +530,7 @@ export const en = {
     publishedOn: (date: string) => `Report date: ${date}`,
     madeWith: "Made with Treadmark",
     notFoundTitle: "Report not available",
+    seeSample: "See a sample report",
     notFoundBody: "This link doesn't open a report. It may have been mistyped or removed. Ask the person who sent it to share it again.",
     photoViewer: "Photo viewer",
     close: "Close",
@@ -562,6 +586,7 @@ export const en = {
 
   profile: {
     title: "Profile",
+    logoutConfirm: "Log out of Treadmark on this phone? You'll need a new OTP to log in again.",
     edit: "Edit profile",
     userType: "I am a",
     owner: "Owner",

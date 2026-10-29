@@ -141,7 +141,7 @@ function CarDetailsForm({ lookup, onChangeReg }: { lookup: Lookup; onChangeReg: 
       className="mt-6 flex flex-col gap-5"
       noValidate
     >
-      <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+      <div className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-white p-4">
         <div className="min-w-0">
           <p className="text-sm text-slate-600">{t.cars.regNumber}</p>
           <p className="truncate text-xl font-bold tracking-widest">{lookup.regNumber}</p>

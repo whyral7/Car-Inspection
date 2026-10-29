@@ -57,7 +57,7 @@ export default async function AppHome() {
               <li key={car.id}>
                 <Link
                   href={`/app/cars/${car.id}`}
-                  className="flex min-h-16 items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 active:bg-slate-50"
+                  className="flex min-h-16 items-center justify-between gap-3 rounded-2xl border border-line bg-white p-4 active:bg-slate-50"
                 >
                   <div className="min-w-0">
                     <p className="font-semibold tracking-wide">{car.reg_number}</p>
@@ -71,7 +71,7 @@ export default async function AppHome() {
         )}
       </section>
 
-      <p className="text-center text-xs text-slate-500">{t.disclaimer}</p>
+      <p className="text-center text-xs text-slate-600">{t.disclaimer}</p>
     </div>
   );
 }

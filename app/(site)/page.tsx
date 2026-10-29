@@ -32,12 +32,12 @@ function WhatsappLink({ className }: { className: string }) {
 function ReportPreview() {
   const p = h.preview;
   return (
-    <div aria-hidden className="mx-auto w-full max-w-xs rotate-1 rounded-3xl border border-slate-200 bg-white p-4 shadow-xl shadow-slate-900/10">
+    <div aria-hidden className="mx-auto w-full max-w-xs rotate-1 rounded-2xl border border-line bg-white p-4 shadow-xl shadow-slate-900/10">
       <div className="flex items-center gap-2">
         <span className="flex size-9 items-center justify-center rounded-lg bg-brand-700 text-sm font-bold text-white">{p.dealer.charAt(0)}</span>
         <div className="min-w-0">
           <p className="truncate text-sm font-bold">{p.dealer}</p>
-          <p className="text-xs text-slate-500">{p.city}</p>
+          <p className="text-xs text-slate-600">{p.city}</p>
         </div>
       </div>
       <div className="mt-3 flex items-start justify-between gap-2">
@@ -52,7 +52,7 @@ function ReportPreview() {
       </div>
       <div className="mt-3 grid grid-cols-4 gap-1">
         {Array.from({ length: 8 }, (_, i) => (
-          <span key={i} className="aspect-[4/3] rounded-md bg-gradient-to-br from-slate-200 to-slate-300" />
+          <span key={i} className="aspect-[4/3] rounded-lg bg-gradient-to-br from-slate-200 to-slate-300" />
         ))}
       </div>
       <ul className="mt-3 flex flex-col gap-1 text-xs text-slate-700">
@@ -97,7 +97,7 @@ export default function Home() {
                 {h.sample}
               </LinkButton>
             </div>
-            <p className="text-sm text-slate-500">{h.ctaNote}</p>
+            <p className="text-sm text-slate-600">{h.ctaNote}</p>
           </div>
           <ReportPreview />
         </div>
@@ -107,7 +107,7 @@ export default function Home() {
         <h2 className="text-2xl font-bold">{h.stepsTitle}</h2>
         <ol className="mt-6 grid gap-4 md:grid-cols-3">
           {h.steps.map((step, i) => (
-            <li key={step.title} className="flex gap-4 rounded-2xl border border-slate-200 bg-white p-5 md:flex-col">
+            <li key={step.title} className="flex gap-4 rounded-2xl border border-line bg-white p-5 md:flex-col">
               <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-700 text-lg font-bold text-white">{i + 1}</span>
               <div>
                 <h3 className="font-semibold">{step.title}</h3>
@@ -139,7 +139,7 @@ export default function Home() {
         <h2 className="text-2xl font-bold">{h.pricingTitle}</h2>
         <p className="mt-2 text-slate-600">{h.pricingSubtitle}</p>
         <ul className="mt-6 grid gap-4 md:grid-cols-3">
-          <li className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5">
+          <li className="flex flex-col rounded-2xl border border-line bg-white p-5">
             <h3 className="font-semibold">{h.free.title}</h3>
             <p className="mt-2 text-3xl font-bold">{h.free.price}</p>
             <p className="mt-1 text-slate-600">{h.free.body(FREE_CREDITS)}</p>
@@ -150,7 +150,7 @@ export default function Home() {
           {CREDIT_PACKS.map((pack) => {
             const best = CREDIT_PACKS.length > 1 && pricePerReportPaise(pack) === cheapest;
             return (
-              <li key={pack.key} className={`flex flex-col rounded-2xl border bg-white p-5 ${best ? "border-brand-600 ring-1 ring-brand-600" : "border-slate-200"}`}>
+              <li key={pack.key} className={`flex flex-col rounded-2xl border bg-white p-5 ${best ? "border-brand-600 ring-1 ring-brand-600" : "border-line"}`}>
                 <div className="flex items-center justify-between gap-2">
                   <h3 className="font-semibold">{h.packTitle(pack.credits)}</h3>
                   {best && <span className="rounded-full bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-800">{h.bestValue}</span>}
@@ -161,7 +161,7 @@ export default function Home() {
             );
           })}
         </ul>
-        <p className="mt-4 text-sm text-slate-500">{t.disclaimer}</p>
+        <p className="mt-4 text-sm text-slate-600">{t.disclaimer}</p>
       </section>
 
       <section className="bg-brand-700 text-white">
@@ -174,13 +174,13 @@ export default function Home() {
             <LinkButton href="/login" variant="secondary" className="border-white">
               {h.cta}
             </LinkButton>
-            <WhatsappLink className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#128c7e] px-5 font-semibold text-white active:bg-[#075e54]" />
+            <WhatsappLink className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-whatsapp px-5 font-semibold text-white active:bg-whatsapp-pressed" />
           </div>
         </div>
       </section>
 
       {/* Always-visible WhatsApp button, the way Indian dealers expect to ask a question. */}
-      <WhatsappLink className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-30 flex min-h-12 items-center gap-2 rounded-full bg-[#128c7e] px-4 font-semibold text-white shadow-lg shadow-slate-900/20 active:bg-[#075e54]" />
+      <WhatsappLink className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-30 flex min-h-12 items-center gap-2 rounded-full bg-whatsapp px-4 font-semibold text-white shadow-lg shadow-slate-900/20 active:bg-whatsapp-pressed" />
     </>
   );
 }

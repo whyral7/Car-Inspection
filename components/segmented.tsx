@@ -57,8 +57,8 @@ export function Segmented<V extends string>({
             disabled={disabled}
             onClick={() => onChange(o.value)}
             onKeyDown={(e) => onKeyDown(e, i)}
-            className={`min-h-11 rounded-xl border px-1 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:opacity-60 ${
-              selected ? (o.selectedClass ?? defaultSelected) : "border-slate-300 bg-white text-slate-700 active:bg-slate-100"
+            className={`min-h-11 rounded-xl border px-1 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-500 ${
+              selected ? (o.selectedClass ?? defaultSelected) : "border-slate-300 bg-white text-ink active:bg-slate-100"
             }`}
           >
             {o.label}

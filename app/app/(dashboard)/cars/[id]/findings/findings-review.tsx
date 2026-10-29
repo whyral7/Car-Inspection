@@ -173,7 +173,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
       </header>
 
       {photos.length === 0 ? (
-        <section className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-5">
+        <section className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-5">
           <p className="text-slate-700">{t.findings.noPhotos}</p>
           <LinkButton href={`/app/cars/${carId}/inspect`}>{t.findings.takePhotos}</LinkButton>
         </section>
@@ -197,7 +197,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
 
       <Group groupKey={GENERAL} title={t.findings.general} subtitle={t.findings.generalHint} photoId={null} findings={generalFindings} {...groupProps} />
 
-      <div className="sticky bottom-0 -mx-4 flex flex-col gap-2 border-t border-slate-200 bg-white/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur">
+      <div className="sticky bottom-0 -mx-4 flex flex-col gap-2 border-t border-line bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
         <p className={`text-center text-sm ${toReview.length ? "text-slate-700" : "text-brand-800"}`}>
           {toReview.length ? t.findings.toReview(toReview.length) : t.findings.allReviewed}
         </p>
@@ -220,7 +220,7 @@ function AnalysisProgress({ total, active, failed, onRetry }: { total: number; a
   const t = useT();
   const done = total - active;
   return (
-    <section aria-live="polite" className="rounded-2xl border border-slate-200 bg-white p-4">
+    <section aria-live="polite" className="rounded-2xl border border-line bg-white p-4">
       {active > 0 ? (
         <>
           <p className="flex items-center gap-2 font-semibold">
@@ -278,7 +278,7 @@ function OdometerCard({ carId, initialKm, photo }: { carId: string; initialKm: n
 
   if (confirmed !== null && !changing) {
     return (
-      <section className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+      <section className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-white p-4">
         <div className="min-w-0">
           <h2 className="text-sm text-slate-600">{t.findings.odometer.title}</h2>
           <p className="font-semibold">✓ {t.findings.odometer.confirmed(kmFormat.format(confirmed))}</p>
@@ -375,7 +375,7 @@ function PhotoGroup({ photo, findings, onRetry, ...actions }: { photo: PhotoStat
 function PhotoStatus({ photo, findingCount, carId, onRetry }: { photo: PhotoState; findingCount: number; carId: string; onRetry: () => void }) {
   const t = useT();
   const s = t.findings.photoStatus;
-  if (photo.run === "queued" || (!photo.run && photo.aiStatus === "pending")) return <p className="text-sm text-slate-500">{s.queued}</p>;
+  if (photo.run === "queued" || (!photo.run && photo.aiStatus === "pending")) return <p className="text-sm text-slate-600">{s.queued}</p>;
   if (photo.run === "running")
     return (
       <p className="flex items-center gap-2 text-sm text-slate-600">
@@ -411,7 +411,7 @@ function PhotoStatus({ photo, findingCount, carId, onRetry }: { photo: PhotoStat
         {retake}
       </div>
     );
-  return <p className="text-sm text-slate-500">{findingCount === 0 ? s.noDamage : s.done}</p>;
+  return <p className="text-sm text-slate-600">{findingCount === 0 ? s.noDamage : s.done}</p>;
 }
 
 function Group({
@@ -439,12 +439,12 @@ function Group({
   const t = useT();
   const adding = editing === `new:${groupKey}`;
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-4" aria-label={title}>
+    <section className="rounded-2xl border border-line bg-white p-4" aria-label={title}>
       <div className="flex flex-wrap items-start gap-3">
         {media}
         <div className="min-w-0 flex-1">
           <h2 className="font-semibold">{title}</h2>
-          {subtitle && <p className="text-sm text-slate-500">{subtitle}</p>}
+          {subtitle && <p className="text-sm text-slate-600">{subtitle}</p>}
           {status}
         </div>
       </div>
@@ -482,11 +482,11 @@ function FindingCard({ finding, onAccept, onEdit, onDelete }: { finding: Finding
   const small = "min-h-11 flex-1 px-2 text-sm";
 
   return (
-    <article className={`rounded-xl border p-3 ${finding.accepted ? "border-slate-200 bg-white" : "border-amber-300 bg-amber-50"}`}>
+    <article className={`rounded-xl border p-3 ${finding.accepted ? "border-line bg-white" : "border-amber-300 bg-amber-50"}`}>
       <div className="flex flex-wrap items-center gap-1.5">
         <span className="font-semibold">{t.findings.types[finding.type]}</span>
         <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${severityChip[finding.severity]}`}>{t.findings.severities[finding.severity]}</span>
-        <span className="ml-auto text-xs font-medium text-slate-500">
+        <span className="ml-auto text-xs font-medium text-slate-600">
           {finding.accepted ? `✓ ${t.findings.accepted}` : t.findings.needsReview} · {finding.source === "ai" ? t.findings.fromAi : t.findings.fromDealer}
         </span>
       </div>

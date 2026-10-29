@@ -3,8 +3,10 @@
 import type { ScoreBand } from "@/lib/score";
 import type { ChecklistResult, Severity } from "@/lib/supabase/database.types";
 
-export const BRAND = { 700: "#0f766e", 800: "#115e59", 50: "#f0fdfa" } as const;
-export const INK = { 900: "#0f172a", 700: "#334155", 500: "#64748b", 300: "#cbd5e1", 200: "#e2e8f0", 100: "#f1f5f9", 50: "#f8fafc" } as const;
+export const BRAND = { 700: "#115e59", 800: "#0b4542", 50: "#e6f4f2" } as const;
+/** Number-plate yellow for the plate and score ring on buyer-facing reports. */
+export const SIGNAL = { plate: "#ffc83d", ring: "#f5a400" } as const;
+export const INK = { 900: "#0b1220", 700: "#334155", 500: "#64748b", 300: "#cbd5e1", 200: "#e2e8f0", 100: "#f1f5f9", 50: "#f8fafc" } as const;
 
 type Chip = { fg: string; bg: string };
 

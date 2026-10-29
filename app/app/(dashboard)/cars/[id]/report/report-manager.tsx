@@ -143,7 +143,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
             {t.report.link}
             <input readOnly value={published.url} onFocus={(e) => e.currentTarget.select()} className="min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-base font-normal" />
           </label>
-          <a href={whatsappShareUrl(shareText)} target="_blank" rel="noopener" className={buttonClass("primary", "bg-[#128c7e] active:bg-[#075e54]")}>
+          <a href={whatsappShareUrl(shareText)} target="_blank" rel="noopener" className={buttonClass("primary", "bg-whatsapp active:bg-whatsapp-pressed")}>
             <span aria-hidden="true">💬</span>
             {t.report.shareWhatsApp}
           </a>
@@ -165,13 +165,13 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
         </section>
       )}
 
-      <section className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+      <section className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-4">
         <div>
           <h2 className="font-semibold">{t.report.price.title}</h2>
           {view.price ? (
             <>
               <p className="mt-1 text-2xl font-bold">{view.price.rangeText}</p>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-600">
                 {view.price.searchedOn} · {hidden.includes("price") ? t.report.price.hiddenOnReport : t.report.price.shownOnReport}
               </p>
             </>
@@ -189,17 +189,17 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
             {view.price ? t.report.price.refresh : t.report.price.run}
           </Button>
         )}
-        {!view.price && !estimating && <p className="text-center text-xs text-slate-500">{t.report.price.free(PRICE.maxPerCarPerDay)}</p>}
+        {!view.price && !estimating && <p className="text-center text-xs text-slate-600">{t.report.price.free(PRICE.maxPerCarPerDay)}</p>}
         <FormError message={priceError} />
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4">
+      <section className="rounded-2xl border border-line bg-white p-4">
         <div className="mb-2 flex items-baseline justify-between gap-3">
           <h2 className="font-semibold">{t.report.sectionsTitle}</h2>
-          {sectionsSave === "saving" && <p className="text-xs text-slate-500">{t.report.savingSections}</p>}
+          {sectionsSave === "saving" && <p className="text-xs text-slate-600">{t.report.savingSections}</p>}
           {sectionsSave === "saved" && <p className="text-xs text-brand-800">{t.report.sectionsSaved}</p>}
         </div>
-        <ul className="divide-y divide-slate-100">
+        <ul className="divide-y divide-line">
           {REPORT_SECTIONS.filter((section) => section !== "price" || view.price).map((section) => {
             const shown = !hidden.includes(section);
             return (
@@ -213,7 +213,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
                 >
                   <span>
                     <span className="block font-medium">{t.report.sections[section]}</span>
-                    <span className={`block text-xs ${shown ? "text-slate-500" : "text-amber-800"}`}>{shown ? t.report.shownToBuyers : t.report.hiddenFromBuyers}</span>
+                    <span className={`block text-xs ${shown ? "text-slate-600" : "text-amber-800"}`}>{shown ? t.report.shownToBuyers : t.report.hiddenFromBuyers}</span>
                   </span>
                   <span className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${shown ? "bg-brand-700" : "bg-slate-300"}`}>
                     <span className={`absolute top-0.5 size-6 rounded-full bg-white shadow transition-transform ${shown ? "translate-x-5.5" : "translate-x-0.5"}`} />
@@ -227,7 +227,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
       </section>
 
       {ready && !published && (
-        <section className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-4">
+        <section className="flex flex-col gap-2 rounded-2xl border border-line bg-white p-4">
           {outOfCredits ? (
             <>
               <p className="text-sm font-medium text-amber-900">{t.report.noCredits}</p>
@@ -238,15 +238,15 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
               <Button onClick={onPublish} loading={publishing}>
                 {publishing ? t.report.publishing : t.report.publish}
               </Button>
-              <p className="text-center text-sm text-slate-500">{t.report.publishCost(credits)}</p>
+              <p className="text-center text-sm text-slate-600">{t.report.publishCost(credits)}</p>
             </>
           )}
           {publishError && !outOfCredits && <FormError message={publishError} />}
         </section>
       )}
 
-      <section aria-label={t.report.previewLabel} className="rounded-3xl border-2 border-dashed border-slate-300 bg-slate-50 p-3">
-        <p className="mb-3 text-center text-xs font-semibold tracking-wide text-slate-500 uppercase">{t.report.previewLabel}</p>
+      <section aria-label={t.report.previewLabel} className="rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-3">
+        <p className="mb-3 text-center text-xs font-semibold tracking-wide text-slate-600 uppercase">{t.report.previewLabel}</p>
         <ReportView view={preview} t={t} pdfHref={null} />
         <div className="mt-4">
           <ContactButtons view={preview} t={t} preview />

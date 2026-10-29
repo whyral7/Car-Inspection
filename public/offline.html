@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#115e59">
+<title>Offline · Treadmark</title>
+<style>
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #f4f6f8; color: #0b1220; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Devanagari", sans-serif; }
+  main { max-width: 360px; padding: 24px 16px; text-align: center; }
+  .mark { width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 16px; background: #115e59; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; }
+  h1 { font-size: 20px; margin: 0 0 8px; }
+  p { margin: 0 0 8px; color: #334155; line-height: 1.5; }
+  button { margin-top: 16px; width: 100%; min-height: 48px; border: 0; border-radius: 12px; background: #115e59; color: #fff; font-size: 16px; font-weight: 600; }
+</style>
+</head>
+<body>
+<main>
+  <div class="mark" aria-hidden="true">T</div>
+  <h1>You're offline</h1>
+  <p>Check your internet and try again. Photos and checklist answers you already took are safe on this phone.</p>
+  <p lang="hi">आप ऑफ़लाइन हैं। इंटरनेट चालू करके फिर से कोशिश करें। जो फ़ोटो और चेकलिस्ट जवाब आपने ले लिए हैं, वे इस फ़ोन पर सुरक्षित हैं।</p>
+  <button type="button" onclick="location.reload()">Try again · फिर से कोशिश करें</button>
+</main>
+</body>
+</html>

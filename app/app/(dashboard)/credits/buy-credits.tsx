@@ -105,7 +105,7 @@ export function BuyCredits({ packs, next }: { packs: Pack[]; next: string | null
 
   if (phase.kind === "confirming") {
     return (
-      <div role="status" className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-5">
+      <div role="status" className="flex items-center gap-3 rounded-2xl border border-line bg-white p-5">
         <span className="size-5 shrink-0 animate-spin rounded-full border-2 border-brand-700 border-t-transparent" />
         <p className="font-medium">{t.credits.confirming}</p>
       </div>
@@ -117,7 +117,7 @@ export function BuyCredits({ packs, next }: { packs: Pack[]; next: string | null
     return (
       <div role="status" className={`flex flex-col gap-4 rounded-2xl p-5 ${success ? "bg-emerald-50" : "bg-amber-50"}`}>
         <div className="flex items-start gap-3">
-          <span aria-hidden className={`flex size-10 shrink-0 items-center justify-center rounded-full text-xl text-white ${success ? "bg-emerald-600" : "bg-amber-500"}`}>
+          <span aria-hidden className={`flex size-10 shrink-0 items-center justify-center rounded-full text-xl text-white ${success ? "bg-emerald-700" : "bg-amber-500"}`}>
             {success ? "✓" : "…"}
           </span>
           <div>
@@ -148,11 +148,11 @@ export function BuyCredits({ packs, next }: { packs: Pack[]; next: string | null
         {packs.map((pack) => {
           const opening = phase.kind === "opening" && phase.packKey === pack.key;
           return (
-            <li key={pack.key} className={`rounded-2xl border bg-white p-4 ${pack.best ? "border-brand-600 ring-1 ring-brand-600" : "border-slate-200"}`}>
+            <li key={pack.key} className={`rounded-2xl border bg-white p-4 ${pack.best ? "border-brand-600 ring-1 ring-brand-600" : "border-line"}`}>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-lg font-bold">{t.credits.pack(pack.credits)}</p>
-                  <p className="text-sm text-slate-500">{t.credits.perReport(formatRupees(pack.perReportPaise))}</p>
+                  <p className="text-sm text-slate-600">{t.credits.perReport(formatRupees(pack.perReportPaise))}</p>
                 </div>
                 {pack.best && <span className="rounded-full bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-800">{t.credits.bestValue}</span>}
               </div>
@@ -163,7 +163,7 @@ export function BuyCredits({ packs, next }: { packs: Pack[]; next: string | null
           );
         })}
       </ul>
-      <p className="text-center text-xs text-slate-500">{t.credits.secure}</p>
+      <p className="text-center text-xs text-slate-600">{t.credits.secure}</p>
     </div>
   );
 }

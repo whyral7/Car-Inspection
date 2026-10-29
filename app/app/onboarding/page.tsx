@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { LogoutButton } from "@/components/logout-button";
+import { SignOut } from "@/components/sign-out";
 import { getCurrentProfile, isProfileComplete } from "@/lib/profile";
 import { logoUrl } from "@/lib/storage";
 import { getT } from "@/lib/i18n.server";
@@ -17,10 +17,7 @@ export default async function OnboardingPage() {
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 pt-4 pb-10">
-      <div className="flex items-center justify-between">
-        <p className="text-xl font-bold text-brand-700">{t.appName}</p>
-        <LogoutButton label={t.common.logout} />
-      </div>
+      <p className="text-xl font-bold text-brand-700">{t.appName}</p>
       <h1 className="mt-6 text-2xl font-bold">{editing ? t.onboarding.editTitle : t.onboarding.title}</h1>
       <p className="mt-1 text-slate-600">{t.onboarding.subtitle}</p>
       <OnboardingForm
@@ -36,6 +33,11 @@ export default async function OnboardingPage() {
           logo_url: logoUrl(profile.logo_path),
         }}
       />
+      {!editing && (
+        <div className="mt-6 flex justify-center">
+          <SignOut compact />
+        </div>
+      )}
     </main>
   );
 }
