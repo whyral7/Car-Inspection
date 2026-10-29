@@ -146,12 +146,20 @@ export default async function AppHome({ searchParams }: PageProps<"/app">) {
       ) : (
         <>
           <CarList cars={cards} />
-          <StickyActions>
+          {/* Sticky once the list is long enough to scroll; otherwise it simply follows the list. */}
+          {cards.length > 3 ? (
+            <StickyActions>
+              <LinkButton href="/app/cars/new">
+                <PlusIcon />
+                {t.dashboard.addCar}
+              </LinkButton>
+            </StickyActions>
+          ) : (
             <LinkButton href="/app/cars/new">
               <PlusIcon />
               {t.dashboard.addCar}
             </LinkButton>
-          </StickyActions>
+          )}
         </>
       )}
     </div>

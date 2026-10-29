@@ -162,7 +162,7 @@ function CarDetailsStep({ lookup, onChangeReg }: { lookup: Lookup; onChangeReg: 
       <div className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-white p-4">
         <div className="min-w-0">
           <p className="mb-1 text-sm text-slate-600">{t.cars.regNumber}</p>
-          <Plate reg={lookup.regNumber} size="lg" />
+          <Plate reg={lookup.regNumber} />
         </div>
         <Button type="button" variant="secondary" onClick={onChangeReg} disabled={isPending} className="min-h-11 shrink-0 px-4 text-sm">
           {t.cars.change}
