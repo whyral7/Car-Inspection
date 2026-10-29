@@ -8,8 +8,9 @@ import { FormError } from "@/components/field";
 import { ContactButtons, ReportView } from "@/components/report/report-view";
 import { reportPdfPath, reportPath, whatsappShareUrl } from "@/lib/report/share";
 import { REPORT_SECTIONS, applyHidden, type ReportSection, type ReportView as View } from "@/lib/report/view";
+import { PRICE } from "@/lib/config";
 import { t } from "@/lib/strings";
-import { publishReport, saveHiddenSections } from "./actions";
+import { estimatePrice, publishReport, saveHiddenSections } from "./actions";
 
 type Props = {
   carId: string;
@@ -30,6 +31,8 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
   const [publishError, setPublishError] = useState<string | null>(null);
   const [outOfCredits, setOutOfCredits] = useState(credits < 1);
   const [copied, setCopied] = useState<"idle" | "done" | "error">("idle");
+  const [estimating, setEstimating] = useState(false);
+  const [priceError, setPriceError] = useState<string | null>(null);
   // Saves run one after another, always sending the latest choice.
   const latest = useRef(hidden);
   const chain = useRef(Promise.resolve());
@@ -66,6 +69,20 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
       setPublishError(navigator.onLine ? t.report.errors.publish : t.common.offline);
     } finally {
       setPublishing(false);
+    }
+  }
+
+  async function onEstimate() {
+    setPriceError(null);
+    setEstimating(true);
+    try {
+      const res = await estimatePrice(carId);
+      if (res.ok) router.refresh();
+      else setPriceError(res.error);
+    } catch {
+      setPriceError(navigator.onLine ? t.report.price.errors.failed : t.common.offline);
+    } finally {
+      setEstimating(false);
     }
   }
 
@@ -147,6 +164,34 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
         </section>
       )}
 
+      <section className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+        <div>
+          <h2 className="font-semibold">{t.report.price.title}</h2>
+          {view.price ? (
+            <>
+              <p className="mt-1 text-2xl font-bold">{view.price.rangeText}</p>
+              <p className="text-xs text-slate-500">
+                {view.price.searchedOn} · {hidden.includes("price") ? t.report.price.hiddenOnReport : t.report.price.shownOnReport}
+              </p>
+            </>
+          ) : (
+            <p className="mt-1 text-sm text-slate-600">{t.report.price.intro}</p>
+          )}
+        </div>
+        {estimating ? (
+          <p role="status" className="flex items-center gap-3 text-sm text-slate-700">
+            <span className="size-5 shrink-0 animate-spin rounded-full border-2 border-brand-700 border-t-transparent" />
+            {t.report.price.running}
+          </p>
+        ) : (
+          <Button variant={view.price ? "secondary" : "primary"} onClick={onEstimate}>
+            {view.price ? t.report.price.refresh : t.report.price.run}
+          </Button>
+        )}
+        {!view.price && !estimating && <p className="text-center text-xs text-slate-500">{t.report.price.free(PRICE.maxPerCarPerDay)}</p>}
+        <FormError message={priceError} />
+      </section>
+
       <section className="rounded-2xl border border-slate-200 bg-white p-4">
         <div className="mb-2 flex items-baseline justify-between gap-3">
           <h2 className="font-semibold">{t.report.sectionsTitle}</h2>
@@ -154,7 +199,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
           {sectionsSave === "saved" && <p className="text-xs text-brand-800">{t.report.sectionsSaved}</p>}
         </div>
         <ul className="divide-y divide-slate-100">
-          {REPORT_SECTIONS.map((section) => {
+          {REPORT_SECTIONS.filter((section) => section !== "price" || view.price).map((section) => {
             const shown = !hidden.includes(section);
             return (
               <li key={section}>

@@ -1,16 +1,17 @@
 // The report as buyers see it. Built once from database rows and rendered by the public page, the
 // dealer's preview, the PDF and the link preview image, so all four always agree.
 import { z } from "zod";
-import { FUELS, TRANSMISSIONS, type Fuel, type Transmission } from "@/lib/cars";
+import { isFuel, isTransmission } from "@/lib/cars";
 import { CHECKLIST_GROUPS, type ChecklistGroupKey, type ChecklistKey } from "@/lib/checklist";
-import { formatDate, formatDateTime, carTitle, isPastDate } from "@/lib/format";
+import { formatDate, formatDateTime, formatInrShort, carTitle, isPastDate } from "@/lib/format";
+import { adjustedRange, type Comparable } from "@/lib/price/estimate";
 import { ANGLES, isAngleKey, type AngleKey } from "@/lib/photos/angles";
 import { conditionScore, formatScore, scoreBand, type ScoreBand } from "@/lib/score";
 import { t } from "@/lib/strings";
 import type { CarRow, ChecklistResult, FindingRow, FindingType, Severity, UserType } from "@/lib/supabase/database.types";
 import { displayName } from "@/lib/user-type";
 
-export const REPORT_SECTIONS = ["photos", "findings", "checklist", "documents"] as const;
+export const REPORT_SECTIONS = ["photos", "findings", "checklist", "documents", "price"] as const;
 export type ReportSection = (typeof REPORT_SECTIONS)[number];
 
 /** Hidden sections sent by the dealer: known names only, no repeats, always in section order. */
@@ -44,6 +45,22 @@ export type ReportInput = {
   photos: readonly { id: string; angle_key: string; url: string; thumbUrl: string | null }[];
   findings: readonly Pick<FindingRow, "type" | "location" | "severity" | "note" | "accepted" | "photo_id">[];
   checklist: readonly { item_key: string; result: ChecklistResult; note: string | null }[];
+  /** The latest market estimate (Claude + web search), or null if none was run. */
+  price: { market_low_inr: number; market_high_inr: number; summary: string | null; comparables: readonly Comparable[]; searched_at: string } | null;
+};
+
+export type ReportPrice = {
+  /** Adjusted for this car's condition score, e.g. "₹4.6 lakh – ₹5.1 lakh". */
+  rangeText: string;
+  lowText: string;
+  highText: string;
+  /** The market range before the condition adjustment. */
+  marketRangeText: string;
+  /** e.g. "+2%" or "−4%", or null when the score matches an average car. */
+  adjustmentText: string | null;
+  summary: string | null;
+  comparables: { title: string; url: string; host: string; priceText: string | null; detail: string | null }[];
+  searchedOn: string;
 };
 
 export type DetailRow = { label: string; value: string; warn?: boolean };
@@ -88,13 +105,12 @@ export type ReportView = {
   findings: ReportFinding[] | null;
   checklist: { groups: ReportCheckGroup[]; counts: Record<ChecklistResult, number> } | null;
   documents: { rows: DetailRow[]; items: ReportCheckItem[] } | null;
+  price: ReportPrice | null;
 };
 
 const SEVERITY_RANK: Record<Severity, number> = { major: 0, moderate: 1, minor: 2 };
 const ANGLE_ORDER = new Map<string, number>(ANGLES.map((a, i) => [a.key, i]));
 
-const isFuel = (v: string | null): v is Fuel => (FUELS as readonly string[]).includes(v ?? "");
-const isTransmission = (v: string | null): v is Transmission => (TRANSMISSIONS as readonly string[]).includes(v ?? "");
 
 function checkItem(key: ChecklistKey, row: ReportInput["checklist"][number]): ReportCheckItem {
   return { key, label: t.checklist.items[key].label, result: row.result, resultLabel: t.checklist.results[row.result], note: row.note || null };
@@ -167,6 +183,7 @@ export function buildReportView(input: ReportInput, hidden: readonly ReportSecti
   const details = detailCandidates.filter((row): row is DetailRow => Boolean(row.value));
 
   const score = conditionScore({ findings: input.findings, checklist: input.checklist });
+  const price = input.price ? buildPrice(input.price, score) : null;
 
   const full: ReportView = {
     slug: input.slug,
@@ -189,6 +206,7 @@ export function buildReportView(input: ReportInput, hidden: readonly ReportSecti
     findings,
     checklist: { groups, counts },
     documents: { rows: documentRows, items: groupItems(documentKeys) },
+    price,
   };
   return applyHidden(full, hidden);
 }
@@ -203,6 +221,7 @@ export function applyHidden(view: ReportView, hidden: readonly ReportSection[]):
     findings: isHidden("findings") ? null : view.findings,
     checklist: isHidden("checklist") ? null : view.checklist,
     documents: isHidden("documents") ? null : view.documents,
+    price: isHidden("price") ? null : view.price,
   };
 }
 
@@ -214,4 +233,35 @@ export function summaryParts(view: ReportView): string[] {
   if (view.findings) parts.push(s.findings(view.findings.length));
   if (view.checklist) parts.push(s.checklist(t.publicReport.checklistSummary(view.checklist.counts.ok, view.checklist.counts.attention, view.checklist.counts.fail)));
   return parts;
+}
+
+const hostOf = (url: string) => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+};
+
+/** The estimate as shown: market range adjusted for the live condition score. */
+function buildPrice(p: NonNullable<ReportInput["price"]>, score: number): ReportPrice {
+  const { low, high, factor } = adjustedRange(p.market_low_inr, p.market_high_inr, score);
+  const pct = Math.round((factor - 1) * 100);
+  const range = (a: number, b: number) => (a === b ? formatInrShort(a) : `${formatInrShort(a)} – ${formatInrShort(b)}`);
+  return {
+    rangeText: range(low, high),
+    lowText: formatInrShort(low),
+    highText: formatInrShort(high),
+    marketRangeText: range(p.market_low_inr, p.market_high_inr),
+    adjustmentText: pct === 0 ? null : `${pct > 0 ? "+" : "−"}${Math.abs(pct)}%`,
+    summary: p.summary || null,
+    comparables: p.comparables.map((c) => ({
+      title: c.title,
+      url: c.url,
+      host: hostOf(c.url),
+      priceText: c.price_inr ? formatInrShort(c.price_inr) : null,
+      detail: [c.year?.toString(), c.km !== null ? t.car.km(c.km) : null].filter(Boolean).join(" · ") || null,
+    })),
+    searchedOn: formatDateTime(p.searched_at),
+  };
 }

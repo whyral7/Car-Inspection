@@ -34,3 +34,6 @@ export function normaliseTransmission(raw: string | null | undefined): Transmiss
   if (/\b(MANUAL|MT)\b/.test(s)) return "manual";
   return null;
 }
+
+export const isFuel = (v: string | null): v is Fuel => (FUELS as readonly string[]).includes(v ?? "");
+export const isTransmission = (v: string | null): v is Transmission => (TRANSMISSIONS as readonly string[]).includes(v ?? "");

@@ -8,6 +8,7 @@ import { logoUrl } from "@/lib/storage";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { CarRow, Database, ReportRow } from "@/lib/supabase/database.types";
 import { buildReportView, parseHiddenSections, type ReportInput, type ReportView } from "./view";
+import { comparablesSchema, type Comparable } from "@/lib/price/estimate";
 import { isValidSlug } from "./slug";
 
 type Client = SupabaseClient<Database>;
@@ -37,16 +38,17 @@ export async function loadReport(client: Client, carId: string, { signUrls = tru
   if (!car) return null;
 
   const bucket = client.storage.from(STORAGE_BUCKETS.inspectionPhotos);
-  const [profileRes, photosRes, findingsRes, checklistRes, reportRes, mainList, smallList] = await Promise.all([
+  const [profileRes, photosRes, findingsRes, checklistRes, reportRes, priceRes, mainList, smallList] = await Promise.all([
     client.from("profiles").select("user_type, business_name, owner_name, phone, city, address, logo_path").eq("id", car.dealer_id).single(),
     client.from("inspection_photos").select("id, angle_key, storage_path, updated_at").eq("car_id", carId),
     client.from("findings").select("type, location, severity, note, accepted, photo_id").eq("car_id", carId).order("created_at"),
     client.from("checklist_items").select("item_key, result, note").eq("car_id", carId),
     client.from("reports").select("*").eq("car_id", carId).maybeSingle(),
+    client.from("price_estimates").select("market_low_inr, market_high_inr, summary, comparables, searched_at").eq("car_id", carId).maybeSingle(),
     bucket.list(`cars/${carId}`, { limit: 100 }),
     bucket.list(`cars/${carId}/small`, { limit: 100 }),
   ]);
-  for (const res of [profileRes, photosRes, findingsRes, checklistRes, reportRes]) if (res.error) throw res.error;
+  for (const res of [profileRes, photosRes, findingsRes, checklistRes, reportRes, priceRes]) if (res.error) throw res.error;
   const profile = profileRes.data!;
   // Logos are for dealers only. A logo left over from before switching type is never shown.
   const logoPath = profile.user_type === "dealer" || profile.user_type === null ? profile.logo_path : null;
@@ -85,6 +87,7 @@ export async function loadReport(client: Client, carId: string, { signUrls = tru
     }),
     findings: findingsRes.data!,
     checklist: checklistRes.data!,
+    price: priceRes.data ? { ...priceRes.data, comparables: parseComparables(priceRes.data.comparables) } : null,
   };
 
   return {
@@ -117,4 +120,10 @@ export const getPublishedReport = cache(async (slug: string, signUrls: boolean =
 /** Short hash of what a report shows, for cache-busting the PDF and the link preview image. */
 export function contentVersion(value: unknown) {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex").slice(0, 16);
+}
+
+/** Stored comparables, re-checked on the way out (they're shown as links on a public page). */
+function parseComparables(value: unknown): Comparable[] {
+  const parsed = comparablesSchema.safeParse(value);
+  return parsed.success ? parsed.data : [];
 }

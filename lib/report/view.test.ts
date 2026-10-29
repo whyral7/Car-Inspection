@@ -28,6 +28,7 @@ const input = (patch: Partial<ReportInput> = {}): ReportInput => ({
     { type: "rust", location: "Door", severity: "moderate", note: null, accepted: false, photo_id: null },
     { type: "dent", location: "Front bumper", severity: "minor", note: "", accepted: true, photo_id: "p-front" },
   ],
+  price: null,
   checklist: [
     { item_key: "engine_start", result: "ok", note: null },
     { item_key: "brakes", result: "attention", note: "Slight pull left" },
@@ -163,5 +164,31 @@ describe("summaryParts", () => {
   it("only mentions shown sections", () => {
     const view = buildReportView(input(), ["checklist"], now);
     expect(summaryParts(view)).toEqual(["2 photos.", "3 damage notes."]);
+  });
+});
+
+describe("price estimate", () => {
+  const price = {
+    market_low_inr: 450_000,
+    market_high_inr: 500_000,
+    summary: "Similar Swifts ask 4.6 to 5.2 lakh.",
+    comparables: [{ title: "2019 Swift VXi, 41,000 km", url: "https://www.cars24.com/buy-used-swift-1", price_inr: 489_000, year: 2019, km: 41_000 }],
+    searched_at: "2026-10-19T06:30:00Z",
+  };
+
+  it("adjusts the market range for the live condition score", () => {
+    const view = buildReportView(input({ price }));
+    // The base fixture scores 6.6, a little below the 7.5 reference: 0.9 points x 2% = -1.8%.
+    expect(view.scoreText).toBe("6.6");
+    expect(view.price?.marketRangeText).toBe("₹4.5 lakh – ₹5 lakh");
+    expect(view.price?.adjustmentText).toBe("−2%");
+    expect(view.price?.rangeText).toBe("₹4.4 lakh – ₹4.9 lakh");
+    expect(view.price?.comparables[0]).toMatchObject({ host: "cars24.com", priceText: "₹4.89 lakh" });
+  });
+
+  it("is null without an estimate and when the owner hides it", () => {
+    expect(buildReportView(input()).price).toBeNull();
+    expect(buildReportView(input({ price }), ["price"]).price).toBeNull();
+    expect(hiddenSectionsSchema.parse(["price", "photos"])).toEqual(["photos", "price"]);
   });
 });

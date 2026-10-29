@@ -11,6 +11,9 @@ import { ReportManager } from "./report-manager";
 
 export const metadata: Metadata = { title: t.report.title };
 
+// The price estimate (a server action on this page) researches listings for up to a minute or two.
+export const maxDuration = 180;
+
 export default async function ReportPage({ params }: PageProps<"/app/cars/[id]/report">) {
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();

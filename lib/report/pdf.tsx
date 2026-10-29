@@ -144,6 +144,28 @@ export function ReportPdf({ view, reportUrl, logo, images }: Props) {
           </View>
         </View>
 
+        {view.price ? (
+          <View style={s.section} wrap={false}>
+            <SectionTitle title={t.publicReport.price} />
+            <Text style={{ fontSize: 16, fontWeight: 700 }}>{view.price.rangeText}</Text>
+            <Text style={[s.small, { color: INK[700], marginTop: 3 }]}>
+              {t.publicReport.priceAdjusted(view.price.marketRangeText, view.price.adjustmentText, view.scoreText)}
+            </Text>
+            {view.price.summary ? <Text style={[s.small, { marginTop: 4 }]}>{view.price.summary}</Text> : null}
+            <Text style={[s.small, s.muted, { marginTop: 6 }]}>{t.publicReport.priceBasedOn(view.price.comparables.length, view.price.searchedOn)}</Text>
+            {view.price.comparables.map((c) => (
+              <View key={c.url} style={[s.row, { paddingVertical: 3 }]}>
+                <Link src={c.url} style={[s.small, { flex: 1, color: BRAND[700] }]}>
+                  {c.title}
+                  {` (${[c.host, c.detail].filter(Boolean).join(" · ")})`}
+                </Link>
+                {c.priceText ? <Text style={[s.small, { fontWeight: 700 }]}>{c.priceText}</Text> : null}
+              </View>
+            ))}
+            <Text style={[s.small, s.muted, { marginTop: 6 }]}>{t.publicReport.priceDisclaimer}</Text>
+          </View>
+        ) : null}
+
         {photos && photos.length > 0 ? (
           <View style={s.section}>
             <SectionTitle title={t.publicReport.photos} aside={t.publicReport.photoCount(photos.length)} />

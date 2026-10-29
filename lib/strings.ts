@@ -587,11 +587,28 @@ export const en = {
     previewSubtitle: "This is what buyers will see. Turn off any section you don't want to share.",
     publishedTitle: "Your report",
     sectionsTitle: "Show on the report",
+    price: {
+      title: "Price estimate",
+      intro: "Find what similar cars are selling for right now. We search current listings online and adjust the range for this car's condition score.",
+      run: "Estimate market price",
+      running: "Searching current listings… this takes up to a minute.",
+      refresh: "Search again",
+      shownOnReport: "Shown on the report. You can hide it below.",
+      hiddenOnReport: "Hidden from the report. Turn it on below to share it.",
+      free: (n: number) => `Free. Up to ${n} searches per car a day.`,
+      errors: {
+        needsDetails: "Add the make, model and year on the car page first, so we can find similar cars.",
+        limit: (n: number) => `You've searched ${n} times today for this car. Try again tomorrow.`,
+        notEnoughData: "We couldn't find enough similar cars for sale to give an honest range. Try again later.",
+        failed: "Couldn't get a price estimate. Please try again in a minute.",
+      },
+    },
     sections: {
       photos: "Photos",
       findings: "Damage notes",
       checklist: "Checklist",
       documents: "Documents",
+      price: "Price estimate",
     },
     hiddenFromBuyers: "Hidden",
     shownToBuyers: "Shown",
@@ -651,6 +668,12 @@ export const en = {
     checklistSummary: (ok: number, attention: number, fail: number) =>
       [`${ok} OK`, attention ? `${attention} attention` : "", fail ? `${fail} fail` : ""].filter(Boolean).join(" · "),
     documents: "Documents",
+    price: "Estimated market price",
+    priceAdjusted: (market: string, adjustment: string | null, score: string) =>
+      adjustment ? `Similar cars sell for ${market}. Adjusted ${adjustment} for this car's condition score of ${score}/10.` : `Similar cars sell for ${market}. This car's condition score of ${score}/10 is about average for its age.`,
+    priceBasedOn: (n: number, date: string) =>
+      n === 0 ? `Researched online on ${date}.` : n === 1 ? `Based on 1 listing found online on ${date}:` : `Based on ${n} listings found online on ${date}:`,
+    priceDisclaimer: "An estimate from current online listings, not a valuation. The final price depends on a test drive, the documents and negotiation.",
     rcSource: "Car details",
     rcVerified: "Taken from the RC",
     rcManual: {

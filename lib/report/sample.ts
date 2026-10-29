@@ -38,6 +38,13 @@ const sampleInput: ReportInput = {
     { type: "scratch", location: "Rear bumper, lower left", severity: "minor", note: "Surface scratch about 8 cm long, paint not broken through.", accepted: true, photo_id: null },
     { type: "scratch", location: "Front-left door", severity: "minor", note: "Light scuff near the handle.", accepted: true, photo_id: null },
   ],
+  price: {
+    market_low_inr: 450_000,
+    market_high_inr: 510_000,
+    summary: "2019 Swift VXi petrol manuals with around 40,000 to 55,000 km are listed for ₹4.6 to 5.3 lakh in Pune, and usually sell a little below that.",
+    comparables: [],
+    searched_at: "2026-10-18T06:30:00.000Z",
+  },
   checklist: CHECKLIST_KEYS.map((key) => ({ item_key: key, result: notOk[key]?.result ?? "ok", note: notOk[key]?.note ?? null })),
 };
 

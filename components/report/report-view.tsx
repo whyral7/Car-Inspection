@@ -151,6 +151,31 @@ export function ReportView({ view, pdfHref }: { view: View; pdfHref?: string | n
         )}
       </section>
 
+      {view.price && (
+        <Section title={t.publicReport.price}>
+          <p className="text-2xl font-bold text-slate-900">{view.price.rangeText}</p>
+          <p className="mt-1 text-sm text-slate-600">{t.publicReport.priceAdjusted(view.price.marketRangeText, view.price.adjustmentText, view.scoreText)}</p>
+          {view.price.summary && <p className="mt-2 text-sm text-slate-700">{view.price.summary}</p>}
+          <p className="mt-3 text-xs text-slate-500">{t.publicReport.priceBasedOn(view.price.comparables.length, view.price.searchedOn)}</p>
+          {view.price.comparables.length > 0 && (
+            <ul className="mt-1 flex flex-col">
+              {view.price.comparables.map((c) => (
+                <li key={c.url}>
+                  <a href={c.url} target="_blank" rel="noopener noreferrer nofollow" className="flex min-h-11 items-center justify-between gap-3 py-1 text-sm">
+                    <span className="min-w-0">
+                      <span className="block truncate font-medium text-brand-700 underline">{c.title}</span>
+                      <span className="block text-xs text-slate-500">{[c.host, c.detail].filter(Boolean).join(" · ")}</span>
+                    </span>
+                    {c.priceText && <span className="shrink-0 font-semibold">{c.priceText}</span>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="mt-3 text-xs text-slate-500">{t.publicReport.priceDisclaimer}</p>
+        </Section>
+      )}
+
       {view.photos && view.photos.length > 0 && (
         <Section title={t.publicReport.photos} aside={t.publicReport.photoCount(view.photos.length)}>
           <PhotoGallery photos={view.photos} />
