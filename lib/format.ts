@@ -6,6 +6,13 @@ export function formatDateTime(iso: string) {
   return dateFormat.format(new Date(iso));
 }
 
+const timestampFormat = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" });
+
+/** Date and time in Indian time, e.g. "29 Oct 2026, 2:14 pm". */
+export function formatTimestamp(iso: string) {
+  return timestampFormat.format(new Date(iso));
+}
+
 /** A calendar date (YYYY-MM-DD) with no time zone shift. */
 export function formatDate(isoDate: string) {
   return plainDateFormat.format(new Date(`${isoDate}T00:00:00Z`));

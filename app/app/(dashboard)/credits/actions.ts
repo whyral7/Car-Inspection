@@ -46,7 +46,7 @@ export async function createCreditOrder(packKey: string): Promise<OrderResult> {
     .select("id", { count: "exact", head: true })
     .eq("dealer_id", profile.id)
     .gte("created_at", since);
-  if (countError) return { ok: false, error: t.credits.errors.start };
+  if (countError) return { ok: false, error: t.credits.errors.server };
   if ((count ?? 0) >= MAX_ORDERS_PER_HOUR) return { ok: false, error: t.credits.errors.tooMany };
 
   let orderId: string;
@@ -59,7 +59,7 @@ export async function createCreditOrder(packKey: string): Promise<OrderResult> {
     orderId = order.id;
   } catch (error) {
     console.error(`[razorpay] dealer=${profile.id} order for ${pack.key} failed`, error);
-    return { ok: false, error: t.credits.errors.start };
+    return { ok: false, error: t.credits.errors.server };
   }
 
   const { error } = await admin.from("payments").insert({
@@ -72,7 +72,7 @@ export async function createCreditOrder(packKey: string): Promise<OrderResult> {
   });
   if (error) {
     console.error(`[razorpay] dealer=${profile.id} order=${orderId} could not be saved`, error);
-    return { ok: false, error: t.credits.errors.start };
+    return { ok: false, error: t.credits.errors.server };
   }
 
   return {

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { BackLink } from "@/components/button";
 import { BUSINESS } from "@/lib/config";
 import { legal } from "@/lib/strings-legal";
 
@@ -7,9 +7,7 @@ type Section = { heading: string; body: readonly string[] };
 export function LegalPage({ title, intro, sections }: { title: string; intro: string; sections: readonly Section[] }) {
   return (
     <article className="mx-auto w-full max-w-2xl px-4 py-8">
-      <Link href="/" className="-ml-1 inline-flex min-h-11 items-center px-1 text-sm font-medium text-brand-700">
-        ← {legal.back}
-      </Link>
+      <BackLink href="/">{legal.back}</BackLink>
       <h1 className="mt-2 text-2xl font-bold">{title}</h1>
       <p className="mt-1 text-sm text-slate-600">{legal.updated(BUSINESS.legalUpdated)}</p>
       <p className="mt-4 leading-relaxed text-slate-700">{intro}</p>

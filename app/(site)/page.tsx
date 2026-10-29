@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LinkButton } from "@/components/button";
-import { APP_NAME, CREDIT_PACKS, FREE_CREDITS, SAMPLE_REPORT_PATH } from "@/lib/config";
+import { CheckIcon, ChatIcon, ChevronDownIcon } from "@/components/icons";
+import { Plate } from "@/components/plate";
+import { APP_NAME, BUSINESS, CREDIT_PACKS, FREE_CREDITS, SAMPLE_REPORT_PATH } from "@/lib/config";
+import { ANGLE_KEYS } from "@/lib/photos/angles";
 import { pricePerReportPaise } from "@/lib/credits/packs";
 import { formatRupees } from "@/lib/format";
 import { supportWhatsappHref } from "@/lib/site";
@@ -17,12 +20,12 @@ export const metadata: Metadata = {
   twitter: { title: h.metaTitle, description: h.metaDescription },
 };
 
+/** "Chat on WhatsApp". Only shown once BUSINESS.whatsapp is set, so it never leads to a placeholder page. */
 function WhatsappLink({ className }: { className: string }) {
-  const href = supportWhatsappHref();
-  const external = href.startsWith("https:");
+  if (!BUSINESS.whatsapp) return null;
   return (
-    <a href={href} className={className} {...(external ? { target: "_blank", rel: "noopener" } : {})}>
-      <span aria-hidden>💬</span>
+    <a href={supportWhatsappHref()} className={className} target="_blank" rel="noopener">
+      <ChatIcon />
       {h.whatsapp}
     </a>
   );
@@ -42,7 +45,7 @@ function ReportPreview() {
       </div>
       <div className="mt-3 flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="inline-block rounded border-2 border-slate-900 px-1.5 text-sm font-bold tracking-widest">{p.reg}</p>
+          <Plate reg={p.reg} size="sm" tone="yellow" />
           <p className="mt-1.5 text-sm leading-snug font-semibold">{p.car}</p>
         </div>
         <p className="shrink-0 rounded-xl bg-emerald-50 px-2.5 py-1.5 text-center text-emerald-800">
@@ -51,14 +54,15 @@ function ReportPreview() {
         </p>
       </div>
       <div className="mt-3 grid grid-cols-4 gap-1">
-        {Array.from({ length: 8 }, (_, i) => (
-          <span key={i} className="aspect-[4/3] rounded-lg bg-gradient-to-br from-slate-200 to-slate-300" />
+        {ANGLE_KEYS.slice(0, 8).map((key) => (
+          // eslint-disable-next-line @next/next/no-img-element -- tiny static drawings
+          <img key={key} src={`/sample/${key}.svg`} alt="" width={80} height={60} className="aspect-[4/3] w-full rounded-lg bg-slate-100 object-cover" />
         ))}
       </div>
       <ul className="mt-3 flex flex-col gap-1 text-xs text-slate-700">
         {p.lines.map((line) => (
           <li key={line} className="flex items-center gap-1.5">
-            <span className="text-brand-600">✓</span>
+            <CheckIcon size={14} className="text-brand-700" />
             {line}
           </li>
         ))}
@@ -126,12 +130,27 @@ export default function Home() {
           <h2 className="text-2xl font-bold">{h.whyTitle}</h2>
           <ul className="mt-6 grid gap-4 md:grid-cols-3">
             {h.why.map((item) => (
-              <li key={item.title} className="rounded-2xl bg-slate-50 p-5">
+              <li key={item.title} className="rounded-2xl border border-line bg-canvas p-5">
                 <h3 className="font-semibold">{item.title}</h3>
                 <p className="mt-1 text-slate-600">{item.body}</p>
               </li>
             ))}
           </ul>
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-5xl px-4 py-12">
+        <h2 className="text-2xl font-bold">{h.faqTitle}</h2>
+        <div className="mt-6 flex flex-col gap-3">
+          {h.faq.map((item) => (
+            <details key={item.q} className="group rounded-2xl border border-line bg-white">
+              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-5 font-semibold [&::-webkit-details-marker]:hidden">
+                {item.q}
+                <ChevronDownIcon size={20} className="shrink-0 text-slate-500 transition-transform group-open:rotate-180" />
+              </summary>
+              <p className="px-5 pb-4 text-slate-700">{item.a}</p>
+            </details>
+          ))}
         </div>
       </section>
 

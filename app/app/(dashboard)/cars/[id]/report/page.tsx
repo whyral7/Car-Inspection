@@ -5,7 +5,9 @@ import { getCurrentProfile } from "@/lib/profile";
 import { loadReport } from "@/lib/report/load";
 import { reportUrl } from "@/lib/report/share";
 import { buildReportView, parseHiddenSections } from "@/lib/report/view";
+import { PRICE } from "@/lib/config";
 import { getT } from "@/lib/i18n.server";
+import { priceSearchesUsed } from "@/lib/price/usage";
 import { appBaseUrl } from "@/lib/url";
 import { ReportManager } from "./report-manager";
 
@@ -28,6 +30,7 @@ export default async function ReportPage({ params }: PageProps<"/app/cars/[id]/r
   if (!loaded) notFound();
 
   const published = loaded.report?.published_at ? { slug: loaded.report.slug, url: reportUrl(await appBaseUrl(), loaded.report.slug) } : null;
+  const searchesUsed = (await priceSearchesUsed(loaded.car.id)) ?? 0;
 
   return (
     <ReportManager
@@ -39,6 +42,7 @@ export default async function ReportPage({ params }: PageProps<"/app/cars/[id]/r
       view={buildReportView(loaded.input, [], undefined, t)}
       initialHidden={parseHiddenSections(loaded.report?.hidden_sections)}
       published={published}
+      searchesLeft={Math.max(0, PRICE.maxPerCarPerDay - searchesUsed)}
     />
   );
 }

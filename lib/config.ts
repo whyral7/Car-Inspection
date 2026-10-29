@@ -62,7 +62,7 @@ export const REPORT = {
   /** PDF download links. /r/<slug>/pdf makes a fresh one on every tap. */
   pdfUrlSeconds: 5 * 60,
   /** Bump when the PDF layout changes, so stored PDFs are rebuilt on the next download. */
-  pdfVersion: 2,
+  pdfVersion: 3,
 } as const;
 
 /** Prepaid report credit packs. Prices in paise (Rs 999 = 99900). */

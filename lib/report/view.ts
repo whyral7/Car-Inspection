@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { isFuel, isTransmission } from "@/lib/cars";
 import { CHECKLIST_GROUPS, type ChecklistGroupKey, type ChecklistKey } from "@/lib/checklist";
-import { formatDate, formatDateTime, formatInrShort, carTitle, isPastDate } from "@/lib/format";
+import { formatDate, formatDateTime, formatInrShort, formatTimestamp, carTitle, isPastDate } from "@/lib/format";
 import { adjustedRange, type Comparable } from "@/lib/price/estimate";
 import { ANGLES, isAngleKey, type AngleKey } from "@/lib/photos/angles";
 import { conditionScore, formatScore, scoreBand, type ScoreBand } from "@/lib/score";
@@ -42,7 +42,7 @@ export type ReportInput = {
     fromRc: boolean;
   };
   /** Photos with a working link; `thumbUrl` is the small copy when there is an up-to-date one. */
-  photos: readonly { id: string; angle_key: string; url: string; thumbUrl: string | null }[];
+  photos: readonly { id: string; angle_key: string; url: string; thumbUrl: string | null; takenAt?: string | null }[];
   findings: readonly Pick<FindingRow, "type" | "location" | "severity" | "note" | "accepted" | "photo_id">[];
   checklist: readonly { item_key: string; result: ChecklistResult; note: string | null }[];
   /** The latest market estimate (Claude + web search), or null if none was run. */
@@ -66,7 +66,7 @@ export type ReportPrice = {
 };
 
 export type DetailRow = { label: string; value: string; warn?: boolean };
-export type ReportPhoto = { key: AngleKey; label: string; url: string; thumbUrl: string };
+export type ReportPhoto = { key: AngleKey; label: string; url: string; thumbUrl: string; /** "29 Oct 2026, 2:14 pm" (upload time). */ takenAt: string | null };
 export type ReportFinding = {
   type: FindingType;
   typeLabel: string;
@@ -133,7 +133,7 @@ export function buildReportView(input: ReportInput, hidden: readonly ReportSecti
   const photos: ReportPhoto[] = input.photos
     .filter((p): p is typeof p & { angle_key: AngleKey } => isAngleKey(p.angle_key))
     .sort((a, b) => ANGLE_ORDER.get(a.angle_key)! - ANGLE_ORDER.get(b.angle_key)!)
-    .map((p) => ({ key: p.angle_key, label: t.photos.angles[p.angle_key].label, url: p.url, thumbUrl: p.thumbUrl ?? p.url }));
+    .map((p) => ({ key: p.angle_key, label: t.photos.angles[p.angle_key].label, url: p.url, thumbUrl: p.thumbUrl ?? p.url, takenAt: p.takenAt ? formatTimestamp(p.takenAt) : null }));
 
   const angleByPhotoId = new Map(input.photos.map((p) => [p.id, p.angle_key]));
   const photoRank = (photoId: string | null) => ANGLE_ORDER.get(angleByPhotoId.get(photoId ?? "") ?? "") ?? ANGLES.length;

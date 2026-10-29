@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BUSINESS } from "@/lib/config";
+import { APP_NAME, BUSINESS } from "@/lib/config";
 import { en as t } from "@/lib/strings";
 
 const links = [
@@ -12,8 +12,8 @@ const links = [
 export function SiteFooter() {
   return (
     <footer className="border-t border-line bg-white pb-[env(safe-area-inset-bottom)]">
-      {/* Bottom padding keeps the last line clear of the floating WhatsApp button. */}
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 pt-8 pb-24">
+      {/* Bottom padding keeps the last line clear of the floating WhatsApp button, when there is one. */}
+      <div className={`mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 pt-8 ${BUSINESS.whatsapp ? "pb-24" : "pb-8"}`}>
         <ul className="flex flex-wrap gap-x-5 gap-y-1">
           {links.map((l) => (
             <li key={l.href}>
@@ -24,7 +24,7 @@ export function SiteFooter() {
           ))}
         </ul>
         <p className="text-xs text-slate-600">{t.disclaimer}</p>
-        <p className="text-xs text-slate-600">{t.site.footer.rights(new Date().getFullYear(), BUSINESS.legalName)}</p>
+        <p className="text-xs text-slate-600">{t.site.footer.rights(new Date().getFullYear(), BUSINESS.legalName.startsWith("[") ? APP_NAME : BUSINESS.legalName)}</p>
       </div>
     </footer>
   );

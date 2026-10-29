@@ -1,8 +1,10 @@
 import { CHECKLIST_KEYS, type ChecklistKey } from "@/lib/checklist";
+import { ANGLE_KEYS } from "@/lib/photos/angles";
 import { buildReportView, type ReportInput } from "./view";
 
 // Made-up report for the landing page's "See a sample report". Built through the same buildReportView
-// as real reports, so it always matches what buyers get. No photos: the sample has no real car.
+// as real reports, so it always matches what buyers get. The sample has no real car, so line drawings
+// of each angle (public/sample/*.svg) stand in for the 20 photos.
 
 const notOk: Partial<Record<ChecklistKey, { result: "attention" | "fail"; note: string }>> = {
   spare_key: { result: "fail", note: "Only one key available." },
@@ -34,10 +36,10 @@ const sampleInput: ReportInput = {
     status: "published",
     fromRc: true,
   },
-  photos: [],
+  photos: ANGLE_KEYS.map((key) => ({ id: `sample-${key}`, angle_key: key, url: `/sample/${key}.svg`, thumbUrl: `/sample/${key}.svg`, takenAt: "2026-10-18T06:05:00.000Z" })),
   findings: [
-    { type: "scratch", location: "Rear bumper, lower left", severity: "minor", note: "Surface scratch about 8 cm long, paint not broken through.", accepted: true, photo_id: null },
-    { type: "scratch", location: "Front-left door", severity: "minor", note: "Light scuff near the handle.", accepted: true, photo_id: null },
+    { type: "scratch", location: "Rear bumper, lower left", severity: "minor", note: "Surface scratch about 8 cm long, paint not broken through.", accepted: true, photo_id: "sample-rear" },
+    { type: "scratch", location: "Front-left door", severity: "minor", note: "Light scuff near the handle.", accepted: true, photo_id: "sample-front_left" },
   ],
   price: {
     market_low_inr: 450_000,
@@ -50,5 +52,5 @@ const sampleInput: ReportInput = {
 };
 
 export function sampleReportView() {
-  return buildReportView(sampleInput, ["photos"]);
+  return buildReportView(sampleInput);
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { BackLink } from "@/components/button";
+import { ChatIcon } from "@/components/icons";
 import { BUSINESS } from "@/lib/config";
 import { formatPhone, whatsappChatUrl } from "@/lib/report/share";
 import { en as t } from "@/lib/strings";
@@ -21,9 +22,7 @@ export default function ContactPage() {
 
   return (
     <article className="mx-auto w-full max-w-2xl px-4 py-8">
-      <Link href="/" className="-ml-1 inline-flex min-h-11 items-center px-1 text-sm font-medium text-brand-700">
-        ← {legal.back}
-      </Link>
+      <BackLink href="/">{legal.back}</BackLink>
       <h1 className="mt-2 text-2xl font-bold">{copy.title}</h1>
       <p className="mt-2 text-slate-700">{copy.intro}</p>
       <dl className="mt-6 divide-y divide-line rounded-2xl border border-line bg-white">
@@ -44,7 +43,7 @@ export default function ContactPage() {
       </dl>
       {chat && (
         <a href={chat} target="_blank" rel="noopener" className="mt-6 flex min-h-12 items-center justify-center gap-2 rounded-xl bg-whatsapp px-5 font-semibold text-white active:bg-whatsapp-pressed">
-          <span aria-hidden>💬</span>
+          <ChatIcon />
           {t.home.whatsapp}
         </a>
       )}

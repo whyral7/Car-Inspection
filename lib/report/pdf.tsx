@@ -5,7 +5,7 @@ import { Document, Font, Image as PdfPicture, Link, Page, StyleSheet, Text, View
 import { APP_NAME } from "@/lib/config";
 import { formatPhone } from "@/lib/report/share";
 import { en as t } from "@/lib/strings";
-import { BAND_COLORS, BRAND, INK, RESULT_COLORS, SEVERITY_COLORS } from "./colors";
+import { BAND_COLORS, BRAND, INK, RESULT_COLORS, SEVERITY_COLORS, SIGNAL } from "./colors";
 import type { DetailRow, ReportCheckItem, ReportView } from "./view";
 
 // The same layout as the public page, on A4: header, car and score, photos, damage notes, checklist,
@@ -42,7 +42,8 @@ const s = StyleSheet.create({
   small: { fontSize: 8 },
   reportTag: { fontSize: 8, color: BRAND[700], fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.8 },
   hero: { flexDirection: "row", gap: 16, marginTop: 14 },
-  plate: { alignSelf: "flex-start", borderWidth: 1.5, borderColor: INK[900], borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2, fontSize: 12, fontWeight: 700, letterSpacing: 1.5 },
+  heroPhoto: { width: 168, height: 126, objectFit: "cover", borderRadius: 6, backgroundColor: INK[100] },
+  plate: { alignSelf: "flex-start", backgroundColor: SIGNAL.plate, borderWidth: 1.5, borderColor: INK[900], borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2, fontSize: 12, fontWeight: 700, letterSpacing: 1.5 },
   carTitle: { fontSize: 17, fontWeight: 700, marginTop: 6 },
   details: { flexDirection: "row", flexWrap: "wrap", marginTop: 8 },
   detail: { width: "50%", flexDirection: "row", paddingVertical: 3, paddingRight: 10, borderBottomWidth: 0.5, borderBottomColor: INK[200] },
@@ -57,7 +58,7 @@ const s = StyleSheet.create({
   photo: { width: 172, height: 129, objectFit: "cover", borderRadius: 4, backgroundColor: INK[100] },
   photoLabel: { fontSize: 7.5, color: INK[700], marginTop: 2 },
   row: { flexDirection: "row", alignItems: "flex-start", gap: 8, paddingVertical: 5, borderBottomWidth: 0.5, borderBottomColor: INK[200] },
-  chip: { fontSize: 7.5, fontWeight: 700, borderRadius: 8, paddingHorizontal: 6, paddingVertical: 1.5, width: 58, textAlign: "center" },
+  chip: { fontSize: 7.5, fontWeight: 700, borderRadius: 8, paddingHorizontal: 6, paddingVertical: 1.5, width: 74, textAlign: "center" },
   groupTitle: { fontSize: 8, fontWeight: 700, color: INK[500], textTransform: "uppercase", letterSpacing: 0.6, marginTop: 8, marginBottom: 1 },
   disclaimer: { marginTop: 18, padding: 10, borderRadius: 6, backgroundColor: INK[100], fontWeight: 700, textAlign: "center" },
 });
@@ -102,6 +103,8 @@ export function ReportPdf({ view, reportUrl, logo, images }: Props) {
   const phone = formatPhone(view.dealer.phone);
   const place = [view.dealer.address, view.dealer.city].filter(Boolean).join(", ");
   const photos = view.photos?.filter((p) => images.has(p.key)) ?? null;
+  // The first photo (normally the front) leads the report, as on the web page.
+  const hero = photos?.[0] ? images.get(photos[0].key) : undefined;
 
   return (
     <Document
@@ -131,6 +134,7 @@ export function ReportPdf({ view, reportUrl, logo, images }: Props) {
         </View>
 
         <View style={s.hero}>
+          {hero ? <PdfPicture src={hero} style={s.heroPhoto} /> : null}
           <View style={{ flex: 1 }}>
             <Text style={s.plate}>{view.car.regNumber}</Text>
             <Text style={s.carTitle}>{view.car.title}</Text>

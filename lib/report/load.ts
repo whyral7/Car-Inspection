@@ -64,7 +64,7 @@ export async function loadReport(client: Client, carId: string, { signUrls = tru
     const small = smallByName.get(`${p.angle_key}.jpg`);
     const smallTime = small?.updated_at ?? small?.created_at;
     const smallPath = small && time(smallTime) >= time(mainTime) ? smallPhotoPath(carId, p.angle_key) : null;
-    return [{ id: p.id, angleKey: p.angle_key, path: p.storage_path, smallPath, version: `${mainTime}|${smallPath ? smallTime : ""}` }];
+    return [{ id: p.id, angleKey: p.angle_key, path: p.storage_path, smallPath, takenAt: p.updated_at, version: `${mainTime}|${smallPath ? smallTime : ""}` }];
   });
 
   const signed = new Map<string, string>();
@@ -81,9 +81,9 @@ export async function loadReport(client: Client, carId: string, { signUrls = tru
     dealer: { ...profile, logoUrl: logoUrl(logoPath) },
     car: { ...car, fromRc: car.rc_raw !== null },
     photos: photos.flatMap((p) => {
-      if (!signUrls) return [{ id: p.id, angle_key: p.angleKey, url: p.path, thumbUrl: p.smallPath }];
+      if (!signUrls) return [{ id: p.id, angle_key: p.angleKey, url: p.path, thumbUrl: p.smallPath, takenAt: p.takenAt }];
       const url = signed.get(p.path);
-      return url ? [{ id: p.id, angle_key: p.angleKey, url, thumbUrl: (p.smallPath && signed.get(p.smallPath)) || null }] : [];
+      return url ? [{ id: p.id, angle_key: p.angleKey, url, thumbUrl: (p.smallPath && signed.get(p.smallPath)) || null, takenAt: p.takenAt }] : [];
     }),
     findings: findingsRes.data!,
     checklist: checklistRes.data!,

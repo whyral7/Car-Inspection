@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Button, LinkButton } from "@/components/button";
 import { FormError } from "@/components/field";
+import { ChatIcon, CheckIcon, ClockIcon } from "@/components/icons";
 import { THEME_COLOR } from "@/lib/config";
 import { formatRupees } from "@/lib/format";
 import { loadCheckout } from "@/lib/razorpay/checkout";
@@ -24,7 +25,7 @@ type Phase =
 const POLL_MS = 2000;
 const POLL_TRIES = 15;
 
-export function BuyCredits({ packs, next }: { packs: Pack[]; next: string | null }) {
+export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: string | null; supportHref: string }) {
   const t = useT();
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>({ kind: "idle" });
@@ -64,7 +65,8 @@ export function BuyCredits({ packs, next }: { packs: Pack[]; next: string | null
     setPhase({ kind: "opening", packKey });
 
     const [order, Razorpay] = await Promise.all([
-      createCreditOrder(packKey).catch(() => ({ ok: false as const, error: t.credits.errors.start })),
+      // A thrown call means the request never got an answer: the phone's connection, not our server.
+      createCreditOrder(packKey).catch(() => ({ ok: false as const, error: navigator.onLine ? t.credits.errors.start : t.common.offline })),
       loadCheckout().catch(() => null),
     ]);
     if (!order.ok) {
@@ -118,7 +120,7 @@ export function BuyCredits({ packs, next }: { packs: Pack[]; next: string | null
       <div role="status" className={`flex flex-col gap-4 rounded-2xl p-5 ${success ? "bg-emerald-50" : "bg-amber-50"}`}>
         <div className="flex items-start gap-3">
           <span aria-hidden className={`flex size-10 shrink-0 items-center justify-center rounded-full text-xl text-white ${success ? "bg-emerald-700" : "bg-amber-500"}`}>
-            {success ? "✓" : "…"}
+            {success ? <CheckIcon size={22} /> : <ClockIcon size={22} />}
           </span>
           <div>
             <h2 className="text-lg font-bold">{success ? t.credits.successTitle : t.credits.slowTitle}</h2>
@@ -143,7 +145,15 @@ export function BuyCredits({ packs, next }: { packs: Pack[]; next: string | null
           <p>{t.credits.failedBody(phase.reason)}</p>
         </div>
       )}
-      <FormError message={error} />
+      {error && (
+        <div className="flex flex-col gap-2">
+          <FormError message={error} />
+          <a href={supportHref} className="inline-flex min-h-11 items-center gap-2 self-start text-sm font-semibold text-brand-700" {...(supportHref.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}>
+            <ChatIcon size={18} />
+            {t.credits.getHelp}
+          </a>
+        </div>
+      )}
       <ul className="flex flex-col gap-3">
         {packs.map((pack) => {
           const opening = phase.kind === "opening" && phase.packKey === pack.key;
