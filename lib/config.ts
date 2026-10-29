@@ -1,5 +1,5 @@
 export const APP_NAME = "Treadmark";
-export const THEME_COLOR = "#115e59";
+export const THEME_COLOR = "#0f5e58";
 export const BACKGROUND_COLOR = "#ffffff";
 
 export const FREE_CREDITS = 3;

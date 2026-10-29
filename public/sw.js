@@ -4,7 +4,7 @@
 // - /_next/static, /icons and /fonts: cache first. Their URLs change whenever the content does.
 // Photo and checklist uploads that fail offline are kept in the page's own outbox (IndexedDB) and
 // sent when the app is next open and online.
-const CACHE = "treadmark-v3";
+const CACHE = "treadmark-v4";
 const OFFLINE_URL = "/offline.html";
 const PRECACHE = [OFFLINE_URL, "/icons/icon-192.png"];
 
