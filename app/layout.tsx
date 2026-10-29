@@ -1,10 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { ServiceWorkerRegister } from "@/components/sw-register";
 import { APP_NAME, THEME_COLOR } from "@/lib/config";
+import { publicEnv } from "@/lib/env";
 import { t } from "@/lib/strings";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  // Makes relative Open Graph URLs absolute. The public report sets absolute ones itself.
+  metadataBase: publicEnv.NEXT_PUBLIC_APP_URL ? new URL(publicEnv.NEXT_PUBLIC_APP_URL) : undefined,
   title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
   description: t.tagline,
   applicationName: APP_NAME,
@@ -17,6 +20,9 @@ export const metadata: Metadata = {
     apple: "/icons/apple-touch-icon.png",
   },
   formatDetection: { telephone: false },
+  // Pages set their own Open Graph title and description where they're worth sharing.
+  openGraph: { type: "website", siteName: APP_NAME, locale: "en_IN" },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {

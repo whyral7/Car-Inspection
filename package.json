@@ -1,5 +1,5 @@
 {
-  "name": "carparakh",
+  "name": "treadmark",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,6 +12,8 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.135.0",
+    "@react-pdf/renderer": "^4.9.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",
     "next": "16.4.2",
