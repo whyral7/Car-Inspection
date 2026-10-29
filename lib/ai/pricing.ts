@@ -41,3 +41,10 @@ export function estimateCostUsd(model: string, usage: TokenUsage): number | null
     usage.input_tokens + usage.cache_creation_input_tokens * CACHE_WRITE + usage.cache_read_input_tokens * CACHE_READ;
   return (inputEquivalent * price.input + usage.output_tokens * price.output) / 1_000_000;
 }
+
+/** Web search is billed per search on top of tokens. */
+export const WEB_SEARCH_USD = 0.01;
+
+export function webSearchCostUsd(searches: number) {
+  return searches * WEB_SEARCH_USD;
+}
