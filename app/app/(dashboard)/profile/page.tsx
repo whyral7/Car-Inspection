@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { LinkButton } from "@/components/ui";
-import { CreditIcon } from "@/components/icons";
+import { FlashToast } from "@/components/flash-toast";
+import { ClockIcon, CreditIcon, PencilIcon } from "@/components/icons";
 import { LanguageToggle } from "@/components/language-toggle";
 import { SignOut } from "@/components/sign-out";
+import { BackLink, Card, EmptyState, LinkButton, ListCard, ListRow } from "@/components/ui";
 import { accountDeletionHref } from "@/lib/site";
 import { FREE_CREDITS } from "@/lib/config";
 import { buildCreditHistory, totalBought, totalUsed, type CreditEntry } from "@/lib/credits/history";
@@ -63,103 +64,104 @@ export default async function ProfilePage() {
   const phone = formatPhone(profile.phone);
   const deleteHref = accountDeletionHref(t.profile.deleteAccountMessage(phone ?? ""));
 
+  const facts = [
+    profile.user_type && { label: t.profile.userType, value: t.onboarding.userTypes[profile.user_type] },
+    profile.owner_name && profile.owner_name !== name && { label: t.profile.owner, value: profile.owner_name },
+    phone && { label: t.profile.phone, value: phone },
+    isDealer && profile.address && { label: t.profile.address, value: profile.address },
+  ].filter(Boolean) as { label: string; value: string }[];
+
   return (
-    <div className="flex flex-col gap-6">
-      <section className="rounded-card border border-line bg-surface p-4">
-        <div className="flex items-center gap-3">
+    <div className="flex flex-1 flex-col gap-8">
+      <FlashToast param="saved" message={t.profile.saved} />
+      <header className="flex flex-col gap-4">
+        <BackLink href="/app">{t.car.backToCars}</BackLink>
+        <div className="flex items-center gap-4">
           {logo ? (
             // eslint-disable-next-line @next/next/no-img-element -- small public logo, no need for the image optimiser
-            <img src={logo} alt="" className="size-14 shrink-0 rounded-control border border-line object-contain" />
+            <img src={logo} alt="" className="size-16 shrink-0 rounded-card bg-surface object-contain shadow-card ring-1 ring-line" />
           ) : (
-            <span className="flex size-14 shrink-0 items-center justify-center rounded-control bg-brand-700 text-title font-bold text-white">
-              {name.charAt(0).toUpperCase()}
-            </span>
+            <span className="flex size-16 shrink-0 items-center justify-center rounded-card bg-brand-700 text-title text-white">{name.charAt(0).toUpperCase()}</span>
           )}
-          <div className="min-w-0">
-            <h1 className="text-title font-bold break-words">{name}</h1>
+          <div className="flex min-w-0 flex-col gap-1">
+            <h1 className="text-title break-words">{name}</h1>
             {profile.city && <p className="text-ink-muted">{profile.city}</p>}
           </div>
         </div>
-        <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-small">
-          {profile.user_type && (
-            <>
-              <dt className="text-ink-muted">{t.profile.userType}</dt>
-              <dd>{t.onboarding.userTypes[profile.user_type]}</dd>
-            </>
-          )}
-          {profile.owner_name && profile.owner_name !== name && (
-            <>
-              <dt className="text-ink-muted">{t.profile.owner}</dt>
-              <dd>{profile.owner_name}</dd>
-            </>
-          )}
-          {phone && (
-            <>
-              <dt className="text-ink-muted">{t.profile.phone}</dt>
-              <dd>{phone}</dd>
-            </>
-          )}
-          {isDealer && profile.address && (
-            <>
-              <dt className="text-ink-muted">{t.profile.address}</dt>
-              <dd className="whitespace-pre-line">{profile.address}</dd>
-            </>
-          )}
-        </dl>
-        <LinkButton href="/app/onboarding" variant="secondary" className="mt-4 w-full">
-          {t.profile.edit}
-        </LinkButton>
+      </header>
+
+      <section aria-labelledby="account-title" className="flex flex-col gap-2">
+        <h2 id="account-title" className="px-1 text-heading">
+          {t.profile.title}
+        </h2>
+        <ListCard>
+          {facts.map((f) => (
+            <ListRow key={f.label} title={<span className="text-small font-normal text-ink-muted">{f.label}</span>} subtitle={<span className="whitespace-pre-line text-body text-ink">{f.value}</span>} />
+          ))}
+          <ListRow href="/app/onboarding" leading={<PencilIcon size={20} className="text-brand-700" />} title={<span className="text-brand-700">{t.profile.edit}</span>} />
+        </ListCard>
       </section>
 
-      <section className="rounded-card border border-line bg-surface p-4">
-        <div className="flex items-center gap-3">
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-control bg-brand-50 text-brand-700">
+      <Card as="section" className="flex flex-col gap-4">
+        <div className="flex items-center gap-4">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-700">
             <CreditIcon />
           </span>
-          <div>
+          <div className="flex flex-col">
             <p className="text-small text-ink-muted">{t.profile.creditsTitle}</p>
-            <p className="text-title font-bold">{t.profile.balance(profile.credits)}</p>
+            <p className="text-title tabular">{t.profile.balance(profile.credits)}</p>
           </div>
         </div>
-        <p className="mt-2 text-small text-ink-muted">
+        <p className="text-small text-ink-muted tabular">
           {t.profile.bought(totalBought(history))} · {t.profile.used(totalUsed(history))}
         </p>
-        <LinkButton href="/app/credits" className="mt-3 w-full">
+        <LinkButton href="/app/credits" size="sm">
           {t.profile.buy}
         </LinkButton>
-      </section>
+      </Card>
 
-      <section className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4">
+      <Card as="section" className="flex flex-wrap items-center justify-between gap-4">
         <h2 className="font-semibold">{t.common.language}</h2>
-        <LanguageToggle className="self-start" />
-      </section>
+        <LanguageToggle />
+      </Card>
 
-      <section id="history" className="scroll-mt-20">
-        <h2 className="mb-3 text-heading font-bold">{t.profile.historyTitle}</h2>
+      <section id="history" aria-labelledby="history-title" className="flex scroll-mt-24 flex-col gap-2">
+        <h2 id="history-title" className="px-1 text-heading">
+          {t.profile.historyTitle}
+        </h2>
         {history.length === 0 ? (
-          <p className="text-ink-muted">{t.profile.historyEmpty}</p>
+          <EmptyState icon={<ClockIcon size={24} />} title={t.profile.historyEmpty} />
         ) : (
-          <ul className="divide-y divide-line rounded-card border border-line bg-surface">
+          <ListCard>
             {history.map((entry, i) => (
-              <li key={i} className="flex items-start justify-between gap-3 p-4">
-                <div className="min-w-0">
-                  <p className="font-medium break-words">{entryLabel(t, entry)}</p>
-                  <p className="text-small text-ink-muted">{formatDateTime(entry.at)}</p>
-                  {entry.kind === "purchase" && entry.paymentId && <p className="text-caption break-all text-ink-muted">{t.profile.paymentId(entry.paymentId)}</p>}
-                </div>
-                <span className={`shrink-0 font-bold tabular-nums ${entry.change > 0 ? "text-success-700" : "text-ink-muted"}`}>
-                  {entry.change > 0 ? `+${entry.change}` : entry.change}
-                </span>
-              </li>
+              <ListRow
+                key={i}
+                title={<span className="break-words">{entryLabel(t, entry)}</span>}
+                subtitle={
+                  <>
+                    {formatDateTime(entry.at)}
+                    {entry.kind === "purchase" && entry.paymentId && <span className="block text-caption break-all">{t.profile.paymentId(entry.paymentId)}</span>}
+                  </>
+                }
+                trailing={
+                  <span className={`shrink-0 font-semibold tabular ${entry.change > 0 ? "text-success-700" : "text-ink-muted"}`}>
+                    {entry.change > 0 ? `+${entry.change}` : entry.change}
+                  </span>
+                }
+              />
             ))}
-          </ul>
+          </ListCard>
         )}
-        <p className="mt-3 text-small text-ink-muted">{t.profile.help}</p>
+        <p className="px-1 text-small text-ink-muted">{t.profile.help}</p>
       </section>
 
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-2">
         <SignOut />
-        <a href={deleteHref} className="inline-flex min-h-11 items-center justify-center text-small font-semibold text-danger-700" {...(deleteHref.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}>
+        <a
+          href={deleteHref}
+          className="inline-flex min-h-11 items-center justify-center self-center rounded-chip px-2 text-small font-semibold text-danger-700 transition-colors hover:bg-danger-50"
+          {...(deleteHref.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}
+        >
           {t.profile.deleteAccount}
         </a>
         <p className="text-center text-caption text-ink-muted">{t.profile.deleteAccountHint}</p>

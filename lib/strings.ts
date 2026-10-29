@@ -685,6 +685,7 @@ export const en = {
     title: "Profile",
     logoutConfirm: "Log out of Treadmark on this phone? You'll need a new OTP to log in again.",
     edit: "Edit profile",
+    saved: "Profile saved.",
     userType: "I am a",
     owner: "Owner",
     phone: "Mobile",

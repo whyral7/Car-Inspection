@@ -2,9 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Button, LinkButton } from "@/components/ui";
-import { FormError } from "@/components/ui";
-import { ChatIcon, CheckIcon, ClockIcon } from "@/components/icons";
+import { ChatIcon, CheckIcon, ClockIcon, ShieldCheckIcon, Spinner } from "@/components/icons";
+import { Badge, Button, Card, FormError, LinkButton, StickyBar } from "@/components/ui";
 import { THEME_COLOR } from "@/lib/config";
 import { formatRupees } from "@/lib/format";
 import { loadCheckout } from "@/lib/razorpay/checkout";
@@ -30,6 +29,7 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>({ kind: "idle" });
   const [error, setError] = useState<string | null>(null);
+  const [selected, setSelected] = useState(() => (packs.find((p) => p.best) ?? packs[0])?.key ?? "");
   const alive = useRef(true);
   useEffect(
     () => () => {
@@ -107,73 +107,99 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
 
   if (phase.kind === "confirming") {
     return (
-      <div role="status" className="flex items-center gap-3 rounded-card border border-line bg-surface p-5">
-        <span className="size-5 shrink-0 animate-spin rounded-full border-2 border-brand-700 border-t-transparent" />
+      <Card role="status" className="flex animate-rise-in items-center gap-4">
+        <Spinner className="size-5 text-brand-700" />
         <p className="font-medium">{t.credits.confirming}</p>
-      </div>
+      </Card>
     );
   }
 
   if (phase.kind === "success" || phase.kind === "slow") {
     const success = phase.kind === "success";
     return (
-      <div role="status" className={`flex flex-col gap-4 rounded-card p-5 ${success ? "bg-success-50" : "bg-warning-50"}`}>
-        <div className="flex items-start gap-3">
-          <span aria-hidden className={`flex size-10 shrink-0 items-center justify-center rounded-full text-title text-white ${success ? "bg-success-700" : "bg-warning-500"}`}>
+      <div className="flex flex-1 flex-col gap-6">
+        <Card role="status" tone={success ? "success" : "warning"} className="flex animate-rise-in items-start gap-4">
+          <span aria-hidden className={`flex size-10 shrink-0 animate-pop items-center justify-center rounded-full text-white ${success ? "bg-success-700" : "bg-warning-500"}`}>
             {success ? <CheckIcon size={22} /> : <ClockIcon size={22} />}
           </span>
-          <div>
-            <h2 className="text-heading font-bold">{success ? t.credits.successTitle : t.credits.slowTitle}</h2>
+          <div className="flex flex-col gap-1">
+            <h2 className="text-heading">{success ? t.credits.successTitle : t.credits.slowTitle}</h2>
             <p className="text-ink-muted">{success ? t.credits.successBody(phase.added, phase.total) : t.credits.slowBody}</p>
           </div>
-        </div>
-        {phase.kind === "slow" && (
-          <Button variant="secondary" onClick={() => checkAgain(phase.orderId)}>
-            {t.credits.checkAgain}
-          </Button>
-        )}
-        {next ? <LinkButton href={next}>{t.credits.backToReport}</LinkButton> : <LinkButton href="/app">{t.credits.backHome}</LinkButton>}
+        </Card>
+        <StickyBar>
+          {phase.kind === "slow" && (
+            <Button variant="secondary" onClick={() => checkAgain(phase.orderId)}>
+              {t.credits.checkAgain}
+            </Button>
+          )}
+          {next ? <LinkButton href={next}>{t.credits.backToReport}</LinkButton> : <LinkButton href="/app">{t.credits.backHome}</LinkButton>}
+        </StickyBar>
       </div>
     );
   }
 
+  const chosen = packs.find((p) => p.key === selected);
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-1 flex-col gap-4">
       {phase.kind === "failed" && (
-        <div role="alert" className="rounded-card bg-danger-50 p-4 text-small text-danger-800">
+        <Card role="alert" tone="danger" className="flex animate-rise-in flex-col gap-1 text-small text-danger-800">
           <p className="font-semibold">{t.credits.failedTitle}</p>
           <p>{t.credits.failedBody(phase.reason)}</p>
-        </div>
+        </Card>
       )}
       {error && (
         <div className="flex flex-col gap-2">
           <FormError message={error} />
-          <a href={supportHref} className="inline-flex min-h-11 items-center gap-2 self-start text-small font-semibold text-brand-700" {...(supportHref.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}>
+          <a
+            href={supportHref}
+            className="-mx-2 inline-flex min-h-11 items-center gap-2 self-start rounded-chip px-2 text-small font-semibold text-brand-700 transition-colors hover:bg-brand-50"
+            {...(supportHref.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}
+          >
             <ChatIcon size={18} />
             {t.credits.getHelp}
           </a>
         </div>
       )}
-      <ul className="flex flex-col gap-3">
+      <div role="radiogroup" aria-label={t.credits.title} className="flex flex-col gap-4">
         {packs.map((pack) => {
-          const opening = phase.kind === "opening" && phase.packKey === pack.key;
+          const active = pack.key === selected;
           return (
-            <li key={pack.key} className={`rounded-card border bg-surface p-4 ${pack.best ? "border-brand-600 ring-1 ring-brand-600" : "border-line"}`}>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-heading font-bold">{t.credits.pack(pack.credits)}</p>
-                  <p className="text-small text-ink-muted">{t.credits.perReport(formatRupees(pack.perReportPaise))}</p>
-                </div>
-                {pack.best && <span className="rounded-full bg-brand-100 px-2.5 py-1 text-caption font-semibold text-brand-800">{t.credits.bestValue}</span>}
-              </div>
-              <Button className="mt-3 w-full" loading={opening} disabled={phase.kind === "opening"} onClick={() => buy(pack.key)}>
-                {opening ? t.credits.opening : t.credits.pay(formatRupees(pack.pricePaise))}
-              </Button>
-            </li>
+            <button
+              key={pack.key}
+              type="button"
+              role="radio"
+              aria-checked={active}
+              disabled={phase.kind === "opening"}
+              onClick={() => setSelected(pack.key)}
+              className={`flex items-center gap-4 rounded-card bg-surface p-4 text-left shadow-card transition-[box-shadow,transform] duration-150 active:scale-[0.99] sm:p-6 ${
+                active ? "ring-2 ring-brand-700" : "ring-1 ring-line"
+              }`}
+            >
+              <span aria-hidden className={`flex size-6 shrink-0 items-center justify-center rounded-full ring-2 ring-inset ${active ? "bg-brand-700 ring-brand-700" : "ring-line-strong"}`}>
+                {active && <span className="size-2 rounded-full bg-white" />}
+              </span>
+              <span className="flex min-w-0 flex-1 flex-col gap-1">
+                <span className="flex flex-wrap items-center gap-2">
+                  <span className="text-heading">{t.credits.pack(pack.credits)}</span>
+                  {pack.best && <Badge tone="brand">{t.credits.bestValue}</Badge>}
+                </span>
+                <span className="text-small text-ink-muted">{t.credits.perReport(formatRupees(pack.perReportPaise))}</span>
+              </span>
+              <span className="shrink-0 text-heading tabular">₹{formatRupees(pack.pricePaise)}</span>
+            </button>
           );
         })}
-      </ul>
-      <p className="text-center text-caption text-ink-muted">{t.credits.secure}</p>
+      </div>
+      <p className="flex items-start justify-center gap-2 text-center text-caption text-ink-muted">
+        <ShieldCheckIcon size={16} className="mt-px shrink-0" />
+        {t.credits.secure}
+      </p>
+      <StickyBar>
+        <Button loading={phase.kind === "opening"} disabled={!chosen} onClick={() => chosen && buy(chosen.key)}>
+          {phase.kind === "opening" ? t.credits.opening : chosen ? t.credits.pay(formatRupees(chosen.pricePaise)) : t.credits.title}
+        </Button>
+      </StickyBar>
     </div>
   );
 }

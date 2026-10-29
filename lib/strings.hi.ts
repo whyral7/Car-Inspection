@@ -679,6 +679,7 @@ export const hi: Strings = {
     title: "प्रोफ़ाइल",
     logoutConfirm: "इस फ़ोन पर Treadmark से लॉग आउट करें? दोबारा लॉग इन के लिए नया OTP लगेगा।",
     edit: "प्रोफ़ाइल बदलें",
+    saved: "प्रोफ़ाइल सेव हो गई।",
     userType: "मैं हूँ",
     owner: "मालिक",
     phone: "मोबाइल",
