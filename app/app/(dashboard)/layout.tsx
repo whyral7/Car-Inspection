@@ -17,7 +17,7 @@ export default async function DashboardLayout({ children }: LayoutProps<"/app">)
   return (
     <div className="flex flex-1 flex-col">
       {/* Log out lives on the profile page, away from where thumbs land while scrolling. */}
-      <header className="sticky top-0 z-20 border-b border-line bg-surface/95 pt-[env(safe-area-inset-top)]">
+      <header className="sticky top-0 z-20 border-b border-line bg-surface pt-[env(safe-area-inset-top)]">
         <div className="mx-auto flex min-h-16 w-full max-w-2xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2">
           <Link
             href="/app/profile"

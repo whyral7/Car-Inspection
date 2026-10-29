@@ -2,12 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BackLink, Button, StickyBar } from "@/components/ui";
 import { useOnline } from "@/components/connection-banner";
-import { FormError, TextAreaField } from "@/components/ui";
 import { useT } from "@/components/i18n-provider";
-import { AlertIcon, CheckIcon, ChevronRightIcon, CloudUploadIcon, HelpIcon, PlusIcon, XIcon } from "@/components/icons";
-import { Segmented, type SegmentOption } from "@/components/ui";
+import { AlertIcon, ArrowRightIcon, CheckIcon, CloudUploadIcon, HelpIcon, PlusIcon, XIcon } from "@/components/icons";
+import { RememberStep } from "@/components/remember-step";
+import { Button, Card, ConfirmSheet, FormError, ProgressBar, Segmented, StepHeader, StickyBar, TextAreaField, TextButton, useToast, type SegmentOption } from "@/components/ui";
 import { CHECKLIST_GROUPS, CHECKLIST_KEYS, checklistProgress, type ChecklistKey } from "@/lib/checklist";
 import { FINDING_LIMITS } from "@/lib/findings";
 import { checklistOutbox } from "@/lib/outbox";
@@ -30,12 +29,14 @@ type Item = {
 type Items = Record<ChecklistKey, Item>;
 
 const RETRY_MS = 15_000;
+/** A note is saved this long after the last keystroke (and on leaving the box). */
+const NOTE_SAVE_MS = 1_200;
 
 const resultOptions = (t: Strings): readonly SegmentOption<ChecklistResult>[] => [
-  { value: "ok", label: t.checklist.results.ok, icon: <CheckIcon size={16} />, selectedClass: "border-success-700 bg-success-700 text-white" },
-  { value: "attention", label: t.checklist.results.attention, icon: <AlertIcon size={16} />, selectedClass: "border-warning-500 bg-warning-500 text-warning-800" },
-  { value: "fail", label: t.checklist.results.fail, icon: <XIcon size={16} />, selectedClass: "border-danger-700 bg-danger-700 text-white" },
-  { value: "na", label: t.checklist.results.na, selectedClass: "border-ink-muted bg-ink-muted text-white" },
+  { value: "ok", label: t.checklist.results.ok, icon: <CheckIcon size={16} />, selectedClass: "bg-success-700 text-white ring-success-700" },
+  { value: "attention", label: t.checklist.results.attention, icon: <AlertIcon size={16} />, selectedClass: "bg-warning-500 text-ink ring-warning-500" },
+  { value: "fail", label: t.checklist.results.fail, icon: <XIcon size={16} />, selectedClass: "bg-danger-700 text-white ring-danger-700" },
+  { value: "na", label: t.checklist.results.na, selectedClass: "bg-ink-muted text-white ring-ink-muted" },
 ];
 
 type Props = {
@@ -50,6 +51,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
   const t = useT();
   const router = useRouter();
   const online = useOnline();
+  const toast = useToast();
   const [items, setItems] = useState<Items>(() => {
     const entries = CHECKLIST_KEYS.map((key) => {
       const saved = initial[key];
@@ -132,6 +134,26 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
     };
   }, [resendUnsaved]);
 
+  // Back on a half-done checklist: start at the first unanswered item.
+  useEffect(() => {
+    const answered = CHECKLIST_KEYS.filter((k) => initial[k]);
+    const first = CHECKLIST_KEYS.find((k) => !initial[k]);
+    if (answered.length > 0 && first) document.getElementById(`item-${first}`)?.scrollIntoView({ block: "start" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, on arrival
+  }, []);
+
+  const noteTimers = useRef(new Map<ChecklistKey, ReturnType<typeof setTimeout>>());
+  useEffect(() => {
+    const timers = noteTimers.current;
+    return () => timers.forEach((timer) => clearTimeout(timer));
+  }, []);
+
+  function changeNote(key: ChecklistKey, note: string) {
+    update(key, { note });
+    clearTimeout(noteTimers.current.get(key));
+    noteTimers.current.set(key, setTimeout(() => void persist(key), NOTE_SAVE_MS));
+  }
+
   function choose(key: ChecklistKey, result: ChecklistResult) {
     // Open the note box for anything worth explaining to a buyer.
     const openNote = result === "attention" || result === "fail" ? { noteOpen: true } : {};
@@ -179,6 +201,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
         setFinishError(res.error);
         return;
       }
+      if (!finished) toast.show({ tone: "success", message: t.checklist.finished });
       router.push(`/app/cars/${carId}/report`);
       router.refresh();
     } catch {
@@ -193,45 +216,54 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
   const waiting = CHECKLIST_KEYS.filter((k) => items[k].save === "waiting").length;
   const label = t.checklist.progress(progress.done, progress.total);
 
+  const stepLabels = [t.car.stepPhotos, t.car.stepFindings, t.car.stepChecklist, t.car.stepReport];
   return (
-    <div className="flex flex-col gap-4">
-      <BackLink href={`/app/cars/${carId}`}>{t.checklist.backToCar}</BackLink>
+    <div className="flex flex-1 flex-col gap-6">
+      <RememberStep carId={carId} step="checklist" />
+      <StepHeader
+        step={3}
+        labels={stepLabels}
+        stepLabel={t.common.stepOf(3, 4)}
+        back={{ href: `/app/cars/${carId}`, label: t.checklist.backToCar }}
+        title={t.checklist.title}
+        meta={
+          <>
+            <span className="font-semibold tracking-wider text-ink tabular">{regNumber}</span>
+            {carTitle && ` · ${carTitle}`}
+          </>
+        }
+        description={t.checklist.subtitle}
+      />
 
-      <header>
-        <h1 className="text-title font-bold">{t.checklist.title}</h1>
-        <p className="text-small text-ink-muted">
-          <span className="font-semibold tracking-wider">{regNumber}</span>
-          {carTitle && ` · ${carTitle}`}
-        </p>
-        <p className="mt-2 text-small text-ink-muted">{t.checklist.subtitle}</p>
-      </header>
-
-      <section className="rounded-card border border-line bg-surface p-4" aria-label={label}>
-        <p className="text-title font-bold">{label}</p>
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-sunken" role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={progress.total} aria-valuenow={progress.done}>
-          <div className="h-full rounded-full bg-brand-600 transition-[width]" style={{ width: `${(progress.done / progress.total) * 100}%` }} />
-        </div>
-      </section>
+      <Card className="flex flex-col gap-4" aria-label={label}>
+        <p className="text-title tabular">{label}</p>
+        <ProgressBar value={progress.done} max={progress.total} label={label} />
+      </Card>
 
       {waiting > 0 && (
-        <p role="status" className="flex items-start gap-2 rounded-control border border-line bg-surface px-4 py-3 text-small text-ink">
+        <p role="status" className="flex animate-rise-in items-start gap-2 rounded-control bg-brand-50 px-4 py-3 text-small text-brand-900">
           <CloudUploadIcon size={18} className="mt-px text-brand-700" />
           {t.checklist.waitingCount(waiting)}
         </p>
       )}
 
       {CHECKLIST_GROUPS.map((group) => (
-        <section key={group.key} className="rounded-card border border-line bg-surface">
-          <h2 className="border-b border-line px-4 py-3 font-semibold">{t.checklist.groups[group.key]}</h2>
-          <ul className="divide-y divide-line">
+        <section key={group.key} aria-labelledby={`group-${group.key}`} className="flex flex-col gap-2">
+          <h2 id={`group-${group.key}`} className="px-1 text-heading">
+            {t.checklist.groups[group.key]}
+          </h2>
+          <ul className="divide-y divide-line overflow-hidden rounded-card bg-surface shadow-card">
             {group.items.map((key) => (
-              <li key={key} className="px-4 py-3">
+              <li key={key} id={`item-${key}`} className="scroll-mt-24 px-4 py-4 sm:px-6">
                 <ChecklistRow
                   itemKey={key}
                   item={items[key]}
                   onChoose={(r) => choose(key, r)}
-                  onNoteChange={(note) => update(key, { note })}
-                  onNoteBlur={() => void persist(key)}
+                  onNoteChange={(note) => changeNote(key, note)}
+                  onNoteBlur={() => {
+                    clearTimeout(noteTimers.current.get(key));
+                    void persist(key);
+                  }}
                   onOpenNote={() => update(key, { noteOpen: true })}
                   onToggleHelp={() => update(key, { helpOpen: !items[key].helpOpen })}
                   onRetry={() => void persist(key)}
@@ -242,39 +274,36 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
         </section>
       ))}
 
+      <ConfirmSheet
+        open={confirmRest}
+        onClose={() => setConfirmRest(false)}
+        title={t.checklist.markRestOk(remaining)}
+        description={t.checklist.markRestConfirm(remaining)}
+        confirmLabel={t.checklist.markRestYes}
+        cancelLabel={t.common.cancel}
+        closeLabel={t.common.close}
+        variant="primary"
+        errorFallback={t.checklist.saveFailed}
+        onConfirm={() => void markRestOk()}
+      />
+
       <StickyBar>
-        {confirmRest ? (
-          <div role="alertdialog" aria-labelledby="mark-rest" className="flex flex-col gap-2">
-            <p id="mark-rest" className="text-small font-medium text-ink">
-              {t.checklist.markRestConfirm(remaining)}
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              <Button variant="secondary" onClick={() => setConfirmRest(false)} autoFocus>
-                {t.common.cancel}
-              </Button>
-              <Button onClick={() => void markRestOk()}>{t.checklist.markRestYes}</Button>
-            </div>
-          </div>
+        <p aria-live="polite" className={`flex items-center justify-center gap-2 text-center text-small ${progress.complete ? "font-medium text-success-700" : "text-ink-muted"}`}>
+          {progress.complete && <CheckIcon size={16} />}
+          {progress.complete ? (finished ? t.checklist.finished : t.checklist.allDone) : t.checklist.finishHint(remaining)}
+        </p>
+        <FormError message={finishError ?? (!online && progress.complete ? t.checklist.finishOffline : null)} />
+        {progress.complete ? (
+          <Button onClick={() => void onFinish()} loading={finishing} disabled={!online}>
+            {finished ? t.checklist.backToCarDone : t.checklist.finish}
+            <ArrowRightIcon size={20} />
+          </Button>
         ) : (
-          <>
-            <p aria-live="polite" className={`text-center text-small ${progress.complete ? "text-brand-800" : "text-ink"}`}>
-              {progress.complete ? (finished ? t.checklist.finished : t.checklist.allDone) : t.checklist.finishHint(remaining)}
-            </p>
-            <FormError message={finishError ?? (!online && progress.complete ? t.checklist.finishOffline : null)} />
-            {progress.complete ? (
-              <Button onClick={() => void onFinish()} loading={finishing} disabled={!online}>
-                {finished ? t.checklist.backToCarDone : t.checklist.finish}
-                <ChevronRightIcon />
-              </Button>
-            ) : (
-              progress.done > 0 && (
-                <Button variant="secondary" onClick={() => setConfirmRest(true)}>
-                  <CheckIcon size={18} />
-                  {t.checklist.markRestOk(remaining)}
-                </Button>
-              )
-            )}
-          </>
+          progress.done > 0 && (
+            <Button variant="secondary" onClick={() => setConfirmRest(true)} icon={<CheckIcon size={18} />}>
+              {t.checklist.markRestOk(remaining)}
+            </Button>
+          )
         )}
       </StickyBar>
     </div>
@@ -304,31 +333,31 @@ function ChecklistRow({
   const { label, hint, how } = t.checklist.items[itemKey];
   const helpId = `how-${itemKey}`;
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
+    <div className="flex flex-col gap-4">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 flex-col gap-1">
           <p className="font-semibold">{label}</p>
           <p className="text-small text-ink-muted">{hint}</p>
         </div>
         <SaveState state={item.save} onRetry={onRetry} />
       </div>
       {item.helpOpen && (
-        <p id={helpId} className="rounded-control bg-brand-50 p-3 text-small text-brand-900">
+        <p id={helpId} className="animate-rise-in rounded-control bg-brand-50 p-4 text-small text-brand-900">
           {how}
         </p>
       )}
       <Segmented label={label} options={resultOptions(t)} value={item.result} onChange={onChoose} columns="grid-cols-2 min-[420px]:grid-cols-4" />
-      <div className="flex flex-wrap gap-x-4">
+      <div className="-my-2 flex flex-wrap gap-x-6">
         {!item.noteOpen && (
-          <button type="button" onClick={onOpenNote} className="inline-flex min-h-11 items-center gap-1.5 text-small font-semibold text-brand-700">
+          <TextButton onClick={onOpenNote}>
             <PlusIcon size={16} />
             {t.checklist.addNote}
-          </button>
+          </TextButton>
         )}
-        <button type="button" onClick={onToggleHelp} aria-expanded={item.helpOpen} aria-controls={helpId} className="inline-flex min-h-11 items-center gap-1.5 text-small font-semibold text-brand-700">
+        <TextButton onClick={onToggleHelp} aria-expanded={item.helpOpen} aria-controls={helpId}>
           <HelpIcon size={16} />
           {t.checklist.howToCheck}
-        </button>
+        </TextButton>
       </div>
       {item.noteOpen && (
         <TextAreaField
@@ -350,7 +379,7 @@ function SaveState({ state, onRetry }: { state: SaveState; onRetry: () => void }
   if (state === "saving") return <span className="shrink-0 text-caption text-ink-muted">{t.checklist.saving}</span>;
   if (state === "saved")
     return (
-      <span className="inline-flex shrink-0 items-center gap-1 text-caption font-semibold text-brand-800">
+      <span className="inline-flex shrink-0 animate-fade-in items-center gap-1 text-caption font-semibold text-success-700">
         <CheckIcon size={14} />
         {t.checklist.saved}
       </span>
@@ -364,7 +393,7 @@ function SaveState({ state, onRetry }: { state: SaveState; onRetry: () => void }
     );
   if (state === "error")
     return (
-      <button type="button" onClick={onRetry} className="min-h-11 shrink-0 text-right text-caption font-semibold text-danger-800">
+      <button type="button" onClick={onRetry} className="min-h-11 shrink-0 text-right text-caption font-semibold text-danger-700">
         {t.checklist.saveFailed}
       </button>
     );
