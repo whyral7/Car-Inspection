@@ -53,7 +53,7 @@ function PhotoViewer({ photos, viewer }: { photos: ReportPhoto[]; viewer: Return
     >
       {photo && (
         <div className="flex h-full flex-col" onTouchStart={(e) => (touchX.current = e.touches[0].clientX)} onTouchEnd={onTouchEnd}>
-          <div className="flex items-center justify-between gap-3 px-4 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-2">
+          <div className="flex items-center justify-between gap-4 px-4 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-2">
             <div className="min-w-0 text-small">
               <p className="truncate">
                 <span className="font-semibold">{photo.label}</span>
@@ -78,7 +78,7 @@ function PhotoViewer({ photos, viewer }: { photos: ReportPhoto[]; viewer: Return
               />
             </button>
           </div>
-          <div className="flex items-center justify-between gap-3 px-4 pt-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+          <div className="flex items-center justify-between gap-4 px-4 pt-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
             {photos.length > 1 ? (
               <button type="button" onClick={() => step(-1)} aria-label={t.publicReport.previous} className="flex min-h-12 flex-1 items-center justify-center rounded-control bg-surface/10 active:bg-surface/20">
                 <ChevronLeftIcon size={24} />

@@ -348,6 +348,7 @@ export const en = {
     enlargePhoto: "show bigger",
     shrinkPhoto: "show smaller",
     deleted: "Note deleted.",
+    noteSaved: "Note saved.",
     undo: "Undo",
     continueWithoutWaiting: "Continue without waiting",
     acceptAllContinue: (n: number) => (n === 1 ? "Accept 1 note and continue" : `Accept all ${n} and continue`),

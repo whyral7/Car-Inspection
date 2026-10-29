@@ -285,6 +285,7 @@ export const hi: Strings = {
     enlargePhoto: "बड़ा देखें",
     shrinkPhoto: "छोटा करें",
     deleted: "नोट हटा दिया।",
+    noteSaved: "नोट सेव हो गया।",
     undo: "वापस लाएँ",
     continueWithoutWaiting: "इंतज़ार किए बिना आगे बढ़ें",
     acceptAllContinue: (n: number) => (n === 1 ? "1 नोट मानें और आगे बढ़ें" : `सभी ${n} मानें और आगे बढ़ें`),

@@ -306,7 +306,7 @@ function ReportHeaderPreview({ logo, name, city }: { logo: string | null; name: 
           <span className="flex size-12 shrink-0 items-center justify-center rounded-control bg-brand-700 font-semibold text-white">{name.trim().charAt(0).toUpperCase() || "?"}</span>
         )}
         <div className="min-w-0">
-          <p className="font-bold break-words">{name}</p>
+          <p className="font-semibold break-words">{name}</p>
           {city && <p className="text-small text-ink-muted">{city}</p>}
         </div>
       </div>

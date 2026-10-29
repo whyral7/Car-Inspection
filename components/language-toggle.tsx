@@ -23,7 +23,7 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
   }
 
   return (
-    <div role="radiogroup" aria-label={t.common.language} aria-busy={pending} className={`inline-flex items-center gap-1 rounded-full bg-sunken p-1 ${className}`}>
+    <div role="radiogroup" aria-label={t.common.language} aria-busy={pending} className={`inline-flex items-center gap-1 rounded-full bg-sunken p-1 transition-opacity ${pending ? "opacity-60" : ""} ${className}`}>
       <GlobeIcon size={16} className="mx-1.5 text-ink-muted" />
       {LOCALES.map((locale) => (
         <button

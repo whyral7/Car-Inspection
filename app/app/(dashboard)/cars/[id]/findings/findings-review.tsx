@@ -205,6 +205,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
       const saved = result.finding;
       setFindings((fs) => (fs.some((f) => f.id === saved.id) ? fs.map((f) => (f.id === saved.id ? saved : f)) : [...fs, saved]));
       setEditing(null);
+      toast.show({ tone: "success", message: t.findings.noteSaved });
     }
     return result;
   }

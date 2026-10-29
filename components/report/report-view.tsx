@@ -219,7 +219,7 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
               : t.publicReport.priceUnadjusted(view.price.marketRangeText)}
           </p>
           {view.price.summary && <p className="mt-2 text-small text-ink">{view.price.summary}</p>}
-          <p className="mt-3 text-caption text-ink-muted">{t.publicReport.priceBasedOn(view.price.comparables.length, view.price.searchedOn)}</p>
+          <p className="mt-4 text-caption text-ink-muted">{t.publicReport.priceBasedOn(view.price.comparables.length, view.price.searchedOn)}</p>
           {view.price.comparables.length > 0 && (
             <ul className="mt-1 flex flex-col">
               {view.price.comparables.map((c) => (
@@ -235,7 +235,7 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
               ))}
             </ul>
           )}
-          <p className="mt-3 text-caption text-ink-muted">{t.publicReport.priceDisclaimer}</p>
+          <p className="mt-4 text-caption text-ink-muted">{t.publicReport.priceDisclaimer}</p>
         </Section>
       )}
 

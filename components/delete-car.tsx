@@ -5,6 +5,7 @@ import { deleteCar } from "@/app/app/(dashboard)/cars/[id]/actions";
 import { useT } from "@/components/i18n-provider";
 import { TrashIcon } from "@/components/icons";
 import { ConfirmSheet, TextButton } from "@/components/ui";
+import { forgetCar } from "@/lib/resume";
 
 /** "Delete this car", behind a confirmation sheet that says exactly what goes. */
 export function DeleteCar({ carId, regNumber, published }: { carId: string; regNumber: string; published: boolean }) {
@@ -28,6 +29,7 @@ export function DeleteCar({ carId, regNumber, published }: { carId: string; regN
         errorFallback={t.car.deleteFailed}
         onConfirm={async () => {
           if (!navigator.onLine) return t.common.offline;
+          forgetCar(carId);
           // Redirects to My cars on success.
           const res = await deleteCar(carId);
           return res.error;

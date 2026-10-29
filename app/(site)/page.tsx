@@ -37,29 +37,29 @@ function ReportPreview() {
   return (
     <div aria-hidden className="mx-auto w-full max-w-xs rotate-1 rounded-card bg-surface p-4 shadow-raised ring-1 ring-line/60">
       <div className="flex items-center gap-2">
-        <span className="flex size-9 items-center justify-center rounded-chip bg-brand-700 text-small font-bold text-white">{p.dealer.charAt(0)}</span>
+        <span className="flex size-9 items-center justify-center rounded-chip bg-brand-700 text-small font-semibold text-white">{p.dealer.charAt(0)}</span>
         <div className="min-w-0">
-          <p className="truncate text-small font-bold">{p.dealer}</p>
+          <p className="truncate text-small font-semibold">{p.dealer}</p>
           <p className="text-caption text-ink-muted">{p.city}</p>
         </div>
       </div>
-      <div className="mt-3 flex items-start justify-between gap-2">
+      <div className="mt-4 flex items-start justify-between gap-2">
         <div className="min-w-0">
           <Plate reg={p.reg} size="sm" />
-          <p className="mt-1.5 text-small leading-snug font-semibold">{p.car}</p>
+          <p className="mt-2 text-small leading-snug font-semibold">{p.car}</p>
         </div>
         <p className="shrink-0 rounded-control bg-success-50 px-2.5 py-1.5 text-center text-success-800">
           <span className="text-title tabular">{p.score}</span>
           <span className="text-caption">{p.outOf}</span>
         </p>
       </div>
-      <div className="mt-3 grid grid-cols-4 gap-1">
+      <div className="mt-4 grid grid-cols-4 gap-1">
         {ANGLE_KEYS.slice(0, 8).map((key) => (
           // eslint-disable-next-line @next/next/no-img-element -- tiny static drawings
           <img key={key} src={`/sample/${key}.svg`} alt="" width={80} height={60} className="aspect-[4/3] w-full rounded-chip bg-sunken object-cover" />
         ))}
       </div>
-      <ul className="mt-3 flex flex-col gap-1 text-caption text-ink-muted">
+      <ul className="mt-4 flex flex-col gap-1 text-caption text-ink-muted">
         {p.lines.map((line) => (
           <li key={line} className="flex items-center gap-1.5">
             <CheckIcon size={14} className="text-brand-700" />
@@ -141,7 +141,7 @@ export default function Home() {
 
       <section className="mx-auto w-full max-w-5xl px-4 py-12">
         <h2 className="text-title">{h.faqTitle}</h2>
-        <div className="mt-6 flex flex-col gap-3">
+        <div className="mt-6 flex flex-col gap-4">
           {h.faq.map((item) => (
             <details key={item.q} className="group rounded-card bg-surface shadow-card">
               <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded-card px-4 font-semibold transition-colors hover:bg-canvas sm:px-6 [&::-webkit-details-marker]:hidden">
@@ -186,10 +186,10 @@ export default function Home() {
       <section className="bg-brand-800 text-white">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-12 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-title font-bold text-balance">{h.finalTitle}</h2>
+            <h2 className="text-title text-balance">{h.finalTitle}</h2>
             <p className="mt-2 text-brand-100">{h.contactBody}</p>
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-col gap-4 sm:flex-row">
             <LinkButton href="/login" variant="secondary" size="lg" className="!ring-0">
               {h.cta}
             </LinkButton>

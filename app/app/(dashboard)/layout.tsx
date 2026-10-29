@@ -21,7 +21,7 @@ export default async function DashboardLayout({ children }: LayoutProps<"/app">)
         <div className="mx-auto flex min-h-16 w-full max-w-2xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2">
           <Link
             href="/app/profile"
-            className="-ml-2 flex min-h-12 min-w-0 flex-1 basis-40 items-center gap-3 rounded-control px-2 transition-colors hover:bg-canvas"
+            className="-ml-2 flex min-h-12 min-w-0 flex-1 basis-40 items-center gap-4 rounded-control px-2 transition-colors hover:bg-canvas"
             aria-label={`${name}, ${t.profile.title}`}
           >
             {logo ? (
