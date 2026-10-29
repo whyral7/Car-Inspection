@@ -10,7 +10,8 @@ import { runWithConcurrency } from "@/lib/concurrency";
 import { AI } from "@/lib/config";
 import { FINDING_LIMITS, FINDING_TYPES } from "@/lib/findings";
 import type { AngleKey } from "@/lib/photos/angles";
-import { t } from "@/lib/strings";
+import { useT } from "@/components/i18n-provider";
+import type { Strings } from "@/lib/strings";
 import type { AiStatus, FindingRow, FindingType, Severity } from "@/lib/supabase/database.types";
 import { confirmOdometer, deleteFinding, saveFinding, setFindingsAccepted, type FindingFormInput, type SaveFindingResult } from "./actions";
 
@@ -38,8 +39,9 @@ type Props = {
 };
 
 const GENERAL = "general";
-const typeOptions = FINDING_TYPES.map((value) => ({ value, label: t.findings.types[value] }));
-const severityOptions = [
+const typeOptions = (t: Strings) => FINDING_TYPES.map((value) => ({ value, label: t.findings.types[value] }));
+const severityOptions = (t: Strings) =>
+  [
   { value: "minor", label: t.findings.severities.minor, selectedClass: "border-amber-500 bg-amber-100 text-amber-900" },
   { value: "moderate", label: t.findings.severities.moderate, selectedClass: "border-orange-600 bg-orange-600 text-white" },
   { value: "major", label: t.findings.severities.major, selectedClass: "border-red-600 bg-red-600 text-white" },
@@ -53,6 +55,7 @@ const severityChip: Record<Severity, string> = {
 const kmFormat = new Intl.NumberFormat("en-IN");
 
 export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initialPhotos, initialFindings }: Props) {
+  const t = useT();
   const [photos, setPhotos] = useState<PhotoState[]>(initialPhotos);
   const [findings, setFindings] = useState<FindingRow[]>(initialFindings);
   // "<finding id>" while editing one, "new:<photo id | general>" while adding, else null.
@@ -214,6 +217,7 @@ function Spinner({ className = "" }: { className?: string }) {
 }
 
 function AnalysisProgress({ total, active, failed, onRetry }: { total: number; active: number; failed: number; onRetry: () => void }) {
+  const t = useT();
   const done = total - active;
   return (
     <section aria-live="polite" className="rounded-2xl border border-slate-200 bg-white p-4">
@@ -242,6 +246,7 @@ function AnalysisProgress({ total, active, failed, onRetry }: { total: number; a
 }
 
 function OdometerCard({ carId, initialKm, photo }: { carId: string; initialKm: number | null; photo: PhotoState | undefined }) {
+  const t = useT();
   const [confirmed, setConfirmed] = useState<number | null>(initialKm);
   const [changing, setChanging] = useState(false);
   // null until the dealer types, so a reading that arrives from the AI later still fills the box.
@@ -337,6 +342,7 @@ type GroupActions = {
 };
 
 function PhotoGroup({ photo, findings, onRetry, ...actions }: { photo: PhotoState; findings: FindingRow[]; onRetry: () => void } & GroupActions) {
+  const t = useT();
   const [expanded, setExpanded] = useState(false);
   const { label } = t.photos.angles[photo.angleKey];
 
@@ -367,6 +373,7 @@ function PhotoGroup({ photo, findings, onRetry, ...actions }: { photo: PhotoStat
 }
 
 function PhotoStatus({ photo, findingCount, carId, onRetry }: { photo: PhotoState; findingCount: number; carId: string; onRetry: () => void }) {
+  const t = useT();
   const s = t.findings.photoStatus;
   if (photo.run === "queued" || (!photo.run && photo.aiStatus === "pending")) return <p className="text-sm text-slate-500">{s.queued}</p>;
   if (photo.run === "running")
@@ -429,6 +436,7 @@ function Group({
   media?: ReactNode;
   status?: ReactNode;
 } & GroupActions) {
+  const t = useT();
   const adding = editing === `new:${groupKey}`;
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-4" aria-label={title}>
@@ -469,6 +477,7 @@ function Group({
 }
 
 function FindingCard({ finding, onAccept, onEdit, onDelete }: { finding: FindingRow; onAccept: (accepted: boolean) => void; onEdit: () => void; onDelete: () => void }) {
+  const t = useT();
   const [confirming, setConfirming] = useState(false);
   const small = "min-h-11 flex-1 px-2 text-sm";
 
@@ -530,6 +539,7 @@ function FindingForm({
   onSave: (values: FindingFormValues) => Promise<SaveFindingResult>;
   onCancel: () => void;
 }) {
+  const t = useT();
   const [type, setType] = useState<FindingType | "">(initial?.type ?? "");
   const [severity, setSeverity] = useState<Severity | null>(initial?.severity ?? null);
   const [location, setLocation] = useState(initial?.location ?? "");
@@ -563,7 +573,7 @@ function FindingForm({
           setType(e.target.value as FindingType);
           setErrors((x) => ({ ...x, type: undefined }));
         }}
-        options={typeOptions}
+        options={typeOptions(t)}
         placeholder={t.cars.choose}
         error={errors.type}
       />
@@ -571,7 +581,7 @@ function FindingForm({
         <p className="mb-1.5 text-sm font-medium text-slate-700">{t.findings.severity}</p>
         <Segmented
           label={t.findings.severity}
-          options={severityOptions}
+          options={severityOptions(t)}
           value={severity}
           onChange={(v) => {
             setSeverity(v);

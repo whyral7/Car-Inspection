@@ -11,7 +11,7 @@ import { carTitle, formatDate, formatDateTime, isPastDate } from "@/lib/format";
 import { photoProgress } from "@/lib/photos/angles";
 import { getCurrentProfile } from "@/lib/profile";
 import { conditionScore, formatScore } from "@/lib/score";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 
 const getCar = cache(async (id: string) => {
   if (!z.uuid().safeParse(id).success) notFound();
@@ -32,6 +32,7 @@ const isFuel = (v: string | null): v is Fuel => (FUELS as readonly string[]).inc
 const isTransmission = (v: string | null): v is Transmission => (TRANSMISSIONS as readonly string[]).includes(v ?? "");
 
 export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
+  const t = await getT();
   const { id } = await params;
   const car = await getCar(id);
   const { supabase } = await getCurrentProfile();
@@ -115,7 +116,7 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
       <section className="rounded-2xl border border-slate-200 bg-white p-5">
         <div className="flex items-start justify-between gap-3">
           <p className="min-w-0 truncate text-2xl font-bold tracking-widest">{car.reg_number}</p>
-          <StatusBadge status={car.status} />
+          <StatusBadge status={car.status} t={t} />
         </div>
         <h1 className="mt-1 text-lg text-slate-700">{carTitle(car)}</h1>
         <p className="mt-1 text-xs text-slate-500">{car.rc_raw ? t.car.fromRc : t.car.enteredManually}</p>

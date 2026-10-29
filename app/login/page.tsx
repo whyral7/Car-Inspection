@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { safeNextPath } from "@/lib/validation/auth";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 import { LoginForm } from "./login-form";
 
-export const metadata: Metadata = { title: t.login.title };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.login.title };
+}
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
+  const t = await getT();
   const { next } = await searchParams;
   const nextPath = safeNextPath(typeof next === "string" ? next : null);
 

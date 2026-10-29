@@ -2,7 +2,8 @@
 
 import { z } from "zod";
 import { getCurrentProfile } from "@/lib/profile";
-import { t } from "@/lib/strings";
+import { errorText } from "@/lib/i18n";
+import { getT } from "@/lib/i18n.server";
 import type { FindingRow } from "@/lib/supabase/database.types";
 import { findingInputSchema, odometerSchema, type FindingField } from "@/lib/validation/finding";
 
@@ -13,6 +14,7 @@ const id = z.uuid();
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
 export async function setFindingsAccepted(findingIds: string[], accepted: boolean): Promise<ActionResult> {
+  const t = await getT();
   const ids = z.array(id).min(1).max(500).safeParse(findingIds);
   if (!ids.success) return { ok: false, error: t.common.somethingWrong };
   const { supabase } = await getCurrentProfile();
@@ -21,6 +23,7 @@ export async function setFindingsAccepted(findingIds: string[], accepted: boolea
 }
 
 export async function deleteFinding(findingId: string): Promise<ActionResult> {
+  const t = await getT();
   if (!id.safeParse(findingId).success) return { ok: false, error: t.common.somethingWrong };
   const { supabase } = await getCurrentProfile();
   const { error } = await supabase.from("findings").delete().eq("id", findingId);
@@ -39,13 +42,14 @@ export type SaveFindingResult =
  * at it, so it is saved as accepted. An edited AI finding keeps source = 'ai'.
  */
 export async function saveFinding(input: FindingFormInput & { carId: string; photoId: string | null; findingId?: string }): Promise<SaveFindingResult> {
+  const t = await getT();
   const ids = z.object({ carId: id, photoId: id.nullable(), findingId: id.optional() }).safeParse(input);
   if (!ids.success) return { ok: false, error: t.common.somethingWrong };
 
   const parsed = findingInputSchema.safeParse(input);
   if (!parsed.success) {
     const fieldErrors: Partial<Record<FindingField, string>> = {};
-    for (const issue of parsed.error.issues) fieldErrors[issue.path[0] as FindingField] ??= issue.message;
+    for (const issue of parsed.error.issues) fieldErrors[issue.path[0] as FindingField] ??= errorText(t, issue.message);
     return { ok: false, fieldErrors };
   }
 
@@ -71,6 +75,7 @@ export async function saveFinding(input: FindingFormInput & { carId: string; pho
 }
 
 export async function confirmOdometer(carId: string, km: string | number): Promise<{ ok: true; km: number } | { ok: false; error: string }> {
+  const t = await getT();
   if (!id.safeParse(carId).success) return { ok: false, error: t.common.somethingWrong };
   const parsed = odometerSchema.safeParse(km);
   if (!parsed.success) return { ok: false, error: t.findings.errors.odometer };

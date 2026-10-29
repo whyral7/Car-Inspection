@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { BRAND, INK } from "@/lib/report/colors";
-import { t } from "@/lib/strings";
+import { en as t } from "@/lib/strings";
 
 // Link preview for the landing and other public pages (WhatsApp, Facebook, X). Built once at build time.
 

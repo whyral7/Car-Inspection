@@ -5,16 +5,20 @@ import { getCurrentProfile } from "@/lib/profile";
 import { loadReport } from "@/lib/report/load";
 import { reportUrl } from "@/lib/report/share";
 import { buildReportView, parseHiddenSections } from "@/lib/report/view";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 import { appBaseUrl } from "@/lib/url";
 import { ReportManager } from "./report-manager";
 
-export const metadata: Metadata = { title: t.report.title };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.report.title };
+}
 
 // The price estimate (a server action on this page) researches listings for up to a minute or two.
 export const maxDuration = 180;
 
 export default async function ReportPage({ params }: PageProps<"/app/cars/[id]/report">) {
+  const t = await getT();
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();
 
@@ -32,7 +36,7 @@ export default async function ReportPage({ params }: PageProps<"/app/cars/[id]/r
       unreviewed={loaded.unreviewed}
       credits={profile.credits}
       // The full report goes to the browser; the preview hides sections as the dealer toggles them.
-      view={buildReportView(loaded.input)}
+      view={buildReportView(loaded.input, [], undefined, t)}
       initialHidden={parseHiddenSections(loaded.report?.hidden_sections)}
       published={published}
     />

@@ -1,6 +1,6 @@
-import { t } from "@/lib/strings";
+import type { Strings } from "@/lib/strings";
 
-export function CreditsBadge({ credits }: { credits: number }) {
+export function CreditsBadge({ credits, t }: { credits: number; t: Strings }) {
   const low = credits <= 1;
   return (
     <span

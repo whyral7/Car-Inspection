@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { buttonClass } from "@/components/button";
-import { t } from "@/lib/strings";
+import { en as t } from "@/lib/strings";
 
 export function SiteHeader() {
   return (

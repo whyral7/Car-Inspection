@@ -11,7 +11,7 @@ import { ensureReportPdf } from "@/lib/report/pdf-store";
 import { generateSlug } from "@/lib/report/slug";
 import { hiddenSectionsSchema } from "@/lib/report/view";
 import { conditionScore } from "@/lib/score";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { appBaseUrl } from "@/lib/url";
 
@@ -33,6 +33,7 @@ async function prebuildPdf(carId: string) {
  * report row and the car status change together in publish_report (service role only).
  */
 export async function publishReport(carId: string, hiddenSections: string[]): Promise<PublishResult> {
+  const t = await getT();
   if (!z.uuid().safeParse(carId).success) return { ok: false, error: t.common.somethingWrong };
   const hidden = hiddenSectionsSchema.safeParse(hiddenSections);
   if (!hidden.success) return { ok: false, error: t.common.somethingWrong };
@@ -74,6 +75,7 @@ export async function publishReport(carId: string, hiddenSections: string[]): Pr
 
 /** Shows or hides sections on an already published report. Free, and buyers see it at once. */
 export async function saveHiddenSections(carId: string, hiddenSections: string[]): Promise<SectionsResult> {
+  const t = await getT();
   if (!z.uuid().safeParse(carId).success) return { ok: false, error: t.common.somethingWrong };
   const hidden = hiddenSectionsSchema.safeParse(hiddenSections);
   if (!hidden.success) return { ok: false, error: t.common.somethingWrong };
@@ -95,6 +97,7 @@ export type PriceResult = { ok: true } | { ok: false; error: string; code?: "nee
  * the user, capped at PRICE.maxPerCarPerDay per car.
  */
 export async function estimatePrice(carId: string): Promise<PriceResult> {
+  const t = await getT();
   if (!z.uuid().safeParse(carId).success) return { ok: false, error: t.common.somethingWrong };
 
   const { supabase, profile } = await getCurrentProfile();

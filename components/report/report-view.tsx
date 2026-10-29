@@ -5,7 +5,7 @@ import { PhotoGallery } from "@/components/report/photo-gallery";
 import { formatPhone, telHref, whatsappChatUrl } from "@/lib/report/share";
 import type { DetailRow, ReportCheckItem, ReportView as View } from "@/lib/report/view";
 import type { ScoreBand } from "@/lib/score";
-import { t } from "@/lib/strings";
+import type { Strings } from "@/lib/strings";
 import type { ChecklistResult, Severity } from "@/lib/supabase/database.types";
 
 const bandStyle: Record<ScoreBand, string> = {
@@ -71,7 +71,7 @@ function CheckList({ items }: { items: ReportCheckItem[] }) {
   );
 }
 
-export function ScoreBadge({ view, className = "" }: { view: Pick<View, "scoreText" | "band">; className?: string }) {
+export function ScoreBadge({ view, t, className = "" }: { view: Pick<View, "scoreText" | "band">; t: Strings; className?: string }) {
   return (
     <div className={`flex shrink-0 flex-col items-center rounded-2xl px-4 py-3 ring-1 ${bandStyle[view.band]} ${className}`}>
       <span className="text-xs font-semibold">{t.publicReport.score}</span>
@@ -85,7 +85,7 @@ export function ScoreBadge({ view, className = "" }: { view: Pick<View, "scoreTe
 }
 
 /** "Call dealer" and "WhatsApp dealer" (or owner). In the sharer's own preview they are shown but do nothing. */
-export function ContactButtons({ view, preview = false }: { view: View; preview?: boolean }) {
+export function ContactButtons({ view, t, preview = false }: { view: View; t: Strings; preview?: boolean }) {
   const { userType, phone } = view.dealer;
   const message = t.publicReport.contactMessage(view.car.title || view.car.regNumber, view.car.regNumber, userType !== "buyer");
   const call = telHref(phone);
@@ -116,7 +116,7 @@ export function ContactButtons({ view, preview = false }: { view: View; preview?
   );
 }
 
-export function ReportView({ view, pdfHref }: { view: View; pdfHref?: string | null }) {
+export function ReportView({ view, t, pdfHref }: { view: View; t: Strings; pdfHref?: string | null }) {
   const phone = formatPhone(view.dealer.phone);
   const place = [view.dealer.address, view.dealer.city].filter(Boolean).join(", ");
 
@@ -142,7 +142,7 @@ export function ReportView({ view, pdfHref }: { view: View; pdfHref?: string | n
             <p className="inline-block rounded-md border-2 border-slate-900 px-2 py-0.5 text-lg font-bold tracking-widest">{view.car.regNumber}</p>
             <h1 className="mt-2 text-xl leading-snug font-bold">{view.car.title}</h1>
           </div>
-          <ScoreBadge view={view} />
+          <ScoreBadge view={view} t={t} />
         </div>
         {view.car.details.length > 0 && (
           <div className="mt-3">

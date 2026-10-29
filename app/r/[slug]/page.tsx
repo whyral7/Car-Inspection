@@ -4,14 +4,17 @@ import { ContactButtons, ReportView } from "@/components/report/report-view";
 import { APP_NAME } from "@/lib/config";
 import { contentVersion, getPublishedReport } from "@/lib/report/load";
 import { reportPdfPath, reportUrl, telHref } from "@/lib/report/share";
-import { summaryParts } from "@/lib/report/view";
-import { t } from "@/lib/strings";
+import { buildReportView, parseHiddenSections, summaryParts } from "@/lib/report/view";
+import { en } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 import { appBaseUrl } from "@/lib/url";
 
 // Public report for buyers. No login: it is read with the service role by slug, and only published
 // reports are found. Hidden sections are removed on the server, so they never reach the browser.
 
+// Link previews (WhatsApp, search) stay in English: crawlers send no language preference.
 export async function generateMetadata({ params }: PageProps<"/r/[slug]">): Promise<Metadata> {
+  const t = en;
   const { slug } = await params;
   const found = await getPublishedReport(slug);
   if (!found) return { title: t.publicReport.notFoundTitle, robots: { index: false, follow: false } };
@@ -38,22 +41,23 @@ export async function generateMetadata({ params }: PageProps<"/r/[slug]">): Prom
 }
 
 export default async function PublicReportPage({ params }: PageProps<"/r/[slug]">) {
+  const t = await getT();
   const { slug } = await params;
   const found = await getPublishedReport(slug);
   if (!found) notFound();
-  const { view } = found;
+  const view = t === en ? found.view : buildReportView(found.loaded.input, parseHiddenSections(found.loaded.report?.hidden_sections), undefined, t);
   const canContact = Boolean(telHref(view.dealer.phone));
 
   return (
     <>
       <main className={`mx-auto w-full max-w-2xl flex-1 px-4 pt-[calc(1rem+env(safe-area-inset-top))] ${canContact ? "pb-28" : "pb-6"}`}>
-        <ReportView view={view} pdfHref={reportPdfPath(slug)} />
+        <ReportView view={view} t={t} pdfHref={reportPdfPath(slug)} />
       </main>
       {canContact && (
         // Always in reach while the buyer scrolls through the photos.
         <div className="fixed inset-x-0 bottom-0 z-10 border-t border-slate-200 bg-white/95 backdrop-blur">
           <div className="mx-auto w-full max-w-2xl px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
-            <ContactButtons view={view} />
+            <ContactButtons view={view} t={t} />
           </div>
         </div>
       )}

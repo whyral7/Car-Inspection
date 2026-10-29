@@ -1,6 +1,7 @@
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 
-export default function ReportNotFound() {
+export default async function ReportNotFound() {
+  const t = await getT();
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-3 px-4 py-10 text-center">
       <span className="text-5xl" aria-hidden>

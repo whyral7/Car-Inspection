@@ -1,6 +1,6 @@
 import { BUSINESS } from "@/lib/config";
 import { whatsappChatUrl } from "@/lib/report/share";
-import { t } from "@/lib/strings";
+import { en as t } from "@/lib/strings";
 
 /** "Chat on WhatsApp" target: a chat with BUSINESS.whatsapp, or the contact page until a number is set. */
 export function supportWhatsappHref() {

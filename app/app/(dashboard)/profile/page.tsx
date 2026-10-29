@@ -6,11 +6,15 @@ import { carTitle, formatDateTime, formatRupees } from "@/lib/format";
 import { displayName, getCurrentProfile } from "@/lib/profile";
 import { formatPhone } from "@/lib/report/share";
 import { logoUrl } from "@/lib/storage";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
+import type { Strings } from "@/lib/strings";
 
-export const metadata: Metadata = { title: t.profile.title };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.profile.title };
+}
 
-function entryLabel(entry: CreditEntry) {
+function entryLabel(t: Strings, entry: CreditEntry) {
   switch (entry.kind) {
     case "welcome":
       return t.profile.entry.welcome;
@@ -22,6 +26,7 @@ function entryLabel(entry: CreditEntry) {
 }
 
 export default async function ProfilePage() {
+  const t = await getT();
   const { supabase, profile } = await getCurrentProfile();
   // RLS limits both to this dealer's rows.
   const [paymentsRes, reportsRes, carsRes] = await Promise.all([
@@ -121,7 +126,7 @@ export default async function ProfilePage() {
             {history.map((entry, i) => (
               <li key={i} className="flex items-start justify-between gap-3 p-4">
                 <div className="min-w-0">
-                  <p className="font-medium break-words">{entryLabel(entry)}</p>
+                  <p className="font-medium break-words">{entryLabel(t, entry)}</p>
                   <p className="text-sm text-slate-500">{formatDateTime(entry.at)}</p>
                   {entry.kind === "purchase" && entry.paymentId && <p className="text-xs break-all text-slate-400">{t.profile.paymentId(entry.paymentId)}</p>}
                 </div>

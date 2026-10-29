@@ -8,7 +8,8 @@ import { PHOTO } from "@/lib/config";
 import { compressImage } from "@/lib/images/compress";
 import { ANGLES, firstMissingIndex, photoProgress, type Angle, type AngleKey } from "@/lib/photos/angles";
 import { isRetryable, uploadAnglePhoto } from "@/lib/photos/upload";
-import { t } from "@/lib/strings";
+import { useT } from "@/components/i18n-provider";
+import type { Strings } from "@/lib/strings";
 import { createClient } from "@/lib/supabase/client";
 
 type SlotStatus = "saved" | "processing" | "uploading" | "failed";
@@ -24,7 +25,7 @@ type Slots = Partial<Record<AngleKey, Slot>>;
 
 export type InitialPhoto = { angleKey: AngleKey; url: string | null };
 
-function uploadErrorMessage(error: unknown) {
+function uploadErrorMessage(t: Strings, error: unknown) {
   if (typeof navigator !== "undefined" && !navigator.onLine) return t.photos.errors.offline;
   return isRetryable(error) ? t.photos.errors.upload : t.photos.errors.rejected;
 }
@@ -39,6 +40,7 @@ type Props = {
 };
 
 export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startAt = null }: Props) {
+  const t = useT();
   const [supabase] = useState(() => createClient());
   const [slots, setSlots] = useState<Slots>(() => Object.fromEntries(initialPhotos.map((p) => [p.angleKey, { status: "saved", url: p.url } satisfies Slot])));
   // null shows the overview grid; a number shows the guided screen for that angle.
@@ -65,7 +67,7 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
     };
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [busy]);
+  }, [busy, t]);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -91,7 +93,7 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
       pending.current.delete(key);
       setSlot(key, { status: "saved" });
     } catch (error) {
-      setSlot(key, { status: "failed", error: uploadErrorMessage(error) });
+      setSlot(key, { status: "failed", error: uploadErrorMessage(t, error) });
     }
   }
 
@@ -220,6 +222,7 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
 }
 
 function ProgressCard({ progress }: { progress: ReturnType<typeof photoProgress> }) {
+  const t = useT();
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-4" aria-label={t.photos.progress(progress.done, progress.total)}>
       <div className="flex items-baseline justify-between gap-3">
@@ -240,6 +243,7 @@ function Spinner({ className = "" }: { className?: string }) {
 }
 
 function Tile({ angle, slot, onOpen }: { angle: Angle; slot: Slot | undefined; onOpen: () => void }) {
+  const t = useT();
   const { label } = t.photos.angles[angle.key];
   const status = slot?.status;
   const border =
@@ -301,6 +305,7 @@ type GuideProps = {
 };
 
 function GuideScreen({ angle, slot, progress, pickError, onPick, onRetry, onPrevious, onNext, onGrid }: GuideProps) {
+  const t = useT();
   const { label, tip } = t.photos.angles[angle.key];
   const working = slot?.status === "processing" || slot?.status === "uploading";
   const hasPhoto = Boolean(slot?.url);
@@ -369,6 +374,7 @@ function GuideScreen({ angle, slot, progress, pickError, onPick, onRetry, onPrev
 }
 
 function SlotStatusLine({ slot }: { slot: Slot | undefined }) {
+  const t = useT();
   if (!slot) return null;
   switch (slot.status) {
     case "processing":

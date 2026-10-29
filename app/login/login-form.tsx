@@ -5,13 +5,15 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Button } from "@/components/button";
 import { Field, FormError } from "@/components/field";
 import { OTP_RESEND_SECONDS } from "@/lib/config";
-import { t } from "@/lib/strings";
+import { useT } from "@/components/i18n-provider";
+import { errorText } from "@/lib/i18n";
+import type { Strings } from "@/lib/strings";
 import { createClient } from "@/lib/supabase/client";
 import { indianMobileSchema, otpSchema } from "@/lib/validation/auth";
 
 type Step = "phone" | "otp";
 
-function authErrorMessage(error: { status?: number; code?: string }, fallback: string) {
+function authErrorMessage(t: Strings, error: { status?: number; code?: string }, fallback: string) {
   if (typeof navigator !== "undefined" && !navigator.onLine) return t.common.offline;
   if (error.status === 429 || error.code === "over_sms_send_rate_limit") return t.login.errors.tooMany;
   return fallback;
@@ -23,6 +25,7 @@ function formatPhone(e164: string) {
 }
 
 export function LoginForm({ nextPath }: { nextPath: string }) {
+  const t = useT();
   const router = useRouter();
   const [step, setStep] = useState<Step>("phone");
   const [phoneInput, setPhoneInput] = useState("");
@@ -50,7 +53,7 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
     const { error } = await createClient().auth.signInWithOtp({ phone: target });
     setPending(false);
     if (error) {
-      setError(authErrorMessage(error, t.login.errors.sendFailed));
+      setError(authErrorMessage(t, error, t.login.errors.sendFailed));
       return false;
     }
     setResendIn(OTP_RESEND_SECONDS);
@@ -61,7 +64,7 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
     e.preventDefault();
     const parsed = indianMobileSchema.safeParse(phoneInput);
     if (!parsed.success) {
-      setFieldError(parsed.error.issues[0]?.message);
+      setFieldError(errorText(t, parsed.error.issues[0]?.message));
       return;
     }
     setFieldError(undefined);
@@ -76,7 +79,7 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
     e.preventDefault();
     const parsed = otpSchema.safeParse(otp);
     if (!parsed.success) {
-      setFieldError(parsed.error.issues[0]?.message);
+      setFieldError(errorText(t, parsed.error.issues[0]?.message));
       return;
     }
     setFieldError(undefined);
@@ -85,7 +88,7 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
     const { error } = await createClient().auth.verifyOtp({ phone, token: parsed.data, type: "sms" });
     if (error) {
       setPending(false);
-      setError(authErrorMessage(error, t.login.errors.wrongOtp));
+      setError(authErrorMessage(t, error, t.login.errors.wrongOtp));
       return;
     }
     // Keep the spinner while the protected page loads.

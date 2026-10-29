@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { FUELS, MAX_OWNERS, MIN_CAR_YEAR, TRANSMISSIONS, maxCarYear } from "@/lib/cars";
-import { t } from "@/lib/strings";
+
+// Error messages are keys into lib/strings.ts ("cars.errors.make"); show them with errorText() from lib/i18n.
 
 // RTO state and union territory codes, including old ones still on the road (OR, UA, DD, DN).
 const STATE_CODES = new Set([
@@ -35,9 +36,9 @@ export function isBhSeries(reg: string) {
 }
 
 export const regNumberSchema = z
-  .string(t.cars.errors.regNumber)
+  .string("cars.errors.regNumber")
   .transform(normaliseRegNumber)
-  .refine((reg) => isValidRegNumber(reg), t.cars.errors.regNumber);
+  .refine((reg) => isValidRegNumber(reg), "cars.errors.regNumber");
 
 const blankToNull = (v: unknown) => (typeof v === "string" ? v.trim() || null : (v ?? null));
 
@@ -67,24 +68,24 @@ const optionalEnum = <T extends readonly [string, ...string[]]>(values: T, messa
 const MAX_RC_RAW_CHARS = 20_000;
 
 export const carDetailsSchema = z.object({
-  make: requiredText(60, t.cars.errors.make),
-  model: requiredText(60, t.cars.errors.model),
-  variant: optionalText(60, t.cars.errors.variant),
-  fuel: optionalEnum(FUELS, t.cars.errors.fuel),
-  transmission: optionalEnum(TRANSMISSIONS, t.cars.errors.transmission),
+  make: requiredText(60, "cars.errors.make"),
+  model: requiredText(60, "cars.errors.model"),
+  variant: optionalText(60, "cars.errors.variant"),
+  fuel: optionalEnum(FUELS, "cars.errors.fuel"),
+  transmission: optionalEnum(TRANSMISSIONS, "cars.errors.transmission"),
   year: z.preprocess(
     (v) => {
       const b = blankToNull(v);
       return b === null ? undefined : Number(b);
     },
     z
-      .number(t.cars.errors.year)
-      .int(t.cars.errors.year)
-      .min(MIN_CAR_YEAR, t.cars.errors.year)
-      .refine((y) => y <= maxCarYear(), t.cars.errors.year),
+      .number("cars.errors.year")
+      .int("cars.errors.year")
+      .min(MIN_CAR_YEAR, "cars.errors.year")
+      .refine((y) => y <= maxCarYear(), "cars.errors.year"),
   ),
-  owners: optionalInt(1, () => MAX_OWNERS, t.cars.errors.owners),
-  insurance_valid_upto: z.preprocess(blankToNull, z.iso.date(t.cars.errors.insurance).nullable()),
+  owners: optionalInt(1, () => MAX_OWNERS, "cars.errors.owners"),
+  insurance_valid_upto: z.preprocess(blankToNull, z.iso.date("cars.errors.insurance").nullable()),
 });
 
 export const newCarSchema = carDetailsSchema.extend({
@@ -93,7 +94,7 @@ export const newCarSchema = carDetailsSchema.extend({
     .record(z.string(), z.unknown())
     .nullable()
     .default(null)
-    .refine((raw) => raw === null || JSON.stringify(raw).length <= MAX_RC_RAW_CHARS, t.common.somethingWrong),
+    .refine((raw) => raw === null || JSON.stringify(raw).length <= MAX_RC_RAW_CHARS, "common.somethingWrong"),
 });
 
 export type CarDetailsInput = z.input<typeof carDetailsSchema>;

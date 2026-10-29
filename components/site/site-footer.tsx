@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BUSINESS } from "@/lib/config";
-import { t } from "@/lib/strings";
+import { en as t } from "@/lib/strings";
 
 const links = [
   { href: "/privacy", label: t.site.footer.privacy },

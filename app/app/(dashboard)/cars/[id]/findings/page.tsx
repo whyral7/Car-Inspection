@@ -5,10 +5,13 @@ import { PHOTO, STORAGE_BUCKETS } from "@/lib/config";
 import { carTitle } from "@/lib/format";
 import { ANGLES, isAngleKey } from "@/lib/photos/angles";
 import { getCurrentProfile } from "@/lib/profile";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 import { FindingsReview, type ReviewPhoto } from "./findings-review";
 
-export const metadata: Metadata = { title: t.findings.title };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.findings.title };
+}
 
 export default async function FindingsPage({ params }: PageProps<"/app/cars/[id]/findings">) {
   const { id } = await params;

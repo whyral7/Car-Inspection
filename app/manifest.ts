@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { APP_NAME, BACKGROUND_COLOR, THEME_COLOR } from "@/lib/config";
-import { t } from "@/lib/strings";
+import { en as t } from "@/lib/strings";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {

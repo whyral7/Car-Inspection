@@ -9,7 +9,7 @@ import { ContactButtons, ReportView } from "@/components/report/report-view";
 import { reportPdfPath, reportPath, whatsappShareUrl } from "@/lib/report/share";
 import { REPORT_SECTIONS, applyHidden, type ReportSection, type ReportView as View } from "@/lib/report/view";
 import { PRICE } from "@/lib/config";
-import { t } from "@/lib/strings";
+import { useT } from "@/components/i18n-provider";
 import { estimatePrice, publishReport, saveHiddenSections } from "./actions";
 
 type Props = {
@@ -24,6 +24,7 @@ type Props = {
 };
 
 export function ReportManager({ carId, ready, unreviewed, credits, view, initialHidden, published }: Props) {
+  const t = useT();
   const router = useRouter();
   const [hidden, setHidden] = useState<ReportSection[]>(initialHidden);
   const [sectionsSave, setSectionsSave] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -246,9 +247,9 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
 
       <section aria-label={t.report.previewLabel} className="rounded-3xl border-2 border-dashed border-slate-300 bg-slate-50 p-3">
         <p className="mb-3 text-center text-xs font-semibold tracking-wide text-slate-500 uppercase">{t.report.previewLabel}</p>
-        <ReportView view={preview} pdfHref={null} />
+        <ReportView view={preview} t={t} pdfHref={null} />
         <div className="mt-4">
-          <ContactButtons view={preview} preview />
+          <ContactButtons view={preview} t={t} preview />
         </div>
       </section>
     </div>

@@ -1,5 +1,5 @@
 import type { CarStatus } from "@/lib/supabase/database.types";
-import { t } from "@/lib/strings";
+import type { Strings } from "@/lib/strings";
 
 const styles: Record<CarStatus, string> = {
   draft: "bg-slate-100 text-slate-700",
@@ -7,7 +7,7 @@ const styles: Record<CarStatus, string> = {
   published: "bg-brand-100 text-brand-800",
 };
 
-export function StatusBadge({ status }: { status: CarStatus }) {
+export function StatusBadge({ status, t }: { status: CarStatus; t: Strings }) {
   return (
     <span className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold ${styles[status]}`}>
       {t.dashboard.status[status]}

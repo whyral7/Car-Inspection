@@ -7,7 +7,7 @@ import { FormError } from "@/components/field";
 import { THEME_COLOR } from "@/lib/config";
 import { formatRupees } from "@/lib/format";
 import { loadCheckout } from "@/lib/razorpay/checkout";
-import { t } from "@/lib/strings";
+import { useT } from "@/components/i18n-provider";
 import { createCreditOrder, getOrderStatus } from "./actions";
 
 type Pack = { key: string; credits: number; pricePaise: number; perReportPaise: number; best: boolean };
@@ -25,6 +25,7 @@ const POLL_MS = 2000;
 const POLL_TRIES = 15;
 
 export function BuyCredits({ packs, next }: { packs: Pack[]; next: string | null }) {
+  const t = useT();
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>({ kind: "idle" });
   const [error, setError] = useState<string | null>(null);

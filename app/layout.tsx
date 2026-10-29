@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { ServiceWorkerRegister } from "@/components/sw-register";
 import { APP_NAME, THEME_COLOR } from "@/lib/config";
 import { publicEnv } from "@/lib/env";
-import { t } from "@/lib/strings";
+import { en as t } from "@/lib/strings";
 import "./globals.css";
 
 export const metadata: Metadata = {

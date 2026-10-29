@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/site/legal-page";
 import { BUSINESS } from "@/lib/config";
-import { t } from "@/lib/strings";
+import { legal } from "@/lib/strings-legal";
 
-const copy = t.legal.privacy;
+const copy = legal.privacy;
 
 export const metadata: Metadata = { title: copy.title, alternates: { canonical: "/privacy" } };
 

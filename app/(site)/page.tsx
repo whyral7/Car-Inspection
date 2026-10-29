@@ -5,7 +5,7 @@ import { APP_NAME, CREDIT_PACKS, FREE_CREDITS, SAMPLE_REPORT_PATH } from "@/lib/
 import { pricePerReportPaise } from "@/lib/credits/packs";
 import { formatRupees } from "@/lib/format";
 import { supportWhatsappHref } from "@/lib/site";
-import { t } from "@/lib/strings";
+import { en as t } from "@/lib/strings";
 
 const h = t.home;
 

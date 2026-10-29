@@ -2,7 +2,7 @@ import "server-only";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
-import { t } from "@/lib/strings";
+import { en as t } from "@/lib/strings";
 import { BAND_COLORS, BRAND, INK } from "./colors";
 import type { ReportView } from "./view";
 

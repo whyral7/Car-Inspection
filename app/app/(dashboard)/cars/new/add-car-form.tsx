@@ -5,23 +5,26 @@ import { useEffect, useRef, useState, useTransition, type FormEvent } from "reac
 import { Button } from "@/components/button";
 import { Field, FormError, SelectField } from "@/components/field";
 import { FUELS, MAX_OWNERS, MIN_CAR_YEAR, TRANSMISSIONS, maxCarYear } from "@/lib/cars";
-import { t } from "@/lib/strings";
+import { useT } from "@/components/i18n-provider";
+import { errorText } from "@/lib/i18n";
+import type { Strings } from "@/lib/strings";
 import { normaliseRegNumber, regNumberSchema } from "@/lib/validation/car";
 import { createCar, lookupRegNumber, type CarFormValues, type CreateCarState, type LookupState } from "./actions";
 
 type Lookup = Exclude<LookupState, { error: string }>;
 
-const fuelOptions = FUELS.map((value) => ({ value, label: t.cars.fuels[value] }));
-const transmissionOptions = TRANSMISSIONS.map((value) => ({ value, label: t.cars.transmissions[value] }));
+const fuelOptions = (t: Strings) => FUELS.map((value) => ({ value, label: t.cars.fuels[value] }));
+const transmissionOptions = (t: Strings) => TRANSMISSIONS.map((value) => ({ value, label: t.cars.transmissions[value] }));
 
-const notices: Record<Lookup["status"], { text: string; tone: string } | null> = {
+const notices = (t: Strings): Record<Lookup["status"], { text: string; tone: string } | null> => ({
   found: { text: t.cars.found, tone: "bg-brand-50 text-brand-800" },
   not_found: { text: t.cars.notFound, tone: "bg-amber-50 text-amber-800" },
   unavailable: { text: t.cars.unavailable, tone: "bg-amber-50 text-amber-800" },
   manual: null,
-};
+});
 
 export function AddCarForm() {
+  const t = useT();
   const [reg, setReg] = useState("");
   const [regError, setRegError] = useState<string | undefined>();
   const [lookup, setLookup] = useState<Lookup | null>(null);
@@ -30,7 +33,7 @@ export function AddCarForm() {
   async function runLookup(manual: boolean) {
     const parsed = regNumberSchema.safeParse(reg);
     if (!parsed.success) {
-      setRegError(parsed.error.issues[0]?.message);
+      setRegError(errorText(t, parsed.error.issues[0]?.message));
       return;
     }
     setRegError(undefined);
@@ -87,10 +90,11 @@ export function AddCarForm() {
 }
 
 function CarDetailsForm({ lookup, onChangeReg }: { lookup: Lookup; onChangeReg: () => void }) {
+  const t = useT();
   const [state, setState] = useState<CreateCarState>({});
   const [isPending, startTransition] = useTransition();
   const firstField = useRef<HTMLInputElement>(null);
-  const notice = notices[lookup.status];
+  const notice = notices(t)[lookup.status];
   const errors = state.fieldErrors ?? {};
   const v = lookup.values;
 
@@ -171,11 +175,11 @@ function CarDetailsForm({ lookup, onChangeReg }: { lookup: Lookup; onChangeReg: 
       <Field label={t.cars.model} name="model" defaultValue={v.model} placeholder={t.cars.modelPlaceholder} error={errors.model} autoComplete="off" required />
       <Field label={t.cars.variant} name="variant" defaultValue={v.variant} placeholder={t.cars.variantPlaceholder} error={errors.variant} autoComplete="off" />
       <div className="grid grid-cols-2 gap-3">
-        <SelectField label={t.cars.fuel} name="fuel" options={fuelOptions} placeholder={t.cars.choose} defaultValue={v.fuel} error={errors.fuel} />
+        <SelectField label={t.cars.fuel} name="fuel" options={fuelOptions(t)} placeholder={t.cars.choose} defaultValue={v.fuel} error={errors.fuel} />
         <SelectField
           label={t.cars.transmission}
           name="transmission"
-          options={transmissionOptions}
+          options={transmissionOptions(t)}
           placeholder={t.cars.choose}
           defaultValue={v.transmission}
           error={errors.transmission}

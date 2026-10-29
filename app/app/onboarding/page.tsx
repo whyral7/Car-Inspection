@@ -2,12 +2,16 @@ import type { Metadata } from "next";
 import { LogoutButton } from "@/components/logout-button";
 import { getCurrentProfile, isProfileComplete } from "@/lib/profile";
 import { logoUrl } from "@/lib/storage";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 import { OnboardingForm } from "./onboarding-form";
 
-export const metadata: Metadata = { title: t.onboarding.title };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.onboarding.title };
+}
 
 export default async function OnboardingPage() {
+  const t = await getT();
   const { user, profile } = await getCurrentProfile();
   const editing = isProfileComplete(profile);
 
@@ -15,7 +19,7 @@ export default async function OnboardingPage() {
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 pt-4 pb-10">
       <div className="flex items-center justify-between">
         <p className="text-xl font-bold text-brand-700">{t.appName}</p>
-        <LogoutButton />
+        <LogoutButton label={t.common.logout} />
       </div>
       <h1 className="mt-6 text-2xl font-bold">{editing ? t.onboarding.editTitle : t.onboarding.title}</h1>
       <p className="mt-1 text-slate-600">{t.onboarding.subtitle}</p>

@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BUSINESS } from "@/lib/config";
 import { formatPhone, whatsappChatUrl } from "@/lib/report/share";
-import { t } from "@/lib/strings";
+import { en as t } from "@/lib/strings";
+import { legal } from "@/lib/strings-legal";
 
-const copy = t.legal.contact;
+const copy = legal.contact;
 
 export const metadata: Metadata = { title: copy.title, alternates: { canonical: "/contact" } };
 
@@ -21,7 +22,7 @@ export default function ContactPage() {
   return (
     <article className="mx-auto w-full max-w-2xl px-4 py-8">
       <Link href="/" className="-ml-1 inline-flex min-h-11 items-center px-1 text-sm font-medium text-brand-700">
-        ← {t.legal.back}
+        ← {legal.back}
       </Link>
       <h1 className="mt-2 text-2xl font-bold">{copy.title}</h1>
       <p className="mt-2 text-slate-700">{copy.intro}</p>

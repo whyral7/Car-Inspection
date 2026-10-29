@@ -3,7 +3,8 @@
 import { z } from "zod";
 import { CHECKLIST_KEYS, checklistProgress } from "@/lib/checklist";
 import { getCurrentProfile } from "@/lib/profile";
-import { t } from "@/lib/strings";
+import { errorText } from "@/lib/i18n";
+import { getT } from "@/lib/i18n.server";
 import { checklistItemSchema } from "@/lib/validation/finding";
 
 // Every query runs as the dealer, so RLS limits it to their own cars.
@@ -12,9 +13,10 @@ export type ChecklistActionResult = { ok: true } | { ok: false; error: string };
 
 /** Saves one item's result and note. Called on every tap, so it upserts. */
 export async function saveChecklistItem(carId: string, input: { item_key: string; result: string; note: string | null }): Promise<ChecklistActionResult> {
+  const t = await getT();
   if (!z.uuid().safeParse(carId).success) return { ok: false, error: t.common.somethingWrong };
   const parsed = checklistItemSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? t.common.somethingWrong };
+  if (!parsed.success) return { ok: false, error: errorText(t, parsed.error.issues[0]?.message) || t.common.somethingWrong };
 
   const { supabase } = await getCurrentProfile();
   const { error } = await supabase.from("checklist_items").upsert({ car_id: carId, ...parsed.data }, { onConflict: "car_id,item_key" });
@@ -23,6 +25,7 @@ export async function saveChecklistItem(carId: string, input: { item_key: string
 
 /** Marks a draft car as inspected once every checklist item has an answer. */
 export async function finishInspection(carId: string): Promise<ChecklistActionResult> {
+  const t = await getT();
   if (!z.uuid().safeParse(carId).success) return { ok: false, error: t.common.somethingWrong };
   const { supabase } = await getCurrentProfile();
 

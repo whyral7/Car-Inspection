@@ -4,9 +4,10 @@ import { CreditsBadge } from "@/components/credits-badge";
 import { LogoutButton } from "@/components/logout-button";
 import { displayName, getCurrentProfile, isProfileComplete } from "@/lib/profile";
 import { logoUrl } from "@/lib/storage";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 
 export default async function DashboardLayout({ children }: LayoutProps<"/app">) {
+  const t = await getT();
   const { profile } = await getCurrentProfile();
   if (!isProfileComplete(profile)) redirect("/app/onboarding");
 
@@ -29,9 +30,9 @@ export default async function DashboardLayout({ children }: LayoutProps<"/app">)
             <span className="truncate font-semibold">{name}</span>
           </Link>
           <Link href="/app/credits" className="flex min-h-11 items-center">
-            <CreditsBadge credits={profile.credits} />
+            <CreditsBadge credits={profile.credits} t={t} />
           </Link>
-          <LogoutButton />
+          <LogoutButton label={t.common.logout} />
         </div>
       </header>
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">{children}</main>

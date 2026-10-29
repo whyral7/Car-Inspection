@@ -6,13 +6,14 @@ import { Field, FormError, inputClass } from "@/components/field";
 import { Segmented } from "@/components/segmented";
 import { LOGO, STORAGE_BUCKETS } from "@/lib/config";
 import { compressImage } from "@/lib/images/compress";
-import { t } from "@/lib/strings";
+import { useT } from "@/components/i18n-provider";
+import type { Strings } from "@/lib/strings";
 import { createClient } from "@/lib/supabase/client";
 import type { UserType } from "@/lib/supabase/database.types";
 import { USER_TYPES } from "@/lib/user-type";
 import { saveProfile, type OnboardingState } from "./actions";
 
-const userTypeOptions = USER_TYPES.map((value) => ({ value, label: t.onboarding.userTypes[value] }));
+const userTypeOptions = (t: Strings) => USER_TYPES.map((value) => ({ value, label: t.onboarding.userTypes[value] }));
 
 type Initial = {
   user_type: UserType | null;
@@ -25,6 +26,7 @@ type Initial = {
 };
 
 export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: string; initial: Initial; cancelHref?: string }) {
+  const t = useT();
   const [state, setState] = useState<OnboardingState>({});
   const [userType, setUserType] = useState<UserType | null>(initial.user_type);
   const isDealer = userType === "dealer";
@@ -152,7 +154,7 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
         <p className="mb-1.5 block text-sm font-medium text-slate-700">{t.onboarding.userType}</p>
         <Segmented
           label={t.onboarding.userType}
-          options={userTypeOptions}
+          options={userTypeOptions(t)}
           value={userType}
           onChange={(value) => {
             setUserType(value);

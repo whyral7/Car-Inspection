@@ -3,7 +3,8 @@
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/profile";
 import { lookupRc } from "@/lib/rc";
-import { t } from "@/lib/strings";
+import { errorText } from "@/lib/i18n";
+import { getT } from "@/lib/i18n.server";
 import type { Json } from "@/lib/supabase/database.types";
 import { newCarSchema, regNumberSchema, type NewCarField } from "@/lib/validation/car";
 
@@ -42,6 +43,7 @@ const emptyValues: CarFormValues = {
 
 /** Validates the number, checks for a duplicate and, unless `manual`, looks it up on the RC provider. */
 export async function lookupRegNumber(input: string, manual = false): Promise<LookupState> {
+  const t = await getT();
   const { supabase } = await getCurrentProfile();
 
   const parsed = regNumberSchema.safeParse(input);
@@ -81,6 +83,7 @@ export type CreateCarState = {
 };
 
 export async function createCar(input: CarFormValues & { reg_number: string; rc_raw: Record<string, unknown> | null }): Promise<CreateCarState> {
+  const t = await getT();
   const { supabase } = await getCurrentProfile();
 
   const parsed = newCarSchema.safeParse(input);
@@ -88,7 +91,7 @@ export async function createCar(input: CarFormValues & { reg_number: string; rc_
     const fieldErrors: CreateCarState["fieldErrors"] = {};
     for (const issue of parsed.error.issues) {
       const key = issue.path[0] as NewCarField;
-      fieldErrors[key] ??= issue.message;
+      fieldErrors[key] ??= errorText(t, issue.message);
     }
     // The number and RC data aren't editable on this step, so surface those as a form error.
     if (fieldErrors.reg_number || fieldErrors.rc_raw) return { formError: fieldErrors.reg_number ?? t.common.somethingWrong };

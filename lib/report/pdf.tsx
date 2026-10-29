@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { Document, Font, Image as PdfPicture, Link, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { APP_NAME } from "@/lib/config";
 import { formatPhone } from "@/lib/report/share";
-import { t } from "@/lib/strings";
+import { en as t } from "@/lib/strings";
 import { BAND_COLORS, BRAND, INK, RESULT_COLORS, SEVERITY_COLORS } from "./colors";
 import type { DetailRow, ReportCheckItem, ReportView } from "./view";
 
