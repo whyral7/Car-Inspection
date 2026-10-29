@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, useTransition, type ChangeEvent, type FormEvent } from "react";
 import { Button, LinkButton } from "@/components/button";
-import { Field, FormError, inputClass } from "@/components/field";
+import { Field, FormError, focusFirstError, inputClass } from "@/components/field";
+import { TagIcon } from "@/components/icons";
 import { Segmented } from "@/components/segmented";
 import { LOGO, STORAGE_BUCKETS } from "@/lib/config";
 import { compressImage } from "@/lib/images/compress";
@@ -11,6 +12,8 @@ import type { Strings } from "@/lib/strings";
 import { createClient } from "@/lib/supabase/client";
 import type { UserType } from "@/lib/supabase/database.types";
 import { USER_TYPES } from "@/lib/user-type";
+import { errorText } from "@/lib/i18n";
+import { onboardingSchema, type OnboardingField } from "@/lib/validation/profile";
 import { saveProfile, type OnboardingState } from "./actions";
 
 const userTypeOptions = (t: Strings) => USER_TYPES.map((value) => ({ value, label: t.onboarding.userTypes[value] }));
@@ -36,6 +39,9 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
   const [logoRemoved, setLogoRemoved] = useState(false);
   const [logoError, setLogoError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(initial.logo_url);
+  // Mirrors of two fields, for the report header preview.
+  const [businessName, setBusinessName] = useState(initial.business_name);
+  const [city, setCity] = useState(initial.city);
   // Path already uploaded in this session, so a retry after a validation error doesn't upload again.
   const uploadedPath = useRef<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -104,7 +110,26 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    // Check the fields here first, so a missing name shows at once instead of after a round trip.
+    const check = onboardingSchema(profileId).safeParse({
+      user_type: userType ?? "",
+      owner_name: formData.get("owner_name") ?? "",
+      city: formData.get("city") ?? "",
+      business_name: isDealer ? (formData.get("business_name") ?? "") : "",
+      address: isDealer ? (formData.get("address") ?? "") : "",
+      logo_path: "",
+    });
+    if (!check.success) {
+      const fieldErrors: OnboardingState["fieldErrors"] = {};
+      for (const issue of check.error.issues) fieldErrors[issue.path[0] as OnboardingField] ??= errorText(t, issue.message);
+      setState({ fieldErrors });
+      focusFirstError(form);
+      return;
+    }
+
     formData.delete("logo_file");
     formData.set("user_type", userType ?? "");
     if (!isDealer) for (const name of ["business_name", "address"]) formData.delete(name);
@@ -151,7 +176,7 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
       noValidate
     >
       <div>
-        <p className="mb-1.5 block text-sm font-medium text-slate-700">{t.onboarding.userType}</p>
+        <p className="mb-1.5 block text-sm font-medium text-slate-800">{t.onboarding.userType}</p>
         <Segmented
           label={t.onboarding.userType}
           options={userTypeOptions(t)}
@@ -161,10 +186,32 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
             clearFieldError("user_type");
           }}
         />
-        {errors.user_type && <p className="mt-1.5 text-sm text-red-600">{errors.user_type}</p>}
+        {errors.user_type ? (
+          <p className="mt-1.5 text-sm font-medium text-red-700">{errors.user_type}</p>
+        ) : (
+          <p className="mt-1.5 text-sm text-slate-700">{userType ? t.onboarding.userTypeHints[userType] : t.onboarding.userTypeChoose}</p>
+        )}
       </div>
-      <Field label={t.onboarding.ownerName} name="owner_name" autoComplete="name" defaultValue={initial.owner_name} error={errors.owner_name} required />
-      <Field label={t.onboarding.city} name="city" autoComplete="address-level2" defaultValue={initial.city} error={errors.city} required />
+      <Field
+        label={t.onboarding.ownerName}
+        name="owner_name"
+        autoComplete="name"
+        autoCapitalize="words"
+        defaultValue={initial.owner_name}
+        error={errors.owner_name}
+        autoFocus={!initial.owner_name}
+        required
+      />
+      <Field
+        label={t.onboarding.city}
+        name="city"
+        autoComplete="address-level2"
+        autoCapitalize="words"
+        defaultValue={initial.city}
+        onChange={(e) => setCity(e.target.value)}
+        error={errors.city}
+        required
+      />
 
       {/* Hidden rather than removed, so switching type and back keeps what was typed. */}
       <section hidden={!isDealer} aria-labelledby="dealer-details" className="flex flex-col gap-5 rounded-2xl border border-line bg-white p-4">
@@ -179,6 +226,7 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
           name="business_name"
           autoComplete="organization"
           defaultValue={initial.business_name}
+          onChange={(e) => setBusinessName(e.target.value)}
           error={errors.business_name}
         />
         <div>
@@ -194,7 +242,7 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
             aria-invalid={Boolean(errors.address)}
             className={`${inputClass} py-3`}
           />
-          {errors.address && <p className="mt-1.5 text-sm text-red-600">{errors.address}</p>}
+          {errors.address && <p className="mt-1.5 text-sm font-medium text-red-700">{errors.address}</p>}
         </div>
 
         <div>
@@ -205,7 +253,7 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
                 // eslint-disable-next-line @next/next/no-img-element -- blob: previews can't go through next/image
                 <img src={preview} alt="" className="size-full object-contain" />
               ) : (
-                <span className="text-2xl text-slate-300">🏷️</span>
+                <TagIcon size={28} className="text-slate-400" />
               )}
             </div>
             <div className="flex flex-col items-start gap-1">
@@ -220,10 +268,12 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
               )}
             </div>
           </div>
-          <p className={`mt-1.5 text-sm ${logoError || errors.logo_path ? "text-red-600" : "text-slate-600"}`}>
+          <p className={`mt-1.5 text-sm ${logoError || errors.logo_path ? "font-medium text-red-700" : "text-slate-600"}`}>
             {logoError ?? errors.logo_path ?? t.onboarding.logoHint}
           </p>
         </div>
+
+        <ReportHeaderPreview logo={preview} name={businessName || t.onboarding.businessName} city={city} />
       </section>
 
       <FormError message={state.formError} />
@@ -236,5 +286,27 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
         </LinkButton>
       )}
     </form>
+  );
+}
+
+/** How the dealership name and logo will look at the top of a shared report. */
+function ReportHeaderPreview({ logo, name, city }: { logo: string | null; name: string; city: string }) {
+  const t = useT();
+  return (
+    <div>
+      <p className="mb-1.5 text-sm font-medium text-slate-800">{t.onboarding.previewTitle}</p>
+      <div className="flex items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-canvas p-3">
+        {logo ? (
+          // eslint-disable-next-line @next/next/no-img-element -- blob: preview
+          <img src={logo} alt="" className="size-11 shrink-0 rounded-lg border border-line bg-white object-contain" />
+        ) : (
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-brand-700 font-bold text-white">{name.trim().charAt(0).toUpperCase() || "?"}</span>
+        )}
+        <div className="min-w-0">
+          <p className="font-bold break-words">{name}</p>
+          {city && <p className="text-sm text-slate-600">{city}</p>}
+        </div>
+      </div>
+    </div>
   );
 }

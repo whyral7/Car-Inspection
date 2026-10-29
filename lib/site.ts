@@ -8,6 +8,19 @@ export function supportWhatsappHref() {
 }
 
 /**
+ * "Delete my account" request: WhatsApp support if a number is set, else an email to support, else the
+ * contact page. Deletion is handled by hand within 30 days (see the privacy policy).
+ */
+export function accountDeletionHref(message: string) {
+  const chat = whatsappChatUrl(BUSINESS.whatsapp, message);
+  if (chat) return chat;
+  if (BUSINESS.email.includes("@") && !BUSINESS.email.startsWith("[")) {
+    return `mailto:${BUSINESS.email}?subject=${encodeURIComponent("Delete my Treadmark account")}&body=${encodeURIComponent(message)}`;
+  }
+  return "/contact";
+}
+
+/**
  * Canonical site URL for the sitemap and robots.txt, which are built ahead of time (no request to
  * read a host from). NEXT_PUBLIC_APP_URL, else Vercel's production domain, else localhost.
  */

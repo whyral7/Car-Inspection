@@ -98,5 +98,6 @@ export const newCarSchema = carDetailsSchema.extend({
 });
 
 export type CarDetailsInput = z.input<typeof carDetailsSchema>;
+export type CarDetailsField = keyof z.infer<typeof carDetailsSchema>;
 export type NewCarInput = z.infer<typeof newCarSchema>;
 export type NewCarField = keyof NewCarInput;

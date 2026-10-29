@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { LinkButton } from "@/components/button";
+import { CreditIcon } from "@/components/icons";
+import { LanguageToggle } from "@/components/language-toggle";
+import { SignOut } from "@/components/sign-out";
+import { accountDeletionHref } from "@/lib/site";
 import { FREE_CREDITS } from "@/lib/config";
 import { buildCreditHistory, totalBought, totalUsed, type CreditEntry } from "@/lib/credits/history";
 import { carTitle, formatDateTime, formatRupees } from "@/lib/format";
@@ -57,6 +61,7 @@ export default async function ProfilePage() {
   const logo = isDealer ? logoUrl(profile.logo_path) : null;
   const name = displayName(profile);
   const phone = formatPhone(profile.phone);
+  const deleteHref = accountDeletionHref(t.profile.deleteAccountMessage(phone ?? ""));
 
   return (
     <div className="flex flex-col gap-6">
@@ -71,7 +76,7 @@ export default async function ProfilePage() {
             </span>
           )}
           <div className="min-w-0">
-            <h1 className="truncate text-xl font-bold">{name}</h1>
+            <h1 className="text-xl font-bold break-words">{name}</h1>
             {profile.city && <p className="text-slate-600">{profile.city}</p>}
           </div>
         </div>
@@ -106,15 +111,27 @@ export default async function ProfilePage() {
         </LinkButton>
       </section>
 
-      <section className="rounded-2xl bg-brand-700 p-5 text-white">
-        <p className="text-sm text-brand-100">{t.profile.creditsTitle}</p>
-        <p className="text-3xl font-bold">{t.profile.balance(profile.credits)}</p>
-        <p className="mt-1 text-sm text-brand-100">
+      <section className="rounded-2xl border border-line bg-white p-4">
+        <div className="flex items-center gap-3">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
+            <CreditIcon />
+          </span>
+          <div>
+            <p className="text-sm text-slate-600">{t.profile.creditsTitle}</p>
+            <p className="text-2xl font-bold">{t.profile.balance(profile.credits)}</p>
+          </div>
+        </div>
+        <p className="mt-2 text-sm text-slate-700">
           {t.profile.bought(totalBought(history))} · {t.profile.used(totalUsed(history))}
         </p>
-        <LinkButton href="/app/credits" variant="secondary" className="mt-4 w-full border-white">
+        <LinkButton href="/app/credits" className="mt-3 w-full">
           {t.profile.buy}
         </LinkButton>
+      </section>
+
+      <section className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-4">
+        <h2 className="font-semibold">{t.common.language}</h2>
+        <LanguageToggle className="self-start" />
       </section>
 
       <section id="history" className="scroll-mt-20">
@@ -128,7 +145,7 @@ export default async function ProfilePage() {
                 <div className="min-w-0">
                   <p className="font-medium break-words">{entryLabel(t, entry)}</p>
                   <p className="text-sm text-slate-600">{formatDateTime(entry.at)}</p>
-                  {entry.kind === "purchase" && entry.paymentId && <p className="text-xs break-all text-slate-400">{t.profile.paymentId(entry.paymentId)}</p>}
+                  {entry.kind === "purchase" && entry.paymentId && <p className="text-xs break-all text-slate-600">{t.profile.paymentId(entry.paymentId)}</p>}
                 </div>
                 <span className={`shrink-0 font-bold tabular-nums ${entry.change > 0 ? "text-emerald-700" : "text-slate-700"}`}>
                   {entry.change > 0 ? `+${entry.change}` : entry.change}
@@ -137,7 +154,15 @@ export default async function ProfilePage() {
             ))}
           </ul>
         )}
-        <p className="mt-3 text-sm text-slate-600">{t.profile.help}</p>
+        <p className="mt-3 text-sm text-slate-700">{t.profile.help}</p>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <SignOut />
+        <a href={deleteHref} className="inline-flex min-h-11 items-center justify-center text-sm font-semibold text-red-700" {...(deleteHref.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}>
+          {t.profile.deleteAccount}
+        </a>
+        <p className="text-center text-xs text-slate-600">{t.profile.deleteAccountHint}</p>
       </section>
     </div>
   );

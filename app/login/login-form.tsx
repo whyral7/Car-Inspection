@@ -47,6 +47,23 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
     if (step === "otp") otpRef.current?.focus();
   }, [step]);
 
+  // Android Chrome can read the code from the SMS (WebOTP) when the SMS ends with "@<domain> #<code>".
+  useEffect(() => {
+    if (step !== "otp" || !("OTPCredential" in window)) return;
+    const abort = new AbortController();
+    navigator.credentials
+      .get({ otp: { transport: ["sms"] }, signal: abort.signal } as CredentialRequestOptions)
+      .then((credential) => {
+        const code = (credential as (Credential & { code?: string }) | null)?.code;
+        if (code) void verify(code);
+      })
+      .catch(() => {
+        // Cancelled, unsupported or timed out: the user types the code instead.
+      });
+    return () => abort.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- start once per OTP step
+  }, [step, phone]);
+
   async function sendOtp(target: string) {
     setPending(true);
     setError(null);
@@ -77,7 +94,13 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
 
   async function onOtpSubmit(e: FormEvent) {
     e.preventDefault();
-    const parsed = otpSchema.safeParse(otp);
+    await verify(otp);
+  }
+
+  async function verify(code: string) {
+    if (pending) return;
+    setOtp(code.replace(/\D/g, "").slice(0, 6));
+    const parsed = otpSchema.safeParse(code);
     if (!parsed.success) {
       setFieldError(errorText(t, parsed.error.issues[0]?.message));
       return;
@@ -89,6 +112,9 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
     if (error) {
       setPending(false);
       setError(authErrorMessage(t, error, t.login.errors.wrongOtp));
+      // Clear the wrong code so the next attempt starts fresh.
+      setOtp("");
+      otpRef.current?.focus();
       return;
     }
     // Keep the spinner while the protected page loads.
@@ -143,7 +169,13 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
         maxLength={6}
         className="[&_input]:text-center [&_input]:text-2xl [&_input]:tracking-[0.5em]"
         value={otp}
-        onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+        onChange={(e) => {
+          const code = e.target.value.replace(/\D/g, "").slice(0, 6);
+          setOtp(code);
+          setError(null);
+          // Six digits is a complete code: verify without another tap.
+          if (code.length === 6) void verify(code);
+        }}
         error={fieldError}
         required
       />

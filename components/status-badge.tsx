@@ -2,9 +2,9 @@ import type { CarStatus } from "@/lib/supabase/database.types";
 import type { Strings } from "@/lib/strings";
 
 const styles: Record<CarStatus, string> = {
-  draft: "bg-slate-100 text-slate-700",
-  inspected: "bg-amber-100 text-amber-800",
-  published: "bg-brand-100 text-brand-800",
+  draft: "bg-slate-100 text-slate-800",
+  inspected: "bg-amber-100 text-amber-900",
+  published: "bg-brand-100 text-brand-900",
 };
 
 export function StatusBadge({ status, t }: { status: CarStatus; t: Strings }) {
