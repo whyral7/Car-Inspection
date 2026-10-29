@@ -72,11 +72,12 @@ function SectionTitle({ title, aside }: { title: string; aside?: string }) {
   );
 }
 
-function Details({ rows }: { rows: DetailRow[] }) {
+/** Two columns of label/value pairs; one column when space is tight (next to the hero photo). */
+function Details({ rows, single = false }: { rows: DetailRow[]; single?: boolean }) {
   return (
     <View style={s.details}>
       {rows.map((row) => (
-        <View key={row.label} style={s.detail}>
+        <View key={row.label} style={single ? [s.detail, { width: "100%", paddingRight: 0 }] : s.detail}>
           <Text style={s.detailLabel}>{row.label}</Text>
           <Text style={[s.detailValue, row.warn ? { color: SEVERITY_COLORS.major.fg } : {}]}>{row.value}</Text>
         </View>
@@ -138,7 +139,7 @@ export function ReportPdf({ view, reportUrl, logo, images }: Props) {
           <View style={{ flex: 1 }}>
             <Text style={s.plate}>{view.car.regNumber}</Text>
             <Text style={s.carTitle}>{view.car.title}</Text>
-            <Details rows={view.car.details} />
+            <Details rows={view.car.details} single={Boolean(hero)} />
           </View>
           <View style={[s.scoreBox, { backgroundColor: band.bg }]}>
             <Text style={[s.small, { color: band.fg, fontWeight: 700 }]}>{t.publicReport.score}</Text>

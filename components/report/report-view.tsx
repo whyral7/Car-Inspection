@@ -165,16 +165,16 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
           <div className="min-w-0 flex-1">
             <Plate reg={view.car.regNumber} tone="yellow" />
             <h1 className="mt-2 text-xl leading-snug font-bold">{view.car.title}</h1>
-            {summary && <p className="mt-1 text-sm font-medium text-slate-800">{summary}</p>}
-            {inspectedOn && (
-              <p className="mt-1 flex items-center gap-1.5 text-sm text-slate-700">
-                <ShieldCheckIcon size={16} className="text-brand-700" />
-                {t.publicReport.inspectedOn(inspectedOn)}
-              </p>
-            )}
           </div>
           <ScoreBadge view={view} t={t} />
         </div>
+        {summary && <p className="mt-3 font-medium text-slate-900">{summary}</p>}
+        {inspectedOn && (
+          <p className="mt-1 flex items-center gap-1.5 text-sm text-slate-700">
+            <ShieldCheckIcon size={16} className="text-brand-700" />
+            {t.publicReport.inspectedOn(inspectedOn)}
+          </p>
+        )}
         <p className="mt-3 flex items-start gap-1.5 text-xs text-slate-700">
           <InfoIcon size={14} className="mt-px" />
           {t.disclaimer}
