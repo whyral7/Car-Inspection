@@ -38,7 +38,7 @@ export type ReportInput = {
     address: string | null;
     logoUrl: string | null;
   };
-  car: Pick<CarRow, "reg_number" | "make" | "model" | "variant" | "fuel" | "transmission" | "year" | "owners" | "insurance_valid_upto" | "odometer_km"> & {
+  car: Pick<CarRow, "reg_number" | "make" | "model" | "variant" | "fuel" | "transmission" | "year" | "owners" | "insurance_valid_upto" | "odometer_km" | "status"> & {
     fromRc: boolean;
   };
   /** Photos with a working link; `thumbUrl` is the small copy when there is an up-to-date one. */
@@ -58,6 +58,8 @@ export type ReportPrice = {
   marketRangeText: string;
   /** e.g. "+2%" or "−4%", or null when the score matches an average car. */
   adjustmentText: string | null;
+  /** false until the inspection is finished: a draft's score means nothing yet, so the range isn't adjusted. */
+  adjusted: boolean;
   summary: string | null;
   comparables: { title: string; url: string; host: string; priceText: string | null; detail: string | null }[];
   searchedOn: string;
@@ -183,7 +185,7 @@ export function buildReportView(input: ReportInput, hidden: readonly ReportSecti
   const details = detailCandidates.filter((row): row is DetailRow => Boolean(row.value));
 
   const score = conditionScore({ findings: input.findings, checklist: input.checklist });
-  const price = input.price ? buildPrice(input.price, score) : null;
+  const price = input.price ? buildPrice(input.price, score, car.status !== "draft") : null;
 
   const full: ReportView = {
     slug: input.slug,
@@ -244,8 +246,8 @@ const hostOf = (url: string) => {
 };
 
 /** The estimate as shown: market range adjusted for the live condition score. */
-function buildPrice(p: NonNullable<ReportInput["price"]>, score: number): ReportPrice {
-  const { low, high, factor } = adjustedRange(p.market_low_inr, p.market_high_inr, score);
+function buildPrice(p: NonNullable<ReportInput["price"]>, score: number, adjust: boolean): ReportPrice {
+  const { low, high, factor } = adjust ? adjustedRange(p.market_low_inr, p.market_high_inr, score) : { low: p.market_low_inr, high: p.market_high_inr, factor: 1 };
   const pct = Math.round((factor - 1) * 100);
   const range = (a: number, b: number) => (a === b ? formatInrShort(a) : `${formatInrShort(a)} – ${formatInrShort(b)}`);
   return {
@@ -254,6 +256,7 @@ function buildPrice(p: NonNullable<ReportInput["price"]>, score: number): Report
     highText: formatInrShort(high),
     marketRangeText: range(p.market_low_inr, p.market_high_inr),
     adjustmentText: pct === 0 ? null : `${pct > 0 ? "+" : "−"}${Math.abs(pct)}%`,
+    adjusted: adjust,
     summary: p.summary || null,
     comparables: p.comparables.map((c) => ({
       title: c.title,

@@ -16,6 +16,7 @@ const input = (patch: Partial<ReportInput> = {}): ReportInput => ({
     owners: 1,
     insurance_valid_upto: "2026-01-31",
     odometer_km: 45230,
+    status: "inspected",
     fromRc: true,
   },
   photos: [
@@ -184,6 +185,11 @@ describe("price estimate", () => {
     expect(view.price?.adjustmentText).toBe("−2%");
     expect(view.price?.rangeText).toBe("₹4.4 lakh – ₹4.9 lakh");
     expect(view.price?.comparables[0]).toMatchObject({ host: "cars24.com", priceText: "₹4.89 lakh" });
+  });
+
+  it("shows the plain market range until the inspection is finished", () => {
+    const view = buildReportView(input({ price, car: { ...input().car, status: "draft" } }));
+    expect(view.price).toMatchObject({ adjusted: false, adjustmentText: null, rangeText: "₹4.5 lakh – ₹5 lakh" });
   });
 
   it("is null without an estimate and when the owner hides it", () => {

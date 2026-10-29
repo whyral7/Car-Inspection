@@ -154,7 +154,9 @@ export function ReportView({ view, pdfHref }: { view: View; pdfHref?: string | n
       {view.price && (
         <Section title={t.publicReport.price}>
           <p className="text-2xl font-bold text-slate-900">{view.price.rangeText}</p>
-          <p className="mt-1 text-sm text-slate-600">{t.publicReport.priceAdjusted(view.price.marketRangeText, view.price.adjustmentText, view.scoreText)}</p>
+          <p className="mt-1 text-sm text-slate-600">{view.price.adjusted
+              ? t.publicReport.priceAdjusted(view.price.marketRangeText, view.price.adjustmentText, view.scoreText)
+              : t.publicReport.priceUnadjusted(view.price.marketRangeText)}</p>
           {view.price.summary && <p className="mt-2 text-sm text-slate-700">{view.price.summary}</p>}
           <p className="mt-3 text-xs text-slate-500">{t.publicReport.priceBasedOn(view.price.comparables.length, view.price.searchedOn)}</p>
           {view.price.comparables.length > 0 && (

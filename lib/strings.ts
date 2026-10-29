@@ -671,6 +671,7 @@ export const en = {
     price: "Estimated market price",
     priceAdjusted: (market: string, adjustment: string | null, score: string) =>
       adjustment ? `Similar cars sell for ${market}. Adjusted ${adjustment} for this car's condition score of ${score}/10.` : `Similar cars sell for ${market}. This car's condition score of ${score}/10 is about average for its age.`,
+    priceUnadjusted: (market: string) => `Similar cars sell for ${market}. Finish the inspection to adjust this for the car's condition.`,
     priceBasedOn: (n: number, date: string) =>
       n === 0 ? `Researched online on ${date}.` : n === 1 ? `Based on 1 listing found online on ${date}:` : `Based on ${n} listings found online on ${date}:`,
     priceDisclaimer: "An estimate from current online listings, not a valuation. The final price depends on a test drive, the documents and negotiation.",

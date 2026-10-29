@@ -31,6 +31,7 @@ const sampleInput: ReportInput = {
     owners: 1,
     insurance_valid_upto: "2027-03-31",
     odometer_km: 48_250,
+    status: "published",
     fromRc: true,
   },
   photos: [],

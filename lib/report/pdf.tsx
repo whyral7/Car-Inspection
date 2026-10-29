@@ -149,7 +149,9 @@ export function ReportPdf({ view, reportUrl, logo, images }: Props) {
             <SectionTitle title={t.publicReport.price} />
             <Text style={{ fontSize: 16, fontWeight: 700 }}>{view.price.rangeText}</Text>
             <Text style={[s.small, { color: INK[700], marginTop: 3 }]}>
-              {t.publicReport.priceAdjusted(view.price.marketRangeText, view.price.adjustmentText, view.scoreText)}
+              {view.price.adjusted
+              ? t.publicReport.priceAdjusted(view.price.marketRangeText, view.price.adjustmentText, view.scoreText)
+              : t.publicReport.priceUnadjusted(view.price.marketRangeText)}
             </Text>
             {view.price.summary ? <Text style={[s.small, { marginTop: 4 }]}>{view.price.summary}</Text> : null}
             <Text style={[s.small, s.muted, { marginTop: 6 }]}>{t.publicReport.priceBasedOn(view.price.comparables.length, view.price.searchedOn)}</Text>
