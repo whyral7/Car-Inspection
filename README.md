@@ -38,12 +38,15 @@ app/                    routes (App Router)
   api/photos/[photoId]/analyse/  POST: analyse one photo with Claude, save notes, log tokens
   api/razorpay/webhook/          POST: Razorpay webhook (signature-checked), adds credits
   manifest.ts           PWA manifest
-components/             shared UI (angle-hint.tsx: SVG outline per photo angle)
+app/tokens.css          design tokens (colour, type, radius, shadow, motion); see docs/design-system.md
+components/ui/          UI kit: Button, Field, Card, Badge, BottomSheet, Toast, StickyBar, StepHeader…
+components/             app-specific pieces (angle-hint.tsx: SVG outline per photo angle)
 lib/
   strings.ts            every English UI string; strings.hi.ts is the Hindi copy (same shape)
   strings-legal.ts      legal page templates (English only)
   i18n.ts, i18n.server.ts, i18n.actions.ts  language picking (lang cookie, then Accept-Language), getT() on the server
   outbox.ts             on-phone queue (IndexedDB) for photos and checklist answers taken offline
+  draft.ts, resume.ts   form drafts kept on the phone, and the last inspection screen for "Pick up where you left off"
   inspection.ts         next step, steps done and provisional score for a car (+ tests)
   images/quality.ts     dark / bright / blurry check before upload (+ tests)
   config.ts             app constants

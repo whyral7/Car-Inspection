@@ -2,7 +2,7 @@
 
 Date: 29 October 2026 · Build: `master` at `4a354b3` · Auditor: Claude (no code changed)
 
-> **Status:** fixed on branch `ux-improvements`. See [ux-audit-fixes.md](ux-audit-fixes.md) for what changed and what was deferred.
+> **Status (design-system pass, branch `design-system`):** every Critical and High issue below is marked ✅ fixed or 🟡 partly fixed (it needs real content from you). Section 5 lists what was done and what's left. Direction chosen: **Option A, Clear Teal**. The earlier round of fixes is in [ux-audit-fixes.md](ux-audit-fixes.md); the design system is documented in [design-system.md](design-system.md).
 
 ## How this audit was done
 
@@ -208,18 +208,18 @@ Severity: **Critical** (blocks or loses work, or breaks trust), **High** (major 
 
 | # | Issue | Sev | Effort |
 |---|---|---|---|
-| G1 | No offline outbox. Saves fail per item, nothing retries on reconnect, and unsynced state is hidden (Top 1). | Critical | L |
-| G2 | No `loading.tsx` skeletons or progress bar. Measured TTFB on slow 4G was 1.3–3.4 s per app page (Top 6). | High | S |
-| G3 | No `error.tsx` or branded `not-found.tsx`: the default Next 404 has no way back ([`39-app-not-found-phone.png`](ux-audit/39-app-not-found-phone.png)). | High | S |
-| G4 | Header Log out is one tap away, the name is cut off, and the header breaks at 200% text (Top 7). | High | S |
-| G5 | Text at 200%: the number plate is cut to one letter on the car page, and sticky footers cover about half the screen ([`40-text-200-*`](ux-audit/)). | High | S |
+| G1 ✅ | No offline outbox. Saves fail per item, nothing retries on reconnect, and unsynced state is hidden (Top 1). | Critical | L |
+| G2 ✅ | No `loading.tsx` skeletons or progress bar. Measured TTFB on slow 4G was 1.3–3.4 s per app page (Top 6). | High | S |
+| G3 ✅ | No `error.tsx` or branded `not-found.tsx`: the default Next 404 has no way back ([`39-app-not-found-phone.png`](ux-audit/39-app-not-found-phone.png)). | High | S |
+| G4 ✅ | Header Log out is one tap away, the name is cut off, and the header breaks at 200% text (Top 7). | High | S |
+| G5 ✅ | Text at 200%: the number plate is cut to one letter on the car page, and sticky footers cover about half the screen ([`40-text-200-*`](ux-audit/)). | High | S |
 | G6 | Brand teal `#0f766e` and WhatsApp green `#128c7e` are nearly the same hue, so "primary" and "WhatsApp" look alike on the same screen. | Medium | S |
 | G7 | Icons are a mix of emoji (💬 📞 ⬇ 🚗 🏷️ 🔍), text glyphs (← › ✓ ✕) and SVG. Emoji render differently per phone brand and look informal on a report. | Medium | M |
 | G8 | Corner radius varies without a rule: 6, 8, 12, 16 and 24 px (`rounded-md` plate, `rounded-lg`, buttons `xl`, cards `2xl`, preview frame `3xl`). | Low | S |
 | G9 | Much secondary text is 12–14 px `slate-500` on `slate-50` (4.55:1). It passes AA but washes out in sunlight. Use `slate-600`/`700` for anything people must read. | Medium | S |
 | G10 | Disabled buttons use 60% opacity teal (e.g. "Finish inspection", "Confirm reading"), which is hard to tell from enabled in bright light. Use a grey disabled style plus a hint saying why. | Medium | S |
 | G11 | Sticky bars use `backdrop-blur`, which is expensive on low-end Android GPUs while scrolling long lists. Use a solid white bar with a top border. | Low | S |
-| G12 | No dark mode (`color-scheme: light` only). Also no Hindi (Top 10). | Low / High | M |
+| G12 🟡 | No dark mode (`color-scheme: light` only). Also no Hindi (Top 10). | Low / High | M |
 | G13 | `aria-progressbar-name`: the progress bars on the Photos and Checklist screens have no accessible name (axe, serious). | Medium | S |
 | G14 | The disclaimer appears on almost every app screen (home, car page, login). It's repetitive in the app. Keep it on reports, the landing page and login. | Low | S |
 | G15 | Next's route announcer (`role=alert`) plus our own alerts: errors aren't moved into focus. After a failed submit, focus should go to the first error. | Low | S |
@@ -228,9 +228,9 @@ Severity: **Critical** (blocks or loses work, or breaks trust), **High** (major 
 
 | # | Issue | Sev | Effort |
 |---|---|---|---|
-| L1 | Footer shows "[Your registered business name]". Legal pages and contact also show [brackets]. | Critical | S |
-| L2 | Copy is for dealers only ("For used-car dealers", "Why dealers use it"), but owners and buyers can sign up. | High | S |
-| L3 | No real car photos anywhere: the hero preview uses grey tiles. | High | S |
+| L1 🟡 | Footer shows "[Your registered business name]". Legal pages and contact also show [brackets]. | Critical | S |
+| L2 ✅ | Copy is for dealers only ("For used-car dealers", "Why dealers use it"), but owners and buyers can sign up. | High | S |
+| L3 🟡 | No real car photos anywhere: the hero preview uses grey tiles. | High | S |
 | L4 | The floating "Chat on WhatsApp" pill covers the hero preview at 360 px and the step cards on desktop. With no number set it links to /contact, which is misleading. | Medium | S |
 | L5 | White on WhatsApp green `#128c7e` is 4.14:1 at 16 px regular, which fails AA (axe). Use `#075e54` (7.7:1) or bold 18 px+. | Medium | S |
 | L6 | No social proof (number of reports, testimonials, dealer logos) and no FAQ ("Is this a mechanical check?", "How do buyers open it?"). | Medium | M |
@@ -240,8 +240,8 @@ Severity: **Critical** (blocks or loses work, or breaks trust), **High** (major 
 
 | # | Issue | Sev | Effort |
 |---|---|---|---|
-| S1 | No photos. The banner says "Real reports also include all 20 photos", which is the exact thing a visitor wants to see. | High | S |
-| S2 | It inherits every public-report layout issue (Top 2). | High | M |
+| S1 🟡 | No photos. The banner says "Real reports also include all 20 photos", which is the exact thing a visitor wants to see. | High | S |
+| S2 ✅ | It inherits every public-report layout issue (Top 2). | High | M |
 | S3 | `/10` at 70% opacity is 3.69:1 (axe). | Low | S |
 
 ### Login `/login` · [`06-login-*`](ux-audit/), [`07-otp-*`](ux-audit/)
@@ -271,8 +271,8 @@ Severity: **Critical** (blocks or loses work, or breaks trust), **High** (major 
 
 | # | Issue | Sev | Effort |
 |---|---|---|---|
-| H1 | The big teal credits card is the strongest thing on screen. Credits are also shown in the header badge, so the main job ("add or continue a car") comes second. | High | S |
-| H2 | No "continue where you left off": a draft just shows "Draft". Show progress ("Photos 8/20") and a Continue button on the card. | High | S |
+| H1 ✅ | The big teal credits card is the strongest thing on screen. Credits are also shown in the header badge, so the main job ("add or continue a car") comes second. | High | S |
+| H2 ✅ | No "continue where you left off": a draft just shows "Draft". Show progress ("Photos 8/20") and a Continue button on the card. | High | S |
 | H3 | Car cards have no photo thumbnail, score or date, so dealers with many cars can't scan the list. | Medium | M |
 | H4 | "+ Add car" is top-right, out of thumb reach once the list scrolls. Use a sticky bottom button or floating action button. | Medium | S |
 | H5 | At 0 credits the card just says "0", with no "Buy credits" button and no explanation that publishing needs one. | Medium | S |
@@ -293,9 +293,9 @@ Severity: **Critical** (blocks or loses work, or breaks trust), **High** (major 
 
 | # | Issue | Sev | Effort |
 |---|---|---|---|
-| P1 | The main button is below the fold on every visit; the details table comes first (Top 4). | High | S |
-| P2 | Score is 10.0/10 before any checking, and the colour doesn't match the report (Top 8). | High | S |
-| P3 | No way to edit car details (make, model, year) after saving, though the price estimate error tells users to "Add the make, model and year on the car page". | High | M |
+| P1 ✅ | The main button is below the fold on every visit; the details table comes first (Top 4). | High | S |
+| P2 ✅ | Score is 10.0/10 before any checking, and the colour doesn't match the report (Top 8). | High | S |
+| P3 ✅ | No way to edit car details (make, model, year) after saving, though the price estimate error tells users to "Add the make, model and year on the car page". | High | M |
 | P4 | No delete or archive for a car (for test cars or mistakes). | Medium | S |
 | P5 | The step list is good (numbered, ticks, status lines). Make the whole stepper sticky or show it at the top of each step screen too. | Low | M |
 
@@ -303,26 +303,26 @@ Severity: **Critical** (blocks or loses work, or breaks trust), **High** (major 
 
 | # | Issue | Sev | Effort |
 |---|---|---|---|
-| F1 | Unsent photos are held in memory only, and are lost if the tab is killed while the camera app is open (Top 1). | Critical | L |
+| F1 ✅ | Unsent photos are held in memory only, and are lost if the tab is killed while the camera app is open (Top 1). | Critical | L |
 | F2 | "Connection is slow. Retrying (1/3)…" is shown while offline. | Medium | S |
-| F3 | 4 taps per photo and no auto-advance (Top 3). | High | S |
-| F4 | No blur or brightness check before upload, so bad photos cost an AI call and come back "unclear" later. | High | M |
+| F3 ✅ | 4 taps per photo and no auto-advance (Top 3). | High | S |
+| F4 ✅ | No blur or brightness check before upload, so bad photos cost an AI call and come back "unclear" later. | High | M |
 | F5 | The outline and tip aren't visible inside the camera. Next: an in-app camera with an overlay. | Medium | L |
 | F6 | In the failed state there are 5 stacked buttons (Try again, Retake, Gallery, Previous, Next) and Next drops below the fold ([`18-photo-upload-failed-offline-phone.png`](ux-audit/18-photo-upload-failed-offline-phone.png)). Merge "Try again" into the status card. | Medium | S |
 | F7 | "Choose from gallery" has equal weight to "Take photo". Demote it, and flag gallery photos with an old EXIF date on the report ("uploaded from gallery"). | Medium | M |
 | F8 | The disabled "Previous" on photo 1 looks almost enabled; "Skip" is allowed on required photos. | Low | S |
 | F9 | The grid's sticky footer (text plus 2 full buttons) covers about 25% of the screen ([`19-photo-grid-required-done-phone.jpg`](ux-audit/19-photo-grid-required-done-phone.jpg)). | Medium | S |
-| F10 | When all required photos are done, the main button is "Back to car" instead of "Review damage notes" (Top 4). | High | S |
-| F11 | The grid and the damage-notes screen load the **full 1600 px photos** as 80 px thumbnails, though a 640 px copy is already uploaded. With real photos (about 300–450 KB each) that's about 6–9 MB per visit on 4G. Measured with stand-in images: 702 KB of images on the grid. Use the small copies. | High | S |
+| F10 ✅ | When all required photos are done, the main button is "Back to car" instead of "Review damage notes" (Top 4). | High | S |
+| F11 ✅ | The grid and the damage-notes screen load the **full 1600 px photos** as 80 px thumbnails, though a 640 px copy is already uploaded. With real photos (about 300–450 KB each) that's about 6–9 MB per visit on 4G. Measured with stand-in images: 702 KB of images on the grid. Use the small copies. | High | S |
 | F12 | Good: required/optional tags, line drawings per angle, retry with backoff, and a warning before leaving mid-upload. | n/a | n/a |
 
 ### Damage notes `/app/cars/[id]/findings` · [`21-*`](ux-audit/), [`22-*`](ux-audit/), [`23-*`](ux-audit/), [`24-*`](ux-audit/)
 
 | # | Issue | Sev | Effort |
 |---|---|---|---|
-| D1 | The bottom bar says "All notes reviewed." and offers Continue while AI checks are running or have failed (Top 5). | High | S |
-| D2 | 20 photo cards, 16 of them "No damage seen", so the page is 5,300 px tall (Top 5). | High | M |
-| D3 | "Accept all" is secondary while "Continue" is primary even when notes are unreviewed. Unreviewed notes stay off the report; the user is only warned later, on the report page. | High | S |
+| D1 ✅ | The bottom bar says "All notes reviewed." and offers Continue while AI checks are running or have failed (Top 5). | High | S |
+| D2 ✅ | 20 photo cards, 16 of them "No damage seen", so the page is 5,300 px tall (Top 5). | High | M |
+| D3 ✅ | "Accept all" is secondary while "Continue" is primary even when notes are unreviewed. Unreviewed notes stay off the report; the user is only warned later, on the report page. | High | S |
 | D4 | No marker on the photo showing where the damage is, and the thumbnail is 80 px. Tapping expands it inline but has no zoom. | Medium | M |
 | D5 | "Needs review · AI" is 12 px grey on amber. The severity chip and source are small. Make "AI suggestion" a clear label. | Low | S |
 | D6 | Delete has a confirmation but no undo. Prefer instant delete plus an "Undo" snackbar (faster, safer). | Low | S |
@@ -333,11 +333,11 @@ Severity: **Critical** (blocks or loses work, or breaks trust), **High** (major 
 
 | # | Issue | Sev | Effort |
 |---|---|---|---|
-| K1 | Failed saves aren't retried; "All items checked" plus an enabled Finish appear with unsaved items (Top 1). | Critical | M |
+| K1 ✅ | Failed saves aren't retried; "All items checked" plus an enabled Finish appear with unsaved items (Top 1). | Critical | M |
 | K2 | 19 items at about 200 px each is about 3,800 px of scrolling. Offer a compact mode and "Mark the rest OK" (with a confirmation). | Medium | S |
 | K3 | White on `emerald-600` `#009966` is 3.65:1 for the selected "OK" (axe, 17 nodes). Use `#047857` (5.5:1). | Medium | S |
 | K4 | "Attention" barely fits its 76 px button at 360 px, and labels will overflow in Hindi. Use icons plus short labels, or a 2×2 grid. | Medium | S |
-| K5 | Finishing goes back to the car page, not to the report preview (Top 4). | High | S |
+| K5 ✅ | Finishing goes back to the car page, not to the report preview (Top 4). | High | S |
 | K6 | Jargon and expert judgement ("suspension noise", "clutch slips"). Add a "How to check" (?) per item (Top 10). | Medium | M |
 | K7 | Good: groups, hints, a note box that opens automatically on Attention/Fail, and per-item save state. | n/a | n/a |
 
@@ -345,7 +345,7 @@ Severity: **Critical** (blocks or loses work, or breaks trust), **High** (major 
 
 | # | Issue | Sev | Effort |
 |---|---|---|---|
-| R1 | The Publish button sits mid-page under the price card and five toggles, and above an 8,000 px preview. It isn't sticky, so the user may never find it. Use a sticky bottom bar: "Publish · uses 1 of 3 credits". | High | S |
+| R1 ✅ | The Publish button sits mid-page under the price card and five toggles, and above an 8,000 px preview. It isn't sticky, so the user may never find it. Use a sticky bottom bar: "Publish · uses 1 of 3 credits". | High | S |
 | R2 | At 0 credits the "Buy credits" block is also mid-page, and the header badge can go stale after a credit change in another tab. | Medium | S |
 | R3 | Price estimate: "Searching… up to a minute" shows only a spinner. Show steps or progress ("Found 3 listings…"). After a failure it says only "try again in a minute" ([`30-price-error-phone.png`](ux-audit/30-price-error-phone.png)). | Medium | M |
 | R4 | "Search again" looks harmless but uses one of 3 daily searches. Show "2 of 3 left today". | Low | S |
@@ -357,8 +357,8 @@ Severity: **Critical** (blocks or loses work, or breaks trust), **High** (major 
 
 | # | Issue | Sev | Effort |
 |---|---|---|---|
-| B1 | No hero photo; price and the details table come before photos; the dealer name is cut off (Top 2). | Critical | M |
-| B2 | The OG/WhatsApp card has no car photo. | High | S |
+| B1 ✅ | No hero photo; price and the details table come before photos; the dealer name is cut off (Top 2). | Critical | M |
+| B2 ✅ | The OG/WhatsApp card has no car photo. | High | S |
 | B3 | The sticky contact bar wraps "WhatsApp dealer" onto 2 lines and covers about 120 px of content. The fixed bar is also outside any landmark (axe). | Medium | S |
 | B4 | No "how this score works" explanation or link. A buyer can't tell what 6.8 means. | Medium | S |
 | B5 | No proof of when the photos were taken (date/time per photo) or that they were taken in-app. This is a key trust signal against reused photos. | Medium | M |
@@ -389,7 +389,7 @@ Severity: **Critical** (blocks or loses work, or breaks trust), **High** (major 
 
 | # | Issue | Sev | Effort |
 |---|---|---|---|
-| W1 | The service worker is pass-through: no offline page, no caching of the app shell, no background sync. | High | M |
+| W1 ✅ | The service worker is pass-through: no offline page, no caching of the app shell, no background sync. | High | M |
 | W2 | No custom install prompt (`beforeinstallprompt`), so most users will never install. Show "Add Treadmark to home screen" after the first published report. | Medium | S |
 | W3 | Manifest is good: name, `standalone`, portrait, teal theme, 192/512 plus maskable icons, `start_url=/app`. The Android splash is generated from these. No iOS splash images and a `default` status bar. | Low | S |
 | W4 | No app shortcuts in the manifest ("Add car", "My cars"). | Low | S |
@@ -557,3 +557,52 @@ If you'd rather have a stronger, more distinctive brand now (before more users s
 ---
 
 **Waiting for your decision:** pick **A**, **B** or the mix, and tell me which issues to start with. My suggested order is Top 1, 4, 6, 7, 8 (mostly small effort, biggest relief), then 2, 3, 5, 9, 10. No code has been changed in this step.
+
+---
+
+## 5. Fix status (design-system pass)
+
+Direction: **Option A, "Clear Teal"**. One accent colour (teal), white cards with soft shadows instead of borders, a strong type scale, an 8px spacing rhythm and 150–250ms motion. The yellow number plate and the separate WhatsApp green are gone, so there is one accent throughout, PDF and link preview included.
+
+### What changed
+
+- **Design system.**
+  - Tokens live in `app/tokens.css`, a Tailwind v4 `@theme` block: colours, type scale, radius, shadows and motion. `lib/report/colors.ts` holds a copy for the PDF and the preview image.
+  - Shared components in `components/ui`: Button, Input (Field, Select, TextArea), Card, ListCard, Badge, BottomSheet, ConfirmSheet, Toast, Skeleton, EmptyState, ProgressBar, PageHeader, StepHeader, StickyBar, Segmented and Switch.
+  - Raw palette and size classes across the app now map onto the tokens.
+  - Geist is self-hosted: 28 KB, cached by the service worker, no new package.
+- **Mobile first.**
+  - Every task screen keeps its main action in a sticky bottom bar within thumb reach. The bar sits at the bottom of the screen even when the page is short.
+  - Tap targets are 44px or larger, checked automatically on every screen.
+  - Inputs set the right keyboard (`inputMode`, `enterKeyHint`, `autoComplete`).
+  - Text passes 4.5:1 or better: secondary text 7.7:1, captions 5.6:1. Input outlines pass 3:1.
+- **Feedback on every action.**
+  - Async actions show loading (spinner on the button), success (a toast: car added, details saved, note saved, report published, link copied, profile saved, back online) and error states.
+  - Toasts sit above the sticky bar, so they never cover the main button.
+- **Empty states** for the car list, damage notes with no photos, and credit history.
+- **Destructive actions.**
+  - Delete car, log out, "Mark the other N OK" and publishing (it spends a credit) confirm in a bottom sheet.
+  - Deleting a damage note has a 6-second Undo toast.
+- **Autosave and resume.**
+  - Car details (add and edit), the profile form and the damage-note sheet keep a draft on the phone (`lib/draft.ts`) and say when they restore it.
+  - Checklist notes save about a second after typing stops.
+  - Photos and checklist answers already sync through the offline outbox.
+  - Home shows "Pick up where you left off" with the screen last used on this phone (`lib/resume.ts`).
+  - The checklist reopens at the first unanswered item.
+- **Every inspection step** shows "Step N of 4" and a four-part indicator.
+- **Checked automatically** on 20 screens, in English and Hindi, at 360px and 1280px, plus 200% text at 360px: no page errors, no sideways scrolling, no axe WCAG 2 AA violations and no tap targets under 44px.
+
+### Left for later
+
+- **Real business details (L1).** The footer already hides the placeholder, but the legal and contact pages still show `[brackets]` until `BUSINESS` in `lib/config.ts` is filled in.
+- **Real car photos (L3, S1).** The landing page and the sample report use drawings. They need real photos you're allowed to publish.
+- **Dark mode (G12).** The tokens are ready for it (one set of variables to redefine), but it's out of scope here. Hindi is done.
+- **Medium and Low issues.** Most were fixed along the way: icons, radius, contrast, disabled look, blur and progress bar names. The rest are product decisions:
+  - an in-app camera with an outline overlay;
+  - damage markers on photos;
+  - single-report pricing;
+  - report view counts;
+  - voice notes;
+  - team accounts.
+- **App icons** are still the earlier teal (#115e59, a hair lighter than the new #0f5e58). The difference is invisible at icon size.
+- **The login button stays under the phone field,** not in a sticky bar: with the keyboard open, that's where the thumb already is.
