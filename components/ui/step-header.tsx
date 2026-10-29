@@ -40,8 +40,8 @@ export function PageHeader({ back, eyebrow, title, meta, description, aside, chi
         </div>
         {aside}
       </div>
-      {description && <p className="max-w-prose text-small text-ink-muted">{description}</p>}
       {children}
+      {description && <p className="max-w-prose text-small text-ink-muted">{description}</p>}
     </header>
   );
 }

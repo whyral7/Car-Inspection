@@ -89,3 +89,17 @@ export function useFormDraft(key: string | null, form: RefObject<HTMLFormElement
     };
   }, [key, form]);
 }
+
+/** For controlled forms: the saved values, if any (call in a lazy useState initialiser). */
+export function readDraft<T extends Record<string, string>>(key: string): Partial<T> | null {
+  return (read(key)?.values as Partial<T> | undefined) ?? null;
+}
+
+/** For controlled forms: save the current values (call from an effect when they change). */
+export function saveDraft(key: string, values: Record<string, string>) {
+  try {
+    localStorage.setItem(PREFIX + key, JSON.stringify({ at: Date.now(), values } satisfies Saved));
+  } catch {
+    // Storage full or blocked: carry on without a draft.
+  }
+}

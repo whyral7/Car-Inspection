@@ -355,6 +355,7 @@ export const en = {
     someFailed: (n: number) => (n === 1 ? "1 photo couldn't be checked." : `${n} photos couldn't be checked.`),
     retryFailed: "Try again",
     noPhotos: "No photos yet. Take the photos first, then come back here.",
+    noPhotosTitle: "No photos yet",
     takePhotos: "Take photos",
     photoStatus: {
       pending: "Checking…",
@@ -371,6 +372,7 @@ export const en = {
     generalHint: "Damage not shown in any one photo.",
     toReview: (n: number) => (n === 1 ? "1 note to review" : `${n} notes to review`),
     allReviewed: "All notes reviewed.",
+    acceptedCount: (n: number) => (n === 1 ? "1 note accepted." : `${n} notes accepted.`),
     needsReview: "Needs review",
     accepted: "Accepted",
     accept: "Accept",

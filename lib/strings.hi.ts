@@ -292,6 +292,7 @@ export const hi: Strings = {
     someFailed: (n: number) => `${n} फ़ोटो जाँचे नहीं जा सके।`,
     retryFailed: "फिर से कोशिश करें",
     noPhotos: "अभी कोई फ़ोटो नहीं। पहले फ़ोटो लें, फिर यहाँ आएँ।",
+    noPhotosTitle: "अभी कोई फ़ोटो नहीं",
     takePhotos: "फ़ोटो लें",
     photoStatus: {
       pending: "जाँच हो रही है…",
@@ -308,6 +309,7 @@ export const hi: Strings = {
     generalHint: "जो नुकसान किसी एक फ़ोटो में नहीं दिखता।",
     toReview: (n: number) => `${n} नोट देखने बाकी`,
     allReviewed: "सारे नोट देख लिए।",
+    acceptedCount: (n: number) => `${n} नोट माने गए।`,
     needsReview: "देखना बाकी",
     accepted: "माना गया",
     accept: "मानें",
