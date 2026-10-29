@@ -19,7 +19,7 @@ export default async function DashboardLayout({ children }: LayoutProps<"/app">)
       {/* Log out lives on the profile page, away from where thumbs land while scrolling. */}
       <header className="sticky top-0 z-20 border-b border-line bg-white pt-[env(safe-area-inset-top)]">
         <div className="mx-auto flex w-full max-w-2xl flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2">
-          <Link href="/app/profile" className="flex min-h-11 min-w-0 flex-1 items-center gap-3" aria-label={`${name}, ${t.profile.title}`}>
+          <Link href="/app/profile" className="flex min-h-11 min-w-0 flex-1 basis-40 items-center gap-3" aria-label={`${name}, ${t.profile.title}`}>
             {logo ? (
               // eslint-disable-next-line @next/next/no-img-element -- small public logo, no need for the image optimiser
               <img src={logo} alt="" className="size-9 shrink-0 rounded-lg border border-line object-contain" />

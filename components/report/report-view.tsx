@@ -121,7 +121,7 @@ export function ContactButtons({ view, t, preview = false }: { view: View; t: St
 /** One line on what was found, for the summary card: "3 damage notes · 15 OK, 2 need attention, 1 problem". */
 function summaryLine(view: View, t: Strings) {
   const parts: string[] = [];
-  if (view.findings) parts.push(t.publicReport.summary.findings(view.findings.length).replace(/\.$/, ""));
+  if (view.findings) parts.push(t.publicReport.summary.findings(view.findings.length).replace(/[.।]$/, ""));
   if (view.checklist) parts.push(t.publicReport.checklistSummary(view.checklist.counts.ok, view.checklist.counts.attention, view.checklist.counts.fail));
   return parts.join(" · ");
 }
