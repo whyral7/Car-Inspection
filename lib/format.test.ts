@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { t } from "@/lib/strings";
-import { carTitle, formatDate, formatRupees, isPastDate } from "./format";
+import { carTitle, formatDate, formatInrShort, formatRupees, isPastDate } from "./format";
 
 describe("format", () => {
   it("formats a calendar date without shifting the day", () => {
@@ -35,5 +35,16 @@ describe("formatRupees", () => {
     expect(formatRupees(249_900)).toBe("2,499");
     expect(formatRupees(10_000_000)).toBe("1,00,000");
     expect(formatRupees(8_330)).toBe("83.30");
+  });
+});
+
+describe("formatInrShort", () => {
+  it("uses lakh and crore like Indian car listings", () => {
+    expect(formatInrShort(85_000)).toBe("₹85,000");
+    expect(formatInrShort(460_000)).toBe("₹4.6 lakh");
+    expect(formatInrShort(465_000)).toBe("₹4.65 lakh");
+    expect(formatInrShort(500_000)).toBe("₹5 lakh");
+    expect(formatInrShort(1_250_000)).toBe("₹12.5 lakh");
+    expect(formatInrShort(12_500_000)).toBe("₹1.25 crore");
   });
 });

@@ -28,3 +28,17 @@ const rupeePaiseFormat = new Intl.NumberFormat("en-IN", { minimumFractionDigits:
 export function formatRupees(paise: number) {
   return paise % 100 === 0 ? rupeeFormat.format(paise / 100) : rupeePaiseFormat.format(paise / 100);
 }
+
+/**
+ * Rupees the way Indian car buyers read prices: "₹4.6 lakh", "₹12.5 lakh", "₹1.25 crore",
+ * and plain "₹85,000" under a lakh.
+ */
+export function formatInrShort(rupees: number) {
+  if (rupees >= 10_000_000) return `₹${trimZeros((rupees / 10_000_000).toFixed(2))} crore`;
+  if (rupees >= 100_000) return `₹${trimZeros((rupees / 100_000).toFixed(rupees < 1_000_000 ? 2 : 1))} lakh`;
+  return `₹${rupeeFormat.format(rupees)}`;
+}
+
+function trimZeros(n: string) {
+  return n.replace(/\.?0+$/, "");
+}

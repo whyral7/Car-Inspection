@@ -62,7 +62,7 @@ export const REPORT = {
   /** PDF download links. /r/<slug>/pdf makes a fresh one on every tap. */
   pdfUrlSeconds: 5 * 60,
   /** Bump when the PDF layout changes, so stored PDFs are rebuilt on the next download. */
-  pdfVersion: 1,
+  pdfVersion: 2,
 } as const;
 
 /** Prepaid report credit packs. Prices in paise (Rs 999 = 99900). */
@@ -91,3 +91,27 @@ export const BUSINESS = {
 
 /** Public sample report linked from the landing page. Set to a real published slug (e.g. "/r/abcd1234ef") to show your own. */
 export const SAMPLE_REPORT_PATH = "/sample-report";
+
+/** Market price estimate on the report (Claude + live web search over current listings). */
+export const PRICE = {
+  /** Web searches Claude may run per estimate. Each costs US$0.01 on top of tokens. */
+  maxSearches: 5,
+  /** Estimates a car can run per day, so repeated taps can't run up the bill. */
+  maxPerCarPerDay: 3,
+  /** "low" keeps the research loop short; raise it if the ranges look careless. */
+  effort: "low" as "low" | "medium" | "high",
+  maxTokens: 16_000,
+  /** Server-tool loops can pause; resume at most this many times before giving up. */
+  maxContinuations: 3,
+  requestTimeoutMs: 120_000,
+  /** Listing links shown with the estimate. */
+  maxComparables: 5,
+  /**
+   * Condition adjustment: a car at the reference score gets the plain market range; each point
+   * above or below moves it by perPoint, within [minFactor, maxFactor].
+   */
+  referenceScore: 7.5,
+  perPoint: 0.02,
+  minFactor: 0.85,
+  maxFactor: 1.05,
+} as const;
