@@ -23,10 +23,13 @@ const variants: Record<ButtonVariant, string> = {
 };
 
 // Disabled looks grey rather than faded, so it reads as "not yet" in bright sunlight.
+// Text-only variants just go grey.
 const disabledLook = "cursor-not-allowed !bg-sunken !text-ink-subtle !shadow-none !ring-0 active:!scale-100";
+const disabledText = "cursor-not-allowed !bg-transparent !text-ink-subtle active:!scale-100";
 
 export function buttonClass(variant: ButtonVariant = "primary", className = "", disabled = false, size: ButtonSize = "md") {
-  return `${base} ${sizes[size]} ${variants[variant]} ${disabled ? disabledLook : ""} ${className}`;
+  const off = variant === "ghost" || variant === "danger-ghost" ? disabledText : disabledLook;
+  return `${base} ${sizes[size]} ${variants[variant]} ${disabled ? off : ""} ${className}`;
 }
 
 type ButtonProps = ComponentProps<"button"> & { variant?: ButtonVariant; size?: ButtonSize; loading?: boolean; icon?: ReactNode };

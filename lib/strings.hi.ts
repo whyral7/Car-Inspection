@@ -20,6 +20,7 @@ export const hi: Strings = {
     offline: "लगता है आप ऑफ़लाइन हैं। इंटरनेट देखकर फिर से कोशिश करें।",
     offlineBanner: "आप ऑफ़लाइन हैं। फ़ोटो और चेकलिस्ट के जवाब इसी फ़ोन पर रखे जा रहे हैं, इंटरनेट आते ही भेज दिए जाएँगे।",
     backOnline: "इंटरनेट वापस आ गया। जो बाकी था, भेजा जा रहा है।",
+    draftRestored: "आपने पहले जो लिखा था, वह वापस भर दिया है।",
     serverError: "हमारी तरफ़ से कुछ गड़बड़ हुई। एक मिनट बाद फिर से कोशिश करें।",
     retry: "फिर से कोशिश करें",
     stepOf: (n: number, total: number) => `${total} में से चरण ${n}`,
@@ -133,6 +134,10 @@ export const hi: Strings = {
     filterAll: "सभी",
     noMatches: "कोई कार नहीं मिली।",
     shareAgain: "WhatsApp पर भेजें",
+    resumeTitle: "जहाँ छोड़ा था, वहीं से शुरू करें",
+    continueStep: (step: string) => `जारी रखें: ${step}`,
+    carCount: (n: number) => (n === 1 ? "1 कार" : `${n} कारें`),
+    stepsDone: (n: number) => `4 में से ${n} काम पूरे`,
     progress: {
       photos: (done: number, total: number) => `फ़ोटो: ${total} में से ${done}`,
       checking: "नुकसान के नोट: AI जाँच का इंतज़ार",
@@ -221,6 +226,8 @@ export const hi: Strings = {
     deleteAction: "कार डिलीट करें",
     deleteFailed: "कार डिलीट नहीं हो पाई। इंटरनेट देखकर फिर से कोशिश करें।",
     deleted: "कार डिलीट हो गई।",
+    saved: "कार की जानकारी सेव हो गई।",
+    added: "कार जुड़ गई। अब फ़ोटो लें।",
     stepsDone: (n: number) => `4 में से ${n} काम पूरे`,
     nextHint: {
       photos: "आप बताए गए 20 फ़ोटो लेंगे (12 ज़रूरी)। कार अच्छी रोशनी में रखें।",

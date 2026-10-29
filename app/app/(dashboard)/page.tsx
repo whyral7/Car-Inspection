@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { LinkButton, StickyBar } from "@/components/ui";
-import { CarIcon, CreditIcon, PlusIcon } from "@/components/icons";
+import { FlashToast } from "@/components/flash-toast";
+import { CarIcon, PlusIcon } from "@/components/icons";
 import { InstallPrompt } from "@/components/install-prompt";
+import { Card, EmptyState, LinkButton, PageHeader, StickyBar } from "@/components/ui";
 import { PHOTO, STORAGE_BUCKETS } from "@/lib/config";
 import { carTitle, formatDateTime } from "@/lib/format";
 import { getT } from "@/lib/i18n.server";
-import { inspectionState } from "@/lib/inspection";
+import { inspectionState, stepHref } from "@/lib/inspection";
 import { smallPhotoPath } from "@/lib/photos/angles";
 import { getCurrentProfile } from "@/lib/profile";
 import { reportUrl } from "@/lib/report/share";
@@ -19,9 +19,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t.dashboard.myCars };
 }
 
-export default async function AppHome({ searchParams }: PageProps<"/app">) {
+export default async function AppHome() {
   const t = await getT();
-  const { deleted } = await searchParams;
   const { supabase, profile } = await getCurrentProfile();
   // RLS limits every row to the user's own cars.
   const { data: carRows, error } = await supabase.from("cars").select("id, reg_number, make, model, variant, year, status, created_at").order("created_at", { ascending: false });
@@ -85,6 +84,7 @@ export default async function AppHome({ searchParams }: PageProps<"/app">) {
       status: car.status,
       progress,
       attention: state.toReview > 0,
+      next: car.status === "published" ? null : { step: state.next, href: stepHref(car.id, state.next), stepsDone: state.stepsDone },
       thumbUrl: thumbs.get(smallPhotoPath(car.id, "front")) ?? null,
       score: state.score && !state.score.provisional ? { text: scoreText!, band: state.score.band } : null,
       share: url ? { url, message: t.report.shareMessage(title || car.reg_number, car.reg_number, scoreText ?? "", url) } : null,
@@ -94,74 +94,44 @@ export default async function AppHome({ searchParams }: PageProps<"/app">) {
   const noCredits = profile.credits < 1;
 
   return (
-    <div className="flex flex-col gap-4">
-      {deleted === "1" && (
-        <p role="status" className="rounded-control bg-ink px-4 py-3 text-small font-medium text-white">
-          {t.car.deleted}
-        </p>
-      )}
+    <div className="flex flex-1 flex-col gap-6">
+      <FlashToast param="deleted" message={t.car.deleted} />
+      <PageHeader title={t.dashboard.myCars} meta={cards.length > 0 ? t.dashboard.carCount(cards.length) : undefined} />
 
-      {noCredits ? (
-        <section className="flex flex-col gap-3 rounded-card border border-warning-200 bg-warning-50 p-4">
-          <p className="font-semibold text-warning-800">{t.dashboard.noCreditsTitle}</p>
-          <p className="text-small text-warning-800">{t.dashboard.noCreditsBody}</p>
-          <LinkButton href="/app/credits" className="min-h-11">
+      {noCredits && (
+        <Card tone="warning" className="flex flex-col gap-4">
+          <div>
+            <p className="font-semibold text-warning-800">{t.dashboard.noCreditsTitle}</p>
+            <p className="mt-1 text-small text-warning-800">{t.dashboard.noCreditsBody}</p>
+          </div>
+          <LinkButton href="/app/credits" size="sm" className="self-start">
             {t.profile.buy}
           </LinkButton>
-        </section>
-      ) : (
-        <Link href="/app/credits" className="flex min-h-14 items-center gap-3 rounded-card border border-line bg-surface px-4 py-2 active:bg-canvas">
-          <CreditIcon className="text-brand-700" />
-          <span className="min-w-0 flex-1">
-            <span className="font-semibold">{t.dashboard.creditsLeft(profile.credits)}</span>
-            <span className="block text-small text-ink-muted">{t.dashboard.creditsHint}</span>
-          </span>
-          <span className="text-small font-semibold text-brand-700">{t.dashboard.buyMore}</span>
-        </Link>
+        </Card>
       )}
 
       <InstallPrompt eligible={anyPublished} />
 
-      <h1 className="text-title font-bold">{t.dashboard.myCars}</h1>
-
       {cards.length === 0 ? (
-        <div className="flex flex-col items-center rounded-card border border-dashed border-line bg-surface px-6 py-10 text-center">
-          <span className="flex size-16 items-center justify-center rounded-full bg-brand-50 text-brand-700">
-            <CarIcon size={32} />
-          </span>
-          <h2 className="mt-4 text-heading font-semibold">{t.dashboard.emptyTitle}</h2>
-          <p className="mt-1 max-w-xs text-ink-muted">{t.dashboard.emptyBody}</p>
-          <ol className="mt-4 flex flex-col gap-1 text-left text-small text-ink-muted">
+        <EmptyState icon={<CarIcon size={24} />} title={t.dashboard.emptyTitle} body={t.dashboard.emptyBody}>
+          <ol className="flex flex-col gap-2 text-left">
             {t.dashboard.emptySteps.map((step, i) => (
-              <li key={step}>
-                <span className="font-semibold text-brand-800">{i + 1}.</span> {step}
+              <li key={step} className="flex items-center gap-4 rounded-control bg-canvas px-4 py-2 text-small">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-700 text-caption font-semibold text-white">{i + 1}</span>
+                {step}
               </li>
             ))}
           </ol>
-          <LinkButton href="/app/cars/new" className="mt-6 w-full max-w-xs">
-            <PlusIcon />
-            {t.dashboard.addCar}
-          </LinkButton>
-        </div>
+        </EmptyState>
       ) : (
-        <>
-          <CarList cars={cards} />
-          {/* Sticky once the list is long enough to scroll; otherwise it simply follows the list. */}
-          {cards.length > 3 ? (
-            <StickyBar>
-              <LinkButton href="/app/cars/new">
-                <PlusIcon />
-                {t.dashboard.addCar}
-              </LinkButton>
-            </StickyBar>
-          ) : (
-            <LinkButton href="/app/cars/new">
-              <PlusIcon />
-              {t.dashboard.addCar}
-            </LinkButton>
-          )}
-        </>
+        <CarList cars={cards} />
       )}
+
+      <StickyBar>
+        <LinkButton href="/app/cars/new" icon={<PlusIcon />}>
+          {t.dashboard.addCar}
+        </LinkButton>
+      </StickyBar>
     </div>
   );
 }

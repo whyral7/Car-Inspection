@@ -44,5 +44,5 @@ export async function saveProfile(formData: FormData): Promise<OnboardingState> 
   }
 
   // First-time setup goes on to My cars; editing goes back to the profile.
-  redirect(isProfileComplete(profile) ? "/app/profile" : "/app");
+  redirect(isProfileComplete(profile) ? "/app/profile?saved=1" : "/app");
 }

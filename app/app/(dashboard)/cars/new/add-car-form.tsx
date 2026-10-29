@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
-import { Button } from "@/components/ui";
+import { useEffect, useRef, useState, useTransition, type FormEvent, type ReactNode } from "react";
 import { CarFields, carFormValues } from "@/components/car-fields";
-import { FormError, focusFirstError } from "@/components/ui";
 import { useT } from "@/components/i18n-provider";
 import { CheckIcon, InfoIcon, PencilIcon, SearchIcon } from "@/components/icons";
 import { Plate } from "@/components/plate";
+import { Button, Card, FieldMessage, FormError, StickyBar, TextButton, focusFirstError, useToast } from "@/components/ui";
+import { clearDraft, useFormDraft } from "@/lib/draft";
 import { isFuel, isTransmission } from "@/lib/cars";
 import { formatDate } from "@/lib/format";
 import { errorText } from "@/lib/i18n";
@@ -17,12 +17,22 @@ import { createCar, lookupRegNumber, type CarFormValues, type CreateCarState, ty
 
 type Lookup = Exclude<LookupState, { error: string }>;
 
-const notices = (t: Strings): Record<Lookup["status"], { text: string; tone: string } | null> => ({
+const notices = (t: Strings): Record<Lookup["status"], string | null> => ({
   found: null,
-  not_found: { text: t.cars.notFound, tone: "border-warning-200 bg-warning-50 text-warning-800" },
-  unavailable: { text: t.cars.unavailable, tone: "border-warning-200 bg-warning-50 text-warning-800" },
+  not_found: t.cars.notFound,
+  unavailable: t.cars.unavailable,
   manual: null,
 });
+
+/** Amber note with an icon: something to know, not an error. */
+function Notice({ children }: { children: ReactNode }) {
+  return (
+    <p className="flex animate-rise-in items-start gap-2 rounded-control bg-warning-50 px-4 py-3 text-small text-warning-800">
+      <InfoIcon size={18} className="mt-px" />
+      <span>{children}</span>
+    </p>
+  );
+}
 
 export function AddCarForm() {
   const t = useT();
@@ -59,9 +69,9 @@ export function AddCarForm() {
 
   const errorId = regError ? "reg_number-error" : undefined;
   return (
-    <form onSubmit={onRegSubmit} className="mt-6 flex flex-col gap-4" noValidate>
-      <div>
-        <label htmlFor="reg_number" className="mb-1.5 block text-small font-semibold text-ink">
+    <form onSubmit={onRegSubmit} className="flex flex-1 flex-col gap-6" noValidate>
+      <Card className="flex flex-col gap-4">
+        <label htmlFor="reg_number" className="text-small font-medium">
           {t.cars.regNumber}
         </label>
         {/* Styled like a number plate, so it's obvious what to type. */}
@@ -84,34 +94,24 @@ export function AddCarForm() {
           // Room for pasted spaces and hyphens; they're stripped as the user types.
           maxLength={20}
           autoFocus
-          className="block min-h-16 w-full rounded-control border-2 border-ink bg-surface px-4 text-center text-title font-bold tracking-[0.12em] text-ink uppercase placeholder:font-semibold placeholder:text-ink-subtle focus:outline-none focus:ring-4 focus:ring-brand-100 aria-invalid:border-danger-600"
+          className="block min-h-16 w-full rounded-control bg-surface px-4 text-center text-title tracking-[0.12em] text-ink uppercase ring-2 ring-ink transition-shadow ring-inset placeholder:font-semibold placeholder:tracking-[0.12em] placeholder:text-line-strong focus:shadow-focus focus:outline-none aria-invalid:ring-danger-700"
         />
-        {regError ? (
-          <p id={errorId} className="mt-1.5 text-small font-medium text-danger-700">
-            {regError}
-          </p>
-        ) : (
-          <p id="reg_number-hint" className="mt-1.5 text-small text-ink-muted">
-            {t.cars.regHint}
-          </p>
-        )}
-      </div>
-      <Button type="submit" loading={looking === "rc"} disabled={looking !== null}>
-        {looking === "rc" ? (
-          t.cars.lookingUp
-        ) : (
-          <>
-            <SearchIcon size={20} />
-            {t.cars.findDetails}
-          </>
-        )}
-      </Button>
-      <div className="flex flex-col items-center">
+        <div className="-mt-2">
+          {regError ? <FieldMessage id={errorId} error={regError} /> : <FieldMessage hint={<span id="reg_number-hint">{t.cars.regHint}</span>} />}
+        </div>
+      </Card>
+      <div className="flex flex-col items-center gap-1 text-center">
         <p className="text-small text-ink-muted">{t.cars.noRc}</p>
-        <Button type="button" variant="ghost" loading={looking === "manual"} disabled={looking !== null} onClick={() => void runLookup(true)} className="min-h-11 px-3">
+        <TextButton onClick={() => void runLookup(true)} disabled={looking !== null}>
+          <PencilIcon size={18} />
           {t.cars.enterManually}
-        </Button>
+        </TextButton>
       </div>
+      <StickyBar>
+        <Button type="submit" loading={looking === "rc"} disabled={looking !== null && looking !== "rc"} icon={<SearchIcon size={20} />}>
+          {looking === "rc" ? t.cars.lookingUp : t.cars.findDetails}
+        </Button>
+      </StickyBar>
     </form>
   );
 }
@@ -123,8 +123,11 @@ function CarDetailsStep({ lookup, onChangeReg }: { lookup: Lookup; onChangeReg: 
   const [editing, setEditing] = useState(lookup.status !== "found");
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
+  const toast = useToast();
   const notice = notices(t)[lookup.status];
   const errors = state.fieldErrors ?? {};
+  const draftKey = `car-new:${lookup.regNumber}`;
+  useFormDraft(editing ? draftKey : null, formRef, () => toast.show({ tone: "info", message: t.common.draftRestored }));
 
   // Manual entry starts with an empty form, so put the cursor in it.
   useEffect(() => {
@@ -136,6 +139,7 @@ function CarDetailsStep({ lookup, onChangeReg }: { lookup: Lookup; onChangeReg: 
       try {
         // On success the action redirects, so a returned value means there's something to show.
         const result = (await createCar({ ...values, reg_number: lookup.regNumber, rc_raw: lookup.rcRaw })) ?? {};
+        if (!result.formError && !result.fieldErrors) clearDraft(draftKey);
         setState(result);
         if (result.fieldErrors) {
           setEditing(true);
@@ -158,39 +162,46 @@ function CarDetailsStep({ lookup, onChangeReg }: { lookup: Lookup; onChangeReg: 
   }
 
   return (
-    <div className="mt-6 flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3 rounded-card border border-line bg-surface p-4">
-        <div className="min-w-0">
-          <p className="mb-1 text-small text-ink-muted">{t.cars.regNumber}</p>
+    <div className="flex flex-1 flex-col gap-6">
+      <Card className="flex items-center justify-between gap-4">
+        <div className="flex min-w-0 flex-col gap-2">
+          <p className="text-small text-ink-muted">{t.cars.regNumber}</p>
           <Plate reg={lookup.regNumber} />
         </div>
-        <Button type="button" variant="secondary" onClick={onChangeReg} disabled={isPending} className="min-h-11 shrink-0 px-4 text-small">
+        <Button variant="secondary" size="sm" onClick={onChangeReg} disabled={isPending} className="shrink-0">
           {t.cars.change}
         </Button>
-      </div>
+      </Card>
 
       {lookup.existingCarId && (
-        <p className="flex items-start gap-2 rounded-control border border-warning-200 bg-warning-50 px-4 py-3 text-small text-warning-800">
-          <InfoIcon size={18} className="mt-px" />
-          <span>
-            {t.cars.duplicate}{" "}
-            <Link href={`/app/cars/${lookup.existingCarId}`} className="font-semibold underline underline-offset-2">
-              {t.cars.openExisting}
-            </Link>
-          </span>
-        </p>
+        <Notice>
+          {t.cars.duplicate}{" "}
+          <Link href={`/app/cars/${lookup.existingCarId}`} className="font-semibold underline underline-offset-2">
+            {t.cars.openExisting}
+          </Link>
+        </Notice>
       )}
-      {notice && <p className={`rounded-control border px-4 py-3 text-small ${notice.tone}`}>{notice.text}</p>}
+      {notice && <Notice>{notice}</Notice>}
 
       {!editing ? (
         <RcSummary values={lookup.values} pending={isPending} onConfirm={() => save(lookup.values)} onEdit={() => setEditing(true)} error={state.formError} />
       ) : (
-        <form ref={formRef} onSubmit={onSubmit} onInput={(e) => clearFieldError((e.target as HTMLInputElement).name)} className="flex flex-col gap-5" noValidate>
-          <CarFields values={lookup.values} errors={errors} />
+        <form
+          ref={formRef}
+          onSubmit={onSubmit}
+          onInput={(e) => clearFieldError((e.target as HTMLInputElement).name)}
+          className="flex flex-1 flex-col gap-6"
+          noValidate
+        >
+          <Card className="flex flex-col gap-6">
+            <CarFields values={lookup.values} errors={errors} />
+          </Card>
           <FormError message={state.formError} />
-          <Button type="submit" loading={isPending}>
-            {isPending ? t.cars.saving : t.cars.save}
-          </Button>
+          <StickyBar>
+            <Button type="submit" loading={isPending}>
+              {isPending ? t.cars.saving : t.cars.save}
+            </Button>
+          </StickyBar>
         </form>
       )}
     </div>
@@ -208,28 +219,33 @@ function RcSummary({ values, pending, onConfirm, onEdit, error }: { values: CarF
   ].filter(Boolean);
 
   return (
-    <section className="flex flex-col gap-3 rounded-card border border-brand-200 bg-surface p-4">
-      <p className="flex items-center gap-2 text-small font-semibold text-brand-800">
-        <CheckIcon size={18} />
-        {t.cars.foundShort}
-      </p>
-      <div>
-        <p className="text-title font-bold">{title}</p>
-        {facts.length > 0 && <p className="text-ink-muted">{facts.join(" · ")}</p>}
-        {values.insurance_valid_upto && (
-          <p className="text-small text-ink-muted">
-            {t.cars.insurance}: {formatDate(values.insurance_valid_upto)}
-          </p>
-        )}
-      </div>
+    <>
+      <Card className="flex animate-rise-in flex-col gap-4">
+        <p className="flex items-center gap-2 text-small font-semibold text-success-700">
+          <span className="flex size-6 items-center justify-center rounded-full bg-success-50">
+            <CheckIcon size={16} />
+          </span>
+          {t.cars.foundShort}
+        </p>
+        <div className="flex flex-col gap-1">
+          <p className="text-title">{title}</p>
+          {facts.length > 0 && <p className="text-ink-muted">{facts.join(" · ")}</p>}
+          {values.insurance_valid_upto && (
+            <p className="text-small text-ink-muted">
+              {t.cars.insurance}: {formatDate(values.insurance_valid_upto)}
+            </p>
+          )}
+        </div>
+      </Card>
       <FormError message={error} />
-      <Button onClick={onConfirm} loading={pending}>
-        {pending ? t.cars.saving : t.cars.looksRight}
-      </Button>
-      <Button variant="secondary" onClick={onEdit} disabled={pending}>
-        <PencilIcon size={18} />
-        {t.cars.editFound}
-      </Button>
-    </section>
+      <StickyBar>
+        <Button onClick={onConfirm} loading={pending} icon={<CheckIcon size={20} />}>
+          {pending ? t.cars.saving : t.cars.looksRight}
+        </Button>
+        <Button variant="ghost" onClick={onEdit} disabled={pending} icon={<PencilIcon size={18} />}>
+          {t.cars.editFound}
+        </Button>
+      </StickyBar>
+    </>
   );
 }

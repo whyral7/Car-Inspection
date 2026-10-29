@@ -32,7 +32,7 @@ export async function updateCar(carId: string, input: CarFormValues): Promise<Up
   const { data, error } = await supabase.from("cars").update(parsed.data).eq("id", carId).select("id");
   if (error || !data?.length) return { formError: t.common.somethingWrong };
 
-  redirect(`/app/cars/${carId}`);
+  redirect(`/app/cars/${carId}?saved=1`);
 }
 
 /**

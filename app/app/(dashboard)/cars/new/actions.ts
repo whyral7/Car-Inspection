@@ -106,5 +106,5 @@ export async function createCar(input: CarFormValues & { reg_number: string; rc_
     .single();
   if (error) return { formError: t.common.somethingWrong };
 
-  redirect(`/app/cars/${data.id}`);
+  redirect(`/app/cars/${data.id}?added=1`);
 }

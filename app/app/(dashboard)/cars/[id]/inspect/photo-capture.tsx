@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { AngleHint } from "@/components/angle-hint";
-import { BackLink, Button, LinkButton, StickyBar, buttonClass } from "@/components/ui";
 import { useT } from "@/components/i18n-provider";
-import { AlertIcon, ArrowLeftIcon, CameraIcon, CheckIcon, ChevronRightIcon, CloudUploadIcon, ImageIcon, Spinner } from "@/components/icons";
+import { AlertIcon, ArrowLeftIcon, ArrowRightIcon, CameraIcon, CheckIcon, ChevronLeftIcon, CloudUploadIcon, ImageIcon, Spinner } from "@/components/icons";
+import { RememberStep } from "@/components/remember-step";
+import { Badge, Button, Card, LinkButton, ProgressBar, StepHeader, StickyBar, buttonClass, useToast } from "@/components/ui";
 import { PHOTO } from "@/lib/config";
 import { compressImage } from "@/lib/images/compress";
 import { checkPhoto, type PhotoIssue } from "@/lib/images/quality";
@@ -66,8 +67,7 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
   const [view, setView] = useState<number | null>(startAt ?? (initialPhotos.length === 0 ? 0 : null));
   const viewRef = useRef(view);
   const [pickError, setPickError] = useState<string | null>(null);
-  // The angle that was just saved, for the "Front saved · Retake" note on the next screen.
-  const [justSaved, setJustSaved] = useState<AngleKey | null>(null);
+  const toast = useToast();
 
   // Compressed photos not yet on the server, so "Try again" never needs the camera. `accepted` is
   // false while the user decides about a photo the quick check flagged.
@@ -157,7 +157,6 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
   function go(next: number | null) {
     if (advanceTimer.current) clearTimeout(advanceTimer.current);
     setPickError(null);
-    setJustSaved(null);
     setView(next);
   }
 
@@ -178,8 +177,9 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
     advanceTimer.current = setTimeout(() => {
       if (viewRef.current !== index) return;
       setPickError(null);
-      setJustSaved(key);
       setView(index < ANGLES.length - 1 ? index + 1 : null);
+      // "Front saved · Retake", in case the auto-advance was too quick.
+      toast.show({ tone: "success", message: t.photos.justSaved(t.photos.angles[key].label), action: { label: t.photos.retake, onClick: () => go(index) } });
     }, ADVANCE_MS);
   }
 
@@ -192,7 +192,7 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
     const key = angle.key;
     const previous = slots[key];
     setPickError(null);
-    setJustSaved(null);
+    toast.dismiss();
     if (file.type && !file.type.startsWith("image/")) {
       setPickError(t.photos.errors.notImage);
       return;
@@ -243,7 +243,6 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
 
   if (view !== null) {
     const angle = ANGLES[view];
-    const saved = justSaved ? ANGLES.find((a) => a.key === justSaved)! : null;
     return (
       <GuideScreen
         key={angle.key}
@@ -252,8 +251,6 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
         progress={progress}
         waiting={waiting}
         pickError={pickError}
-        justSaved={saved}
-        onRetakeSaved={() => saved && go(ANGLES.indexOf(saved))}
         onPick={(e) => onPick(angle, e)}
         onKeep={() => void accept(angle)}
         onRetry={() => void upload(angle.key)}
@@ -271,22 +268,28 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
   const requiredCovered = ANGLES.filter((a) => a.required && covered.includes(a.key)).length;
   const requiredDone = requiredCovered === progress.requiredTotal;
 
+  const stepLabels = [t.car.stepPhotos, t.car.stepFindings, t.car.stepChecklist, t.car.stepReport];
   return (
-    <div className="flex flex-col gap-4">
-      <BackLink href={`/app/cars/${carId}`}>{t.photos.backToCar}</BackLink>
-
-      <header>
-        <h1 className="text-title font-bold">{t.photos.title}</h1>
-        <p className="text-small text-ink-muted">
-          <span className="font-semibold tracking-wider">{regNumber}</span>
-          {carTitle && ` · ${carTitle}`}
-        </p>
-      </header>
+    <div className="flex flex-1 flex-col gap-6">
+      <RememberStep carId={carId} step="photos" />
+      <StepHeader
+        step={1}
+        labels={stepLabels}
+        stepLabel={t.common.stepOf(1, 4)}
+        back={{ href: `/app/cars/${carId}`, label: t.photos.backToCar }}
+        title={t.photos.title}
+        meta={
+          <>
+            <span className="font-semibold tracking-wider text-ink tabular">{regNumber}</span>
+            {carTitle && ` · ${carTitle}`}
+          </>
+        }
+      />
 
       <ProgressCard progress={progress} />
       {waiting > 0 && <WaitingNote count={waiting} />}
 
-      <ul className="grid grid-cols-3 gap-2">
+      <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-4">
         {ANGLES.map((angle, i) => (
           <li key={angle.key}>
             <Tile angle={angle} slot={slots[angle.key]} onOpen={() => go(i)} />
@@ -299,20 +302,19 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
           <>
             <LinkButton href={`/app/cars/${carId}/findings`}>
               {t.car.reviewFindings}
-              <ChevronRightIcon />
+              <ArrowRightIcon size={20} />
             </LinkButton>
             {nextAngle && (
-              <button type="button" onClick={() => go(nextIndex)} className="min-h-11 text-small font-semibold text-brand-700">
+              <Button variant="ghost" size="sm" onClick={() => go(nextIndex)}>
                 {t.photos.optionalNext(t.photos.angles[nextAngle.key].label)}
-              </button>
+              </Button>
             )}
           </>
         ) : (
           <>
             <p className="text-center text-small text-ink-muted">{t.photos.missingRequired(progress.requiredTotal - requiredCovered)}</p>
             {nextAngle && (
-              <Button onClick={() => go(nextIndex)}>
-                <CameraIcon />
+              <Button onClick={() => go(nextIndex)} icon={<CameraIcon />}>
                 {t.photos.continueWith(t.photos.angles[nextAngle.key].label)}
               </Button>
             )}
@@ -327,24 +329,22 @@ function ProgressCard({ progress }: { progress: ReturnType<typeof photoProgress>
   const t = useT();
   const label = t.photos.progress(progress.done, progress.total);
   return (
-    <section className="rounded-card border border-line bg-surface p-4" aria-label={label}>
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-        <p className="text-title font-bold">{label}</p>
-        <p className={`text-small font-semibold ${progress.allRequiredDone ? "text-brand-800" : "text-ink-muted"}`}>
+    <Card className="flex flex-col gap-4" aria-label={label}>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+        <p className="text-title tabular">{label}</p>
+        <Badge tone={progress.allRequiredDone ? "success" : "warning"} dot className="tabular">
           {t.photos.requiredProgress(progress.requiredDone, progress.requiredTotal)}
-        </p>
+        </Badge>
       </div>
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-sunken" role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={progress.total} aria-valuenow={progress.done}>
-        <div className="h-full rounded-full bg-brand-600 transition-[width]" style={{ width: `${(progress.done / progress.total) * 100}%` }} />
-      </div>
-    </section>
+      <ProgressBar value={progress.done} max={progress.total} label={label} />
+    </Card>
   );
 }
 
 function WaitingNote({ count }: { count: number }) {
   const t = useT();
   return (
-    <p role="status" className="flex items-start gap-2 rounded-control border border-line bg-surface px-4 py-3 text-small text-ink">
+    <p role="status" className="flex animate-rise-in items-start gap-2 rounded-control bg-brand-50 px-4 py-3 text-small text-brand-900">
       <CloudUploadIcon size={18} className="mt-px text-brand-700" />
       {t.photos.waitingCount(count)}
     </p>
@@ -356,16 +356,15 @@ function Tile({ angle, slot, onOpen }: { angle: Angle; slot: Slot | undefined; o
   const [thumbBroken, setThumbBroken] = useState(false);
   const { label } = t.photos.angles[angle.key];
   const status = slot?.status;
-  const border =
+  // Ring colour says what needs doing: red for a problem, amber for a required photo still to take.
+  const ring =
     status === "failed" || status === "review"
-      ? "border-danger-600"
-      : status === "waiting"
-        ? "border-line-strong"
-        : status
-          ? "border-line"
-          : angle.required
-            ? "border-warning-500"
-            : "border-dashed border-line";
+      ? "ring-2 ring-danger-600"
+      : status
+        ? "ring-1 ring-line"
+        : angle.required
+          ? "ring-2 ring-warning-500/70"
+          : "ring-1 ring-line";
   const statusText = status ? t.photos.status[status] : angle.required ? t.photos.required : t.photos.optional;
   const src = (!thumbBroken && slot?.thumbUrl) || slot?.url;
 
@@ -374,29 +373,29 @@ function Tile({ angle, slot, onOpen }: { angle: Angle; slot: Slot | undefined; o
       type="button"
       onClick={onOpen}
       aria-label={`${angle.number}. ${label}. ${statusText}`}
-      className={`block w-full overflow-hidden rounded-control border-2 bg-surface text-left active:bg-canvas focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 ${border}`}
+      className={`block w-full overflow-hidden rounded-card bg-surface text-left shadow-card transition-transform duration-150 ring-inset active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 ${ring}`}
     >
-      <div className="relative aspect-square bg-sunken">
+      <div className="relative aspect-square bg-canvas">
         {src ? (
           // eslint-disable-next-line @next/next/no-img-element -- private signed URL or local blob, not optimisable
           <img src={src} alt="" loading="lazy" decoding="async" onError={() => setThumbBroken(true)} className="size-full object-cover" />
         ) : (
           <AngleHint angle={angle} className="size-full p-2 text-ink-subtle" />
         )}
-        <span className="absolute top-1 left-1 flex size-6 items-center justify-center rounded-full bg-ink/75 text-caption font-semibold text-white">{angle.number}</span>
+        <span className="absolute top-2 left-2 flex size-6 items-center justify-center rounded-full bg-ink/70 text-caption font-semibold text-white tabular">{angle.number}</span>
         <TileBadge status={status} />
       </div>
-      <p className="line-clamp-2 min-h-10 px-1.5 py-1.5 text-caption leading-tight font-medium text-ink">{label}</p>
+      <p className="line-clamp-2 min-h-12 px-2 py-2 text-caption font-medium text-ink">{label}</p>
     </button>
   );
 }
 
 function TileBadge({ status }: { status: SlotStatus | undefined }) {
   if (!status) return null;
-  const base = "absolute top-1 right-1 flex size-6 items-center justify-center rounded-full text-white";
+  const base = "absolute top-2 right-2 flex size-6 animate-pop items-center justify-center rounded-full text-white shadow-card";
   if (status === "saved")
     return (
-      <span className={`${base} bg-brand-700`}>
+      <span className={`${base} bg-success-600`}>
         <CheckIcon size={14} strokeWidth={3} />
       </span>
     );
@@ -425,8 +424,6 @@ type GuideProps = {
   progress: ReturnType<typeof photoProgress>;
   waiting: number;
   pickError: string | null;
-  justSaved: Angle | null;
-  onRetakeSaved: () => void;
   onPick: (e: ChangeEvent<HTMLInputElement>) => void;
   onKeep: () => void;
   onRetry: () => void;
@@ -435,7 +432,7 @@ type GuideProps = {
   onGrid: () => void;
 };
 
-function GuideScreen({ angle, slot, progress, waiting, pickError, justSaved, onRetakeSaved, onPick, onKeep, onRetry, onPrevious, onNext, onGrid }: GuideProps) {
+function GuideScreen({ angle, slot, progress, waiting, pickError, onPick, onKeep, onRetry, onPrevious, onNext, onGrid }: GuideProps) {
   const t = useT();
   const { label, tip } = t.photos.angles[angle.key];
   const working = slot?.status === "processing";
@@ -444,84 +441,90 @@ function GuideScreen({ angle, slot, progress, waiting, pickError, justSaved, onR
   const isLast = angle.number === ANGLES.length;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-x-3">
-        <button type="button" onClick={onGrid} className="-ml-1 inline-flex min-h-11 items-center gap-1.5 px-1 text-small font-semibold text-brand-700">
-          <ArrowLeftIcon size={18} />
-          {t.photos.grid} ({progress.done}/{progress.total})
-        </button>
-        <p className="text-small text-ink-muted">{t.photos.stepOf(angle.number, ANGLES.length)}</p>
-      </div>
-
-      {justSaved && (
-        <p role="status" className="flex animate-pop items-center gap-2 rounded-control bg-brand-50 px-3 py-2 text-small font-medium text-brand-900">
-          <CheckIcon size={18} />
-          <span className="flex-1">{t.photos.justSaved(t.photos.angles[justSaved.key].label)}</span>
-          <button type="button" onClick={onRetakeSaved} className="min-h-9 px-2 font-semibold underline underline-offset-2">
-            {t.photos.retake}
+    <div className="flex flex-1 flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-x-4">
+          <button
+            type="button"
+            onClick={onGrid}
+            className="-ml-2 inline-flex min-h-11 items-center gap-2 rounded-chip px-2 text-small font-semibold text-brand-700 transition-colors hover:bg-brand-50"
+          >
+            <ArrowLeftIcon size={18} />
+            {t.photos.grid} <span className="tabular">({progress.done}/{progress.total})</span>
           </button>
-        </p>
-      )}
-      {waiting > 0 && !justSaved && <WaitingNote count={waiting} />}
-
-      <div>
-        <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-title font-bold">{label}</h1>
-          <span className={`rounded-chip px-2 py-0.5 text-caption font-semibold ${angle.required ? "bg-warning-50 text-warning-800" : "bg-sunken text-ink"}`}>
-            {angle.required ? t.photos.required : t.photos.optional}
-          </span>
+          <p className="text-small text-ink-muted tabular">{t.photos.stepOf(angle.number, ANGLES.length)}</p>
         </div>
-        <p className="mt-1 text-ink-muted">{tip}</p>
+        <ProgressBar value={angle.number} max={ANGLES.length} label={t.photos.stepOf(angle.number, ANGLES.length)} size="sm" />
       </div>
 
-      <div className="relative aspect-[4/3] overflow-hidden rounded-card border border-line bg-surface">
+      {waiting > 0 && <WaitingNote count={waiting} />}
+
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <h1 className="text-title">{label}</h1>
+          <Badge tone={angle.required ? "warning" : "neutral"}>{angle.required ? t.photos.required : t.photos.optional}</Badge>
+        </div>
+        <p className="text-ink-muted">{tip}</p>
+      </div>
+
+      <div className="relative aspect-[4/3] overflow-hidden rounded-card bg-surface shadow-card">
         {slot?.url ? (
           // eslint-disable-next-line @next/next/no-img-element -- private signed URL or local blob, not optimisable
-          <img src={slot.url} alt={label} decoding="async" className="size-full bg-ink object-contain" />
+          <img src={slot.url} alt={label} decoding="async" className="size-full animate-fade-in bg-ink object-contain" />
         ) : (
           <>
-            <AngleHint angle={angle} className="size-full p-6 text-ink-subtle" />
-            <p className="absolute inset-x-0 bottom-2 text-center text-caption text-ink-muted">{t.photos.noPhotoYet}</p>
+            <AngleHint angle={angle} className="size-full p-8 text-ink-subtle" />
+            <p className="absolute inset-x-0 bottom-4 text-center text-caption text-ink-subtle">{t.photos.noPhotoYet}</p>
           </>
         )}
       </div>
 
       <div aria-live="polite" className="flex flex-col gap-2 empty:hidden">
         <SlotStatusLine slot={slot} onRetry={onRetry} />
-        {pickError && <p className="font-medium text-danger-700">{pickError}</p>}
+        {pickError && (
+          <p className="flex items-start gap-2 text-small font-medium text-danger-700">
+            <AlertIcon size={18} className="mt-px" />
+            {pickError}
+          </p>
+        )}
       </div>
 
-      {reviewing ? (
-        <div className="flex flex-col gap-2">
-          <PickButton variant="primary" capture disabled={false} onPick={onPick}>
-            <CameraIcon />
-            {t.photos.retake}
-          </PickButton>
-          <Button variant="secondary" onClick={onKeep}>
-            {t.photos.useAnyway}
-          </Button>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-1">
-          <PickButton variant={hasPhoto ? "secondary" : "primary"} capture disabled={working} onPick={onPick}>
-            <CameraIcon />
-            {hasPhoto ? t.photos.retake : t.photos.takePhoto}
-          </PickButton>
-          <PickButton variant="link" disabled={working} onPick={onPick}>
-            <ImageIcon size={18} />
-            {t.photos.chooseFromGallery}
-          </PickButton>
-        </div>
+      {!reviewing && (
+        <PickButton variant="link" disabled={working} onPick={onPick}>
+          <ImageIcon size={18} />
+          {t.photos.chooseFromGallery}
+        </PickButton>
       )}
 
-      <div className="grid grid-cols-2 gap-2">
-        <Button variant="secondary" onClick={onPrevious} disabled={angle.number === 1}>
-          {t.photos.previous}
-        </Button>
-        <Button variant={hasPhoto && !reviewing ? "primary" : "ghost"} onClick={onNext}>
-          {isLast ? t.photos.grid : hasPhoto ? t.photos.next : angle.required ? t.photos.skipForNow : t.photos.skip}
-        </Button>
-      </div>
+      <StickyBar>
+        {reviewing ? (
+          <>
+            <PickButton variant="primary" capture disabled={false} onPick={onPick}>
+              <CameraIcon />
+              {t.photos.retake}
+            </PickButton>
+            <Button variant="secondary" onClick={onKeep}>
+              {t.photos.useAnyway}
+            </Button>
+          </>
+        ) : (
+          <>
+            <PickButton variant={hasPhoto ? "secondary" : "primary"} capture disabled={working} onPick={onPick}>
+              <CameraIcon />
+              {hasPhoto ? t.photos.retake : t.photos.takePhoto}
+            </PickButton>
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="ghost" size="sm" onClick={onPrevious} disabled={angle.number === 1} icon={<ChevronLeftIcon size={18} />}>
+                {t.photos.previous}
+              </Button>
+              <Button variant={hasPhoto ? "primary" : "ghost"} size="sm" onClick={onNext}>
+                {isLast ? t.photos.grid : hasPhoto ? t.photos.next : angle.required ? t.photos.skipForNow : t.photos.skip}
+                <ArrowRightIcon size={18} />
+              </Button>
+            </div>
+          </>
+        )}
+      </StickyBar>
     </div>
   );
 }
@@ -536,7 +539,7 @@ function SlotStatusLine({ slot, onRetry }: { slot: Slot | undefined; onRetry: ()
       return <StatusRow icon={<Spinner />}>{slot.retry ? t.photos.status.retrying(slot.retry, PHOTO.uploadRetries) : t.photos.status.uploading}</StatusRow>;
     case "saved":
       return (
-        <StatusRow icon={<CheckIcon size={18} />} className="text-brand-800">
+        <StatusRow icon={<CheckIcon size={18} />} className="text-success-700">
           {t.photos.status.saved}
         </StatusRow>
       );
@@ -548,7 +551,7 @@ function SlotStatusLine({ slot, onRetry }: { slot: Slot | undefined; onRetry: ()
       );
     case "review":
       return (
-        <div role="alert" className="rounded-control border border-warning-200 bg-warning-50 p-3 text-warning-800">
+        <div role="alert" className="animate-rise-in rounded-control bg-warning-50 p-4 text-warning-800">
           <p className="flex items-center gap-2 font-semibold">
             <AlertIcon size={18} />
             {slot.issue ? t.photos.issues[slot.issue] : t.photos.issues.blurry}
@@ -558,9 +561,9 @@ function SlotStatusLine({ slot, onRetry }: { slot: Slot | undefined; onRetry: ()
       );
     case "failed":
       return (
-        <div role="alert" className="flex flex-col gap-2 rounded-control border border-danger-200 bg-danger-50 p-3 text-danger-800">
+        <div role="alert" className="flex animate-rise-in flex-col gap-4 rounded-control bg-danger-50 p-4 text-danger-800">
           <p className="font-medium">{slot.error ?? t.photos.errors.upload}</p>
-          <Button variant="secondary" onClick={onRetry} className="min-h-11 self-start px-4 text-small">
+          <Button variant="secondary" size="sm" onClick={onRetry} className="self-start">
             {t.photos.tryAgain}
           </Button>
         </div>
@@ -570,7 +573,7 @@ function SlotStatusLine({ slot, onRetry }: { slot: Slot | undefined; onRetry: ()
 
 function StatusRow({ icon, className = "text-ink-muted", children }: { icon?: ReactNode; className?: string; children: ReactNode }) {
   return (
-    <p className={`flex items-center gap-2 font-medium ${className}`}>
+    <p className={`flex items-center gap-2 text-small font-medium ${className}`}>
       {icon}
       {children}
     </p>
@@ -593,7 +596,7 @@ function PickButton({
   // A label around a visually hidden input opens the camera/gallery on every mobile browser.
   const look =
     variant === "link"
-      ? `inline-flex min-h-11 items-center justify-center gap-2 self-center rounded-control px-3 text-small font-semibold ${disabled ? "text-ink-subtle" : "text-brand-700 active:bg-brand-50"}`
+      ? `inline-flex min-h-11 items-center justify-center gap-2 self-center rounded-chip px-4 text-small font-semibold transition-colors ${disabled ? "text-ink-subtle" : "text-brand-700 hover:bg-brand-50"}`
       : buttonClass(variant, "w-full", disabled);
   return (
     <label aria-disabled={disabled} className={`${look} cursor-pointer has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-brand-700 ${disabled ? "pointer-events-none" : ""}`}>

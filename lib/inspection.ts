@@ -48,3 +48,12 @@ export function inspectionState({ status, photos, findings, checklist }: Inspect
 
   return { photos: photoState, toReview, analysed, findingsDone, checklist: checklistState, next, stepsDone, score };
 }
+
+export const INSPECTION_STEPS = ["photos", "findings", "checklist", "report"] as const satisfies readonly InspectionStep[];
+
+const STEP_PATH: Record<InspectionStep, string> = { photos: "inspect", findings: "findings", checklist: "checklist", report: "report" };
+
+/** The screen for one step of a car's inspection. */
+export function stepHref(carId: string, step: InspectionStep) {
+  return `/app/cars/${carId}/${STEP_PATH[step]}`;
+}

@@ -16,11 +16,11 @@ export function CarFields({ values, errors }: { values: CarFormValues; errors: P
       <Field label={t.cars.make} name="make" defaultValue={values.make} placeholder={t.cars.makePlaceholder} error={errors.make} autoCapitalize="words" autoComplete="off" required />
       <Field label={t.cars.model} name="model" defaultValue={values.model} placeholder={t.cars.modelPlaceholder} error={errors.model} autoCapitalize="words" autoComplete="off" required />
       <Field label={t.cars.variant} name="variant" defaultValue={values.variant} placeholder={t.cars.variantPlaceholder} error={errors.variant} autoComplete="off" />
-      <div className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 min-[360px]:grid-cols-2 min-[360px]:gap-4">
         <SelectField label={t.cars.fuel} name="fuel" options={fuelOptions} placeholder={t.cars.choose} defaultValue={values.fuel} error={errors.fuel} />
         <SelectField label={t.cars.transmission} name="transmission" options={transmissionOptions} placeholder={t.cars.choose} defaultValue={values.transmission} error={errors.transmission} />
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-4">
         {/* Text with a number keypad: type="number" adds spinners on desktop and accepts "e". */}
         <Field label={t.cars.year} name="year" inputMode="numeric" pattern="[0-9]*" maxLength={4} autoComplete="off" defaultValue={values.year} placeholder="2019" error={errors.year} required />
         <Field label={t.cars.owners} name="owners" inputMode="numeric" pattern="[0-9]*" maxLength={2} autoComplete="off" defaultValue={values.owners} placeholder="1" error={errors.owners} />

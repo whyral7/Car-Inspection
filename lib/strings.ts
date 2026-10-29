@@ -15,6 +15,7 @@ export const en = {
     offline: "You seem to be offline. Check your internet and try again.",
     offlineBanner: "You're offline. Photos and checklist answers are kept on this phone and sent when you're back online.",
     backOnline: "Back online. Sending anything that was waiting.",
+    draftRestored: "We put back what you typed earlier.",
     serverError: "Something went wrong on our side. Please try again in a minute.",
     retry: "Try again",
     stepOf: (n: number, total: number) => `Step ${n} of ${total}`,
@@ -193,6 +194,10 @@ export const en = {
     filterAll: "All",
     noMatches: "No cars match.",
     shareAgain: "Share on WhatsApp",
+    resumeTitle: "Pick up where you left off",
+    continueStep: (step: string) => `Continue: ${step}`,
+    carCount: (n: number) => (n === 1 ? "1 car" : `${n} cars`),
+    stepsDone: (n: number) => `${n} of 4 steps done`,
     progress: {
       photos: (done: number, total: number) => `Photos: ${done} of ${total}`,
       checking: "Damage notes: waiting for AI checks",
@@ -284,6 +289,8 @@ export const en = {
     deleteAction: "Delete car",
     deleteFailed: "Couldn't delete the car. Check your internet and try again.",
     deleted: "Car deleted.",
+    saved: "Car details saved.",
+    added: "Car added. Next, the photos.",
     stepsDone: (n: number) => `${n} of 4 steps done`,
     nextHint: {
       photos: "You'll take 20 guided photos (12 required). Keep the car in good light.",
