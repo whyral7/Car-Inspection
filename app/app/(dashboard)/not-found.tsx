@@ -1,4 +1,4 @@
-import { LinkButton } from "@/components/button";
+import { LinkButton } from "@/components/ui";
 import { SearchIcon } from "@/components/icons";
 import { StatusPage } from "@/components/status-page";
 import { getT } from "@/lib/i18n.server";

@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Button, LinkButton } from "@/components/button";
-import { FormError } from "@/components/field";
+import { Button, LinkButton } from "@/components/ui";
+import { FormError } from "@/components/ui";
 import { ChatIcon, CheckIcon, ClockIcon } from "@/components/icons";
 import { THEME_COLOR } from "@/lib/config";
 import { formatRupees } from "@/lib/format";
@@ -107,7 +107,7 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
 
   if (phase.kind === "confirming") {
     return (
-      <div role="status" className="flex items-center gap-3 rounded-2xl border border-line bg-white p-5">
+      <div role="status" className="flex items-center gap-3 rounded-card border border-line bg-surface p-5">
         <span className="size-5 shrink-0 animate-spin rounded-full border-2 border-brand-700 border-t-transparent" />
         <p className="font-medium">{t.credits.confirming}</p>
       </div>
@@ -117,14 +117,14 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
   if (phase.kind === "success" || phase.kind === "slow") {
     const success = phase.kind === "success";
     return (
-      <div role="status" className={`flex flex-col gap-4 rounded-2xl p-5 ${success ? "bg-emerald-50" : "bg-amber-50"}`}>
+      <div role="status" className={`flex flex-col gap-4 rounded-card p-5 ${success ? "bg-success-50" : "bg-warning-50"}`}>
         <div className="flex items-start gap-3">
-          <span aria-hidden className={`flex size-10 shrink-0 items-center justify-center rounded-full text-xl text-white ${success ? "bg-emerald-700" : "bg-amber-500"}`}>
+          <span aria-hidden className={`flex size-10 shrink-0 items-center justify-center rounded-full text-title text-white ${success ? "bg-success-700" : "bg-warning-500"}`}>
             {success ? <CheckIcon size={22} /> : <ClockIcon size={22} />}
           </span>
           <div>
-            <h2 className="text-lg font-bold">{success ? t.credits.successTitle : t.credits.slowTitle}</h2>
-            <p className="text-slate-700">{success ? t.credits.successBody(phase.added, phase.total) : t.credits.slowBody}</p>
+            <h2 className="text-heading font-bold">{success ? t.credits.successTitle : t.credits.slowTitle}</h2>
+            <p className="text-ink-muted">{success ? t.credits.successBody(phase.added, phase.total) : t.credits.slowBody}</p>
           </div>
         </div>
         {phase.kind === "slow" && (
@@ -140,7 +140,7 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
   return (
     <div className="flex flex-col gap-3">
       {phase.kind === "failed" && (
-        <div role="alert" className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div role="alert" className="rounded-card bg-danger-50 p-4 text-small text-danger-800">
           <p className="font-semibold">{t.credits.failedTitle}</p>
           <p>{t.credits.failedBody(phase.reason)}</p>
         </div>
@@ -148,7 +148,7 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
       {error && (
         <div className="flex flex-col gap-2">
           <FormError message={error} />
-          <a href={supportHref} className="inline-flex min-h-11 items-center gap-2 self-start text-sm font-semibold text-brand-700" {...(supportHref.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}>
+          <a href={supportHref} className="inline-flex min-h-11 items-center gap-2 self-start text-small font-semibold text-brand-700" {...(supportHref.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}>
             <ChatIcon size={18} />
             {t.credits.getHelp}
           </a>
@@ -158,13 +158,13 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
         {packs.map((pack) => {
           const opening = phase.kind === "opening" && phase.packKey === pack.key;
           return (
-            <li key={pack.key} className={`rounded-2xl border bg-white p-4 ${pack.best ? "border-brand-600 ring-1 ring-brand-600" : "border-line"}`}>
+            <li key={pack.key} className={`rounded-card border bg-surface p-4 ${pack.best ? "border-brand-600 ring-1 ring-brand-600" : "border-line"}`}>
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-lg font-bold">{t.credits.pack(pack.credits)}</p>
-                  <p className="text-sm text-slate-600">{t.credits.perReport(formatRupees(pack.perReportPaise))}</p>
+                  <p className="text-heading font-bold">{t.credits.pack(pack.credits)}</p>
+                  <p className="text-small text-ink-muted">{t.credits.perReport(formatRupees(pack.perReportPaise))}</p>
                 </div>
-                {pack.best && <span className="rounded-full bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-800">{t.credits.bestValue}</span>}
+                {pack.best && <span className="rounded-full bg-brand-100 px-2.5 py-1 text-caption font-semibold text-brand-800">{t.credits.bestValue}</span>}
               </div>
               <Button className="mt-3 w-full" loading={opening} disabled={phase.kind === "opening"} onClick={() => buy(pack.key)}>
                 {opening ? t.credits.opening : t.credits.pay(formatRupees(pack.pricePaise))}
@@ -173,7 +173,7 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
           );
         })}
       </ul>
-      <p className="text-center text-xs text-slate-600">{t.credits.secure}</p>
+      <p className="text-center text-caption text-ink-muted">{t.credits.secure}</p>
     </div>
   );
 }

@@ -1,43 +1,5 @@
 @import "tailwindcss";
-
-/*
- * Design tokens ("Clear Teal", see docs/ux-audit.md section 4).
- * Radius: lg (8px) chips, badges, number plates · xl (12px) buttons, inputs · 2xl (16px) cards, sheets · full pills.
- * Text: ink for main text, slate-600/700 for secondary text people must read, slate-500 for captions only.
- */
-@theme {
-  --color-brand-50: #e6f4f2;
-  --color-brand-100: #cce9e5;
-  --color-brand-200: #99d3cb;
-  --color-brand-600: #13756e;
-  --color-brand-700: #115e59;
-  --color-brand-800: #0b4542;
-  --color-brand-900: #07302e;
-
-  --color-ink: #0b1220;
-  --color-canvas: #f4f6f8;
-  --color-line: #d7dee6;
-
-  /* WhatsApp buttons only: 7.7:1 with white text. */
-  --color-whatsapp: #075e54;
-  --color-whatsapp-pressed: #054640;
-
-  --color-accent: #f59e0b;
-
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Devanagari", "Helvetica Neue", Arial, sans-serif;
-
-  --animate-pop: pop 200ms ease-out;
-  @keyframes pop {
-    from {
-      transform: scale(0.6);
-      opacity: 0;
-    }
-    to {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-}
+@import "./tokens.css";
 
 :root {
   color-scheme: light;
@@ -45,13 +7,35 @@
 
 html {
   -webkit-tap-highlight-color: transparent;
+  text-size-adjust: 100%;
   /* Keep focused or scrolled-to items clear of the sticky header and bottom action bar. */
   scroll-padding-top: 5rem;
-  scroll-padding-bottom: 11rem;
+  scroll-padding-bottom: calc(var(--sticky-bar-height, 0px) + 1.5rem);
 }
 
 body {
-  @apply bg-canvas text-ink antialiased;
+  @apply bg-canvas font-sans text-body text-ink antialiased;
+}
+
+/* Numbers that change or line up (scores, counts, prices) don't jiggle. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: var(--color-brand-100);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand-700);
+  outline-offset: 2px;
+}
+
+dialog::backdrop {
+  background: rgb(11 18 32 / 0.48);
+}
+dialog[open]::backdrop {
+  animation: var(--animate-fade-in);
 }
 
 @media (prefers-reduced-motion: reduce) {

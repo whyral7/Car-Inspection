@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { AngleHint } from "@/components/angle-hint";
-import { BackLink, Button, LinkButton, StickyActions, buttonClass } from "@/components/button";
+import { BackLink, Button, LinkButton, StickyBar, buttonClass } from "@/components/ui";
 import { useT } from "@/components/i18n-provider";
 import { AlertIcon, ArrowLeftIcon, CameraIcon, CheckIcon, ChevronRightIcon, CloudUploadIcon, ImageIcon, Spinner } from "@/components/icons";
 import { PHOTO } from "@/lib/config";
@@ -276,8 +276,8 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
       <BackLink href={`/app/cars/${carId}`}>{t.photos.backToCar}</BackLink>
 
       <header>
-        <h1 className="text-xl font-bold">{t.photos.title}</h1>
-        <p className="text-sm text-slate-700">
+        <h1 className="text-title font-bold">{t.photos.title}</h1>
+        <p className="text-small text-ink-muted">
           <span className="font-semibold tracking-wider">{regNumber}</span>
           {carTitle && ` · ${carTitle}`}
         </p>
@@ -294,7 +294,7 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
         ))}
       </ul>
 
-      <StickyActions>
+      <StickyBar>
         {requiredDone ? (
           <>
             <LinkButton href={`/app/cars/${carId}/findings`}>
@@ -302,14 +302,14 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
               <ChevronRightIcon />
             </LinkButton>
             {nextAngle && (
-              <button type="button" onClick={() => go(nextIndex)} className="min-h-11 text-sm font-semibold text-brand-700">
+              <button type="button" onClick={() => go(nextIndex)} className="min-h-11 text-small font-semibold text-brand-700">
                 {t.photos.optionalNext(t.photos.angles[nextAngle.key].label)}
               </button>
             )}
           </>
         ) : (
           <>
-            <p className="text-center text-sm text-slate-700">{t.photos.missingRequired(progress.requiredTotal - requiredCovered)}</p>
+            <p className="text-center text-small text-ink-muted">{t.photos.missingRequired(progress.requiredTotal - requiredCovered)}</p>
             {nextAngle && (
               <Button onClick={() => go(nextIndex)}>
                 <CameraIcon />
@@ -318,7 +318,7 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
             )}
           </>
         )}
-      </StickyActions>
+      </StickyBar>
     </div>
   );
 }
@@ -327,14 +327,14 @@ function ProgressCard({ progress }: { progress: ReturnType<typeof photoProgress>
   const t = useT();
   const label = t.photos.progress(progress.done, progress.total);
   return (
-    <section className="rounded-2xl border border-line bg-white p-4" aria-label={label}>
+    <section className="rounded-card border border-line bg-surface p-4" aria-label={label}>
       <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-        <p className="text-2xl font-bold">{label}</p>
-        <p className={`text-sm font-semibold ${progress.allRequiredDone ? "text-brand-800" : "text-slate-700"}`}>
+        <p className="text-title font-bold">{label}</p>
+        <p className={`text-small font-semibold ${progress.allRequiredDone ? "text-brand-800" : "text-ink-muted"}`}>
           {t.photos.requiredProgress(progress.requiredDone, progress.requiredTotal)}
         </p>
       </div>
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={progress.total} aria-valuenow={progress.done}>
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-sunken" role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={progress.total} aria-valuenow={progress.done}>
         <div className="h-full rounded-full bg-brand-600 transition-[width]" style={{ width: `${(progress.done / progress.total) * 100}%` }} />
       </div>
     </section>
@@ -344,7 +344,7 @@ function ProgressCard({ progress }: { progress: ReturnType<typeof photoProgress>
 function WaitingNote({ count }: { count: number }) {
   const t = useT();
   return (
-    <p role="status" className="flex items-start gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800">
+    <p role="status" className="flex items-start gap-2 rounded-control border border-line bg-surface px-4 py-3 text-small text-ink">
       <CloudUploadIcon size={18} className="mt-px text-brand-700" />
       {t.photos.waitingCount(count)}
     </p>
@@ -358,14 +358,14 @@ function Tile({ angle, slot, onOpen }: { angle: Angle; slot: Slot | undefined; o
   const status = slot?.status;
   const border =
     status === "failed" || status === "review"
-      ? "border-red-500"
+      ? "border-danger-600"
       : status === "waiting"
-        ? "border-slate-400"
+        ? "border-line-strong"
         : status
           ? "border-line"
           : angle.required
-            ? "border-amber-400"
-            : "border-dashed border-slate-300";
+            ? "border-warning-500"
+            : "border-dashed border-line";
   const statusText = status ? t.photos.status[status] : angle.required ? t.photos.required : t.photos.optional;
   const src = (!thumbBroken && slot?.thumbUrl) || slot?.url;
 
@@ -374,19 +374,19 @@ function Tile({ angle, slot, onOpen }: { angle: Angle; slot: Slot | undefined; o
       type="button"
       onClick={onOpen}
       aria-label={`${angle.number}. ${label}. ${statusText}`}
-      className={`block w-full overflow-hidden rounded-xl border-2 bg-white text-left active:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 ${border}`}
+      className={`block w-full overflow-hidden rounded-control border-2 bg-surface text-left active:bg-canvas focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 ${border}`}
     >
-      <div className="relative aspect-square bg-slate-100">
+      <div className="relative aspect-square bg-sunken">
         {src ? (
           // eslint-disable-next-line @next/next/no-img-element -- private signed URL or local blob, not optimisable
           <img src={src} alt="" loading="lazy" decoding="async" onError={() => setThumbBroken(true)} className="size-full object-cover" />
         ) : (
-          <AngleHint angle={angle} className="size-full p-2 text-slate-500" />
+          <AngleHint angle={angle} className="size-full p-2 text-ink-subtle" />
         )}
-        <span className="absolute top-1 left-1 flex size-6 items-center justify-center rounded-full bg-ink/75 text-xs font-semibold text-white">{angle.number}</span>
+        <span className="absolute top-1 left-1 flex size-6 items-center justify-center rounded-full bg-ink/75 text-caption font-semibold text-white">{angle.number}</span>
         <TileBadge status={status} />
       </div>
-      <p className="line-clamp-2 min-h-10 px-1.5 py-1.5 text-xs leading-tight font-medium text-slate-800">{label}</p>
+      <p className="line-clamp-2 min-h-10 px-1.5 py-1.5 text-caption leading-tight font-medium text-ink">{label}</p>
     </button>
   );
 }
@@ -402,13 +402,13 @@ function TileBadge({ status }: { status: SlotStatus | undefined }) {
     );
   if (status === "failed" || status === "review")
     return (
-      <span className={`${base} bg-red-700`}>
+      <span className={`${base} bg-danger-700`}>
         <AlertIcon size={14} />
       </span>
     );
   if (status === "waiting")
     return (
-      <span className={`${base} bg-slate-700`}>
+      <span className={`${base} bg-ink-muted`}>
         <CloudUploadIcon size={14} />
       </span>
     );
@@ -446,15 +446,15 @@ function GuideScreen({ angle, slot, progress, waiting, pickError, justSaved, onR
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-x-3">
-        <button type="button" onClick={onGrid} className="-ml-1 inline-flex min-h-11 items-center gap-1.5 px-1 text-sm font-semibold text-brand-700">
+        <button type="button" onClick={onGrid} className="-ml-1 inline-flex min-h-11 items-center gap-1.5 px-1 text-small font-semibold text-brand-700">
           <ArrowLeftIcon size={18} />
           {t.photos.grid} ({progress.done}/{progress.total})
         </button>
-        <p className="text-sm text-slate-700">{t.photos.stepOf(angle.number, ANGLES.length)}</p>
+        <p className="text-small text-ink-muted">{t.photos.stepOf(angle.number, ANGLES.length)}</p>
       </div>
 
       {justSaved && (
-        <p role="status" className="flex animate-pop items-center gap-2 rounded-xl bg-brand-50 px-3 py-2 text-sm font-medium text-brand-900">
+        <p role="status" className="flex animate-pop items-center gap-2 rounded-control bg-brand-50 px-3 py-2 text-small font-medium text-brand-900">
           <CheckIcon size={18} />
           <span className="flex-1">{t.photos.justSaved(t.photos.angles[justSaved.key].label)}</span>
           <button type="button" onClick={onRetakeSaved} className="min-h-9 px-2 font-semibold underline underline-offset-2">
@@ -466,29 +466,29 @@ function GuideScreen({ angle, slot, progress, waiting, pickError, justSaved, onR
 
       <div>
         <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-xl font-bold">{label}</h1>
-          <span className={`rounded-lg px-2 py-0.5 text-xs font-semibold ${angle.required ? "bg-amber-100 text-amber-900" : "bg-slate-100 text-slate-800"}`}>
+          <h1 className="text-title font-bold">{label}</h1>
+          <span className={`rounded-chip px-2 py-0.5 text-caption font-semibold ${angle.required ? "bg-warning-50 text-warning-800" : "bg-sunken text-ink"}`}>
             {angle.required ? t.photos.required : t.photos.optional}
           </span>
         </div>
-        <p className="mt-1 text-slate-700">{tip}</p>
+        <p className="mt-1 text-ink-muted">{tip}</p>
       </div>
 
-      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-line bg-white">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-card border border-line bg-surface">
         {slot?.url ? (
           // eslint-disable-next-line @next/next/no-img-element -- private signed URL or local blob, not optimisable
           <img src={slot.url} alt={label} decoding="async" className="size-full bg-ink object-contain" />
         ) : (
           <>
-            <AngleHint angle={angle} className="size-full p-6 text-slate-500" />
-            <p className="absolute inset-x-0 bottom-2 text-center text-xs text-slate-600">{t.photos.noPhotoYet}</p>
+            <AngleHint angle={angle} className="size-full p-6 text-ink-subtle" />
+            <p className="absolute inset-x-0 bottom-2 text-center text-caption text-ink-muted">{t.photos.noPhotoYet}</p>
           </>
         )}
       </div>
 
       <div aria-live="polite" className="flex flex-col gap-2 empty:hidden">
         <SlotStatusLine slot={slot} onRetry={onRetry} />
-        {pickError && <p className="font-medium text-red-700">{pickError}</p>}
+        {pickError && <p className="font-medium text-danger-700">{pickError}</p>}
       </div>
 
       {reviewing ? (
@@ -542,25 +542,25 @@ function SlotStatusLine({ slot, onRetry }: { slot: Slot | undefined; onRetry: ()
       );
     case "waiting":
       return (
-        <StatusRow icon={<CloudUploadIcon size={18} />} className="text-slate-800">
+        <StatusRow icon={<CloudUploadIcon size={18} />} className="text-ink">
           {t.photos.status.waitingLong}
         </StatusRow>
       );
     case "review":
       return (
-        <div role="alert" className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-amber-950">
+        <div role="alert" className="rounded-control border border-warning-200 bg-warning-50 p-3 text-warning-800">
           <p className="flex items-center gap-2 font-semibold">
             <AlertIcon size={18} />
             {slot.issue ? t.photos.issues[slot.issue] : t.photos.issues.blurry}
           </p>
-          <p className="mt-1 text-sm">{t.photos.issueHint}</p>
+          <p className="mt-1 text-small">{t.photos.issueHint}</p>
         </div>
       );
     case "failed":
       return (
-        <div role="alert" className="flex flex-col gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-red-800">
+        <div role="alert" className="flex flex-col gap-2 rounded-control border border-danger-200 bg-danger-50 p-3 text-danger-800">
           <p className="font-medium">{slot.error ?? t.photos.errors.upload}</p>
-          <Button variant="secondary" onClick={onRetry} className="min-h-11 self-start px-4 text-sm">
+          <Button variant="secondary" onClick={onRetry} className="min-h-11 self-start px-4 text-small">
             {t.photos.tryAgain}
           </Button>
         </div>
@@ -568,7 +568,7 @@ function SlotStatusLine({ slot, onRetry }: { slot: Slot | undefined; onRetry: ()
   }
 }
 
-function StatusRow({ icon, className = "text-slate-700", children }: { icon?: ReactNode; className?: string; children: ReactNode }) {
+function StatusRow({ icon, className = "text-ink-muted", children }: { icon?: ReactNode; className?: string; children: ReactNode }) {
   return (
     <p className={`flex items-center gap-2 font-medium ${className}`}>
       {icon}
@@ -593,7 +593,7 @@ function PickButton({
   // A label around a visually hidden input opens the camera/gallery on every mobile browser.
   const look =
     variant === "link"
-      ? `inline-flex min-h-11 items-center justify-center gap-2 self-center rounded-xl px-3 text-sm font-semibold ${disabled ? "text-slate-500" : "text-brand-700 active:bg-brand-50"}`
+      ? `inline-flex min-h-11 items-center justify-center gap-2 self-center rounded-control px-3 text-small font-semibold ${disabled ? "text-ink-subtle" : "text-brand-700 active:bg-brand-50"}`
       : buttonClass(variant, "w-full", disabled);
   return (
     <label aria-disabled={disabled} className={`${look} cursor-pointer has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-brand-700 ${disabled ? "pointer-events-none" : ""}`}>

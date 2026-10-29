@@ -54,14 +54,14 @@ function PhotoViewer({ photos, viewer }: { photos: ReportPhoto[]; viewer: Return
       {photo && (
         <div className="flex h-full flex-col" onTouchStart={(e) => (touchX.current = e.touches[0].clientX)} onTouchEnd={onTouchEnd}>
           <div className="flex items-center justify-between gap-3 px-4 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-2">
-            <div className="min-w-0 text-sm">
+            <div className="min-w-0 text-small">
               <p className="truncate">
                 <span className="font-semibold">{photo.label}</span>
                 <span className="text-white/75"> · {t.publicReport.photoPosition(index + 1, photos.length)}</span>
               </p>
-              {photo.takenAt && <p className="text-xs text-white/75">{t.publicReport.photoTaken(photo.takenAt)}</p>}
+              {photo.takenAt && <p className="text-caption text-white/75">{t.publicReport.photoTaken(photo.takenAt)}</p>}
             </div>
-            <button type="button" onClick={() => dialog.current?.close()} className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold active:bg-white/10">
+            <button type="button" onClick={() => dialog.current?.close()} className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-chip px-3 text-small font-semibold active:bg-surface/10">
               <XIcon size={18} />
               {t.publicReport.close}
             </button>
@@ -80,18 +80,18 @@ function PhotoViewer({ photos, viewer }: { photos: ReportPhoto[]; viewer: Return
           </div>
           <div className="flex items-center justify-between gap-3 px-4 pt-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
             {photos.length > 1 ? (
-              <button type="button" onClick={() => step(-1)} aria-label={t.publicReport.previous} className="flex min-h-12 flex-1 items-center justify-center rounded-xl bg-white/10 active:bg-white/20">
+              <button type="button" onClick={() => step(-1)} aria-label={t.publicReport.previous} className="flex min-h-12 flex-1 items-center justify-center rounded-control bg-surface/10 active:bg-surface/20">
                 <ChevronLeftIcon size={24} />
               </button>
             ) : (
               <span className="flex-1" />
             )}
-            <button type="button" onClick={() => setZoomed(!zoomed)} className="inline-flex min-h-12 shrink-0 items-center gap-2 rounded-xl bg-white/10 px-4 text-sm font-semibold active:bg-white/20">
+            <button type="button" onClick={() => setZoomed(!zoomed)} className="inline-flex min-h-12 shrink-0 items-center gap-2 rounded-control bg-surface/10 px-4 text-small font-semibold active:bg-surface/20">
               <ZoomInIcon size={20} />
               {zoomed ? t.publicReport.zoomOut : t.publicReport.zoomIn}
             </button>
             {photos.length > 1 ? (
-              <button type="button" onClick={() => step(1)} aria-label={t.publicReport.next} className="flex min-h-12 flex-1 items-center justify-center rounded-xl bg-white/10 active:bg-white/20">
+              <button type="button" onClick={() => step(1)} aria-label={t.publicReport.next} className="flex min-h-12 flex-1 items-center justify-center rounded-control bg-surface/10 active:bg-surface/20">
                 <ChevronRightIcon size={24} />
               </button>
             ) : (
@@ -112,11 +112,11 @@ export function PhotoGallery({ photos }: { photos: ReportPhoto[] }) {
       <ul className="grid grid-cols-3 gap-1.5 sm:grid-cols-4">
         {photos.map((p, i) => (
           <li key={p.key}>
-            <button type="button" onClick={() => viewer.open(i)} className="block w-full overflow-hidden rounded-lg bg-slate-100 focus-visible:outline-2 focus-visible:outline-brand-700">
+            <button type="button" onClick={() => viewer.open(i)} className="block w-full overflow-hidden rounded-chip bg-sunken focus-visible:outline-2 focus-visible:outline-brand-700">
               {/* eslint-disable-next-line @next/next/no-img-element -- signed storage URLs; the small copy is already sized for this grid */}
               <img src={p.thumbUrl} alt={p.label} width={640} height={480} loading="lazy" decoding="async" className="aspect-[4/3] w-full object-cover" />
             </button>
-            <p className="mt-0.5 truncate text-xs text-slate-700">{p.label}</p>
+            <p className="mt-0.5 truncate text-caption text-ink-muted">{p.label}</p>
           </li>
         ))}
       </ul>
@@ -143,19 +143,19 @@ export function PhotoHero({ photos }: { photos: ReportPhoto[] }) {
           const el = e.currentTarget;
           setCurrent(Math.round(el.scrollLeft / el.clientWidth));
         }}
-        className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] sm:rounded-2xl [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] sm:rounded-card [&::-webkit-scrollbar]:hidden"
         aria-label={t.publicReport.photos}
       >
         {photos.map((p, i) => (
           <li key={p.key} className="w-full shrink-0 snap-center">
-            <button type="button" onClick={() => viewer.open(i)} className="block w-full bg-slate-200" aria-label={`${p.label}: ${t.publicReport.tapToEnlarge}`}>
+            <button type="button" onClick={() => viewer.open(i)} className="block w-full bg-sunken" aria-label={`${p.label}: ${t.publicReport.tapToEnlarge}`}>
               {/* eslint-disable-next-line @next/next/no-img-element -- signed storage URL */}
               <img src={p.thumbUrl} alt={p.label} width={640} height={480} loading={i === 0 ? "eager" : "lazy"} decoding="async" className="aspect-[4/3] w-full object-cover" />
             </button>
           </li>
         ))}
       </ul>
-      <p className="pointer-events-none absolute right-3 bottom-3 rounded-full bg-ink/80 px-3 py-1 text-sm font-semibold text-white">
+      <p className="pointer-events-none absolute right-3 bottom-3 rounded-full bg-ink/80 px-3 py-1 text-small font-semibold text-white">
         {photos[current]?.label} · {t.publicReport.photoPosition(current + 1, photos.length)}
       </p>
       <PhotoViewer photos={photos} viewer={viewer} />

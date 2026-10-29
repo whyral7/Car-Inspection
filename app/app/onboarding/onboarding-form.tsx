@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition, type ChangeEvent, type FormEvent } from "react";
-import { Button, LinkButton } from "@/components/button";
-import { Field, FormError, focusFirstError, inputClass } from "@/components/field";
+import { Button, LinkButton } from "@/components/ui";
+import { Field, FormError, focusFirstError, inputClass } from "@/components/ui";
 import { TagIcon } from "@/components/icons";
-import { Segmented } from "@/components/segmented";
+import { Segmented } from "@/components/ui";
 import { LOGO, STORAGE_BUCKETS } from "@/lib/config";
 import { compressImage } from "@/lib/images/compress";
 import { useT } from "@/components/i18n-provider";
@@ -176,7 +176,7 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
       noValidate
     >
       <div>
-        <p className="mb-1.5 block text-sm font-medium text-slate-800">{t.onboarding.userType}</p>
+        <p className="mb-1.5 block text-small font-medium text-ink">{t.onboarding.userType}</p>
         <Segmented
           label={t.onboarding.userType}
           options={userTypeOptions(t)}
@@ -187,9 +187,9 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
           }}
         />
         {errors.user_type ? (
-          <p className="mt-1.5 text-sm font-medium text-red-700">{errors.user_type}</p>
+          <p className="mt-1.5 text-small font-medium text-danger-700">{errors.user_type}</p>
         ) : (
-          <p className="mt-1.5 text-sm text-slate-700">{userType ? t.onboarding.userTypeHints[userType] : t.onboarding.userTypeChoose}</p>
+          <p className="mt-1.5 text-small text-ink-muted">{userType ? t.onboarding.userTypeHints[userType] : t.onboarding.userTypeChoose}</p>
         )}
       </div>
       <Field
@@ -214,12 +214,12 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
       />
 
       {/* Hidden rather than removed, so switching type and back keeps what was typed. */}
-      <section hidden={!isDealer} aria-labelledby="dealer-details" className="flex flex-col gap-5 rounded-2xl border border-line bg-white p-4">
+      <section hidden={!isDealer} aria-labelledby="dealer-details" className="flex flex-col gap-5 rounded-card border border-line bg-surface p-4">
         <div>
           <h2 id="dealer-details" className="font-semibold">
             {t.onboarding.dealerDetails}
           </h2>
-          <p className="text-sm text-slate-600">{t.onboarding.dealerDetailsHint}</p>
+          <p className="text-small text-ink-muted">{t.onboarding.dealerDetailsHint}</p>
         </div>
         <Field
           label={t.onboarding.businessName}
@@ -230,7 +230,7 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
           error={errors.business_name}
         />
         <div>
-          <label htmlFor="address" className="mb-1.5 block text-sm font-medium text-slate-700">
+          <label htmlFor="address" className="mb-1.5 block text-small font-medium text-ink-muted">
             {t.onboarding.address}
           </label>
           <textarea
@@ -242,33 +242,33 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
             aria-invalid={Boolean(errors.address)}
             className={`${inputClass} py-3`}
           />
-          {errors.address && <p className="mt-1.5 text-sm font-medium text-red-700">{errors.address}</p>}
+          {errors.address && <p className="mt-1.5 text-small font-medium text-danger-700">{errors.address}</p>}
         </div>
 
         <div>
-          <p className="mb-1.5 block text-sm font-medium text-slate-700">{t.onboarding.logo}</p>
+          <p className="mb-1.5 block text-small font-medium text-ink-muted">{t.onboarding.logo}</p>
           <div className="flex items-center gap-4">
-            <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-300 bg-white">
+            <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-control border border-line bg-surface">
               {preview ? (
                 // eslint-disable-next-line @next/next/no-img-element -- blob: previews can't go through next/image
                 <img src={preview} alt="" className="size-full object-contain" />
               ) : (
-                <TagIcon size={28} className="text-slate-400" />
+                <TagIcon size={28} className="text-ink-subtle" />
               )}
             </div>
             <div className="flex flex-col items-start gap-1">
-              <label className="inline-flex min-h-12 cursor-pointer items-center rounded-xl border border-slate-300 bg-white px-4 font-semibold active:bg-slate-100">
+              <label className="inline-flex min-h-12 cursor-pointer items-center rounded-control border border-line bg-surface px-4 font-semibold active:bg-sunken">
                 {preview ? t.onboarding.changeLogo : t.onboarding.chooseLogo}
                 <input ref={fileInput} type="file" name="logo_file" accept={LOGO.mimeTypes.join(",")} onChange={onLogoChange} className="sr-only" />
               </label>
               {preview && (
-                <button type="button" onClick={removeLogo} className="min-h-11 px-1 text-sm font-medium text-slate-600">
+                <button type="button" onClick={removeLogo} className="min-h-11 px-1 text-small font-medium text-ink-muted">
                   {t.onboarding.removeLogo}
                 </button>
               )}
             </div>
           </div>
-          <p className={`mt-1.5 text-sm ${logoError || errors.logo_path ? "font-medium text-red-700" : "text-slate-600"}`}>
+          <p className={`mt-1.5 text-small ${logoError || errors.logo_path ? "font-medium text-danger-700" : "text-ink-muted"}`}>
             {logoError ?? errors.logo_path ?? t.onboarding.logoHint}
           </p>
         </div>
@@ -294,17 +294,17 @@ function ReportHeaderPreview({ logo, name, city }: { logo: string | null; name: 
   const t = useT();
   return (
     <div>
-      <p className="mb-1.5 text-sm font-medium text-slate-800">{t.onboarding.previewTitle}</p>
-      <div className="flex items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-canvas p-3">
+      <p className="mb-1.5 text-small font-medium text-ink">{t.onboarding.previewTitle}</p>
+      <div className="flex items-center gap-3 rounded-control border border-dashed border-line bg-canvas p-3">
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element -- blob: preview
-          <img src={logo} alt="" className="size-11 shrink-0 rounded-lg border border-line bg-white object-contain" />
+          <img src={logo} alt="" className="size-11 shrink-0 rounded-chip border border-line bg-surface object-contain" />
         ) : (
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-brand-700 font-bold text-white">{name.trim().charAt(0).toUpperCase() || "?"}</span>
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-chip bg-brand-700 font-bold text-white">{name.trim().charAt(0).toUpperCase() || "?"}</span>
         )}
         <div className="min-w-0">
           <p className="font-bold break-words">{name}</p>
-          {city && <p className="text-sm text-slate-600">{city}</p>}
+          {city && <p className="text-small text-ink-muted">{city}</p>}
         </div>
       </div>
     </div>

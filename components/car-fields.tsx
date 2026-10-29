@@ -1,7 +1,7 @@
 "use client";
 
 import type { CarFormValues } from "@/app/app/(dashboard)/cars/new/actions";
-import { Field, SelectField } from "@/components/field";
+import { Field, SelectField } from "@/components/ui";
 import { useT } from "@/components/i18n-provider";
 import { FUELS, TRANSMISSIONS } from "@/lib/cars";
 

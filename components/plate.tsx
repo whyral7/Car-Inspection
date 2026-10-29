@@ -1,12 +1,12 @@
 /**
- * A registration number drawn like a number plate. Never truncated: at large text sizes it wraps
- * instead of being cut to one letter. `yellow` is the buyer-facing report style.
+ * A registration number drawn like an Indian number plate: white, dark border, wide letter spacing.
+ * Never truncated: at large text sizes it wraps instead of being cut to one letter.
  */
-export function Plate({ reg, size = "md", tone = "white", className = "" }: { reg: string; size?: "sm" | "md" | "lg"; tone?: "white" | "yellow"; className?: string }) {
-  const sizes = { sm: "px-1.5 py-0.5 text-sm", md: "px-2 py-0.5 text-lg", lg: "px-2.5 py-1 text-2xl" };
+export function Plate({ reg, size = "md", className = "" }: { reg: string; size?: "sm" | "md" | "lg"; className?: string }) {
+  const sizes = { sm: "px-2 py-0.5 text-small", md: "px-2 py-0.5 text-heading", lg: "px-3 py-1 text-title" };
   return (
     <span
-      className={`inline-block max-w-full rounded-lg border-2 border-ink font-bold tracking-[0.08em] [overflow-wrap:anywhere] tabular-nums ${tone === "yellow" ? "bg-[#ffc83d]" : "bg-white"} ${sizes[size]} ${className}`}
+      className={`inline-block max-w-full rounded-chip bg-surface font-bold tracking-[0.08em] text-ink tabular ring-2 ring-ink ring-inset [overflow-wrap:anywhere] ${sizes[size]} ${className}`}
     >
       {reg}
     </span>

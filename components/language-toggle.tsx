@@ -23,8 +23,8 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
   }
 
   return (
-    <div role="radiogroup" aria-label={t.common.language} aria-busy={pending} className={`inline-flex items-center gap-1 rounded-full border border-slate-300 bg-white p-1 ${className}`}>
-      <GlobeIcon size={16} className="mx-1.5 text-slate-600" />
+    <div role="radiogroup" aria-label={t.common.language} aria-busy={pending} className={`inline-flex items-center gap-1 rounded-full border border-line bg-surface p-1 ${className}`}>
+      <GlobeIcon size={16} className="mx-1.5 text-ink-muted" />
       {LOCALES.map((locale) => (
         <button
           key={locale}
@@ -33,7 +33,7 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
           aria-checked={locale === current}
           lang={locale}
           onClick={() => choose(locale)}
-          className={`min-h-10 rounded-full px-3 text-sm font-semibold ${locale === current ? "bg-brand-700 text-white" : "text-ink active:bg-slate-100"}`}
+          className={`min-h-10 rounded-full px-3 text-small font-semibold ${locale === current ? "bg-brand-700 text-white" : "text-ink active:bg-sunken"}`}
         >
           {t.common.languageNames[locale]}
         </button>

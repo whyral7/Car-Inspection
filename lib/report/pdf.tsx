@@ -5,7 +5,7 @@ import { Document, Font, Image as PdfPicture, Link, Page, StyleSheet, Text, View
 import { APP_NAME } from "@/lib/config";
 import { formatPhone } from "@/lib/report/share";
 import { en as t } from "@/lib/strings";
-import { BAND_COLORS, BRAND, INK, RESULT_COLORS, SEVERITY_COLORS, SIGNAL } from "./colors";
+import { BAND_COLORS, BRAND, INK, RESULT_COLORS, SEVERITY_COLORS } from "./colors";
 import type { DetailRow, ReportCheckItem, ReportView } from "./view";
 
 // The same layout as the public page, on A4: header, car and score, photos, damage notes, checklist,
@@ -43,7 +43,7 @@ const s = StyleSheet.create({
   reportTag: { fontSize: 8, color: BRAND[700], fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.8 },
   hero: { flexDirection: "row", gap: 16, marginTop: 14 },
   heroPhoto: { width: 168, height: 126, objectFit: "cover", borderRadius: 6, backgroundColor: INK[100] },
-  plate: { alignSelf: "flex-start", backgroundColor: SIGNAL.plate, borderWidth: 1.5, borderColor: INK[900], borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2, fontSize: 12, fontWeight: 700, letterSpacing: 1.5 },
+  plate: { alignSelf: "flex-start", backgroundColor: "#ffffff", borderWidth: 1.5, borderColor: INK[900], borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2, fontSize: 12, fontWeight: 700, letterSpacing: 1.5 },
   carTitle: { fontSize: 17, fontWeight: 700, marginTop: 6 },
   details: { flexDirection: "row", flexWrap: "wrap", marginTop: 8 },
   detail: { width: "50%", flexDirection: "row", paddingVertical: 3, paddingRight: 10, borderBottomWidth: 0.5, borderBottomColor: INK[200] },

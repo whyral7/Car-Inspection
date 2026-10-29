@@ -62,7 +62,9 @@ export const REPORT = {
   /** PDF download links. /r/<slug>/pdf makes a fresh one on every tap. */
   pdfUrlSeconds: 5 * 60,
   /** Bump when the PDF layout changes, so stored PDFs are rebuilt on the next download. */
-  pdfVersion: 3,
+  pdfVersion: 4,
+  /** Bump when the link preview image's layout changes, so WhatsApp fetches a fresh one. */
+  ogVersion: 2,
 } as const;
 
 /** Prepaid report credit packs. Prices in paise (Rs 999 = 99900). */

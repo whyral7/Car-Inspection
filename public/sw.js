@@ -1,10 +1,10 @@
 // Treadmark service worker.
 // - Pages: always from the network; when that fails (no signal) show /offline.html instead of the
 //   browser's error page. Pages are never cached, so nobody sees someone else's data or stale credits.
-// - /_next/static and /icons: cache first. Their URLs change whenever the content does.
+// - /_next/static, /icons and /fonts: cache first. Their URLs change whenever the content does.
 // Photo and checklist uploads that fail offline are kept in the page's own outbox (IndexedDB) and
 // sent when the app is next open and online.
-const CACHE = "treadmark-v2";
+const CACHE = "treadmark-v3";
 const OFFLINE_URL = "/offline.html";
 const PRECACHE = [OFFLINE_URL, "/icons/icon-192.png"];
 
@@ -37,7 +37,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/")) {
+  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/") || url.pathname.startsWith("/fonts/")) {
     event.respondWith(
       caches.match(request).then(
         (cached) =>

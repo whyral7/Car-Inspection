@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { LinkButton } from "@/components/button";
+import { LinkButton } from "@/components/ui";
 import { CreditIcon } from "@/components/icons";
 import { LanguageToggle } from "@/components/language-toggle";
 import { SignOut } from "@/components/sign-out";
@@ -65,43 +65,43 @@ export default async function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="rounded-2xl border border-line bg-white p-4">
+      <section className="rounded-card border border-line bg-surface p-4">
         <div className="flex items-center gap-3">
           {logo ? (
             // eslint-disable-next-line @next/next/no-img-element -- small public logo, no need for the image optimiser
-            <img src={logo} alt="" className="size-14 shrink-0 rounded-xl border border-line object-contain" />
+            <img src={logo} alt="" className="size-14 shrink-0 rounded-control border border-line object-contain" />
           ) : (
-            <span className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-brand-700 text-xl font-bold text-white">
+            <span className="flex size-14 shrink-0 items-center justify-center rounded-control bg-brand-700 text-title font-bold text-white">
               {name.charAt(0).toUpperCase()}
             </span>
           )}
           <div className="min-w-0">
-            <h1 className="text-xl font-bold break-words">{name}</h1>
-            {profile.city && <p className="text-slate-600">{profile.city}</p>}
+            <h1 className="text-title font-bold break-words">{name}</h1>
+            {profile.city && <p className="text-ink-muted">{profile.city}</p>}
           </div>
         </div>
-        <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+        <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-small">
           {profile.user_type && (
             <>
-              <dt className="text-slate-600">{t.profile.userType}</dt>
+              <dt className="text-ink-muted">{t.profile.userType}</dt>
               <dd>{t.onboarding.userTypes[profile.user_type]}</dd>
             </>
           )}
           {profile.owner_name && profile.owner_name !== name && (
             <>
-              <dt className="text-slate-600">{t.profile.owner}</dt>
+              <dt className="text-ink-muted">{t.profile.owner}</dt>
               <dd>{profile.owner_name}</dd>
             </>
           )}
           {phone && (
             <>
-              <dt className="text-slate-600">{t.profile.phone}</dt>
+              <dt className="text-ink-muted">{t.profile.phone}</dt>
               <dd>{phone}</dd>
             </>
           )}
           {isDealer && profile.address && (
             <>
-              <dt className="text-slate-600">{t.profile.address}</dt>
+              <dt className="text-ink-muted">{t.profile.address}</dt>
               <dd className="whitespace-pre-line">{profile.address}</dd>
             </>
           )}
@@ -111,17 +111,17 @@ export default async function ProfilePage() {
         </LinkButton>
       </section>
 
-      <section className="rounded-2xl border border-line bg-white p-4">
+      <section className="rounded-card border border-line bg-surface p-4">
         <div className="flex items-center gap-3">
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-control bg-brand-50 text-brand-700">
             <CreditIcon />
           </span>
           <div>
-            <p className="text-sm text-slate-600">{t.profile.creditsTitle}</p>
-            <p className="text-2xl font-bold">{t.profile.balance(profile.credits)}</p>
+            <p className="text-small text-ink-muted">{t.profile.creditsTitle}</p>
+            <p className="text-title font-bold">{t.profile.balance(profile.credits)}</p>
           </div>
         </div>
-        <p className="mt-2 text-sm text-slate-700">
+        <p className="mt-2 text-small text-ink-muted">
           {t.profile.bought(totalBought(history))} · {t.profile.used(totalUsed(history))}
         </p>
         <LinkButton href="/app/credits" className="mt-3 w-full">
@@ -129,40 +129,40 @@ export default async function ProfilePage() {
         </LinkButton>
       </section>
 
-      <section className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-4">
+      <section className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4">
         <h2 className="font-semibold">{t.common.language}</h2>
         <LanguageToggle className="self-start" />
       </section>
 
       <section id="history" className="scroll-mt-20">
-        <h2 className="mb-3 text-lg font-bold">{t.profile.historyTitle}</h2>
+        <h2 className="mb-3 text-heading font-bold">{t.profile.historyTitle}</h2>
         {history.length === 0 ? (
-          <p className="text-slate-600">{t.profile.historyEmpty}</p>
+          <p className="text-ink-muted">{t.profile.historyEmpty}</p>
         ) : (
-          <ul className="divide-y divide-line rounded-2xl border border-line bg-white">
+          <ul className="divide-y divide-line rounded-card border border-line bg-surface">
             {history.map((entry, i) => (
               <li key={i} className="flex items-start justify-between gap-3 p-4">
                 <div className="min-w-0">
                   <p className="font-medium break-words">{entryLabel(t, entry)}</p>
-                  <p className="text-sm text-slate-600">{formatDateTime(entry.at)}</p>
-                  {entry.kind === "purchase" && entry.paymentId && <p className="text-xs break-all text-slate-600">{t.profile.paymentId(entry.paymentId)}</p>}
+                  <p className="text-small text-ink-muted">{formatDateTime(entry.at)}</p>
+                  {entry.kind === "purchase" && entry.paymentId && <p className="text-caption break-all text-ink-muted">{t.profile.paymentId(entry.paymentId)}</p>}
                 </div>
-                <span className={`shrink-0 font-bold tabular-nums ${entry.change > 0 ? "text-emerald-700" : "text-slate-700"}`}>
+                <span className={`shrink-0 font-bold tabular-nums ${entry.change > 0 ? "text-success-700" : "text-ink-muted"}`}>
                   {entry.change > 0 ? `+${entry.change}` : entry.change}
                 </span>
               </li>
             ))}
           </ul>
         )}
-        <p className="mt-3 text-sm text-slate-700">{t.profile.help}</p>
+        <p className="mt-3 text-small text-ink-muted">{t.profile.help}</p>
       </section>
 
       <section className="flex flex-col gap-3">
         <SignOut />
-        <a href={deleteHref} className="inline-flex min-h-11 items-center justify-center text-sm font-semibold text-red-700" {...(deleteHref.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}>
+        <a href={deleteHref} className="inline-flex min-h-11 items-center justify-center text-small font-semibold text-danger-700" {...(deleteHref.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}>
           {t.profile.deleteAccount}
         </a>
-        <p className="text-center text-xs text-slate-600">{t.profile.deleteAccountHint}</p>
+        <p className="text-center text-caption text-ink-muted">{t.profile.deleteAccountHint}</p>
       </section>
     </div>
   );

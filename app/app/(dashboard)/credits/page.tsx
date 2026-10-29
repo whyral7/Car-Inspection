@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BackLink } from "@/components/button";
+import { BackLink } from "@/components/ui";
 import { CreditIcon } from "@/components/icons";
 import { supportWhatsappHref } from "@/lib/site";
 import { CREDIT_PACKS } from "@/lib/config";
@@ -36,15 +36,15 @@ export default async function CreditsPage({ searchParams }: PageProps<"/app/cred
     <div className="flex flex-col gap-4">
       <BackLink href={nextPath ?? "/app"}>{t.credits.back}</BackLink>
       <header>
-        <h1 className="text-xl font-bold">{t.credits.title}</h1>
-        <p className="text-sm text-slate-600">{t.credits.subtitle}</p>
-        <p className={`mt-3 inline-flex items-center gap-2 rounded-xl px-3 py-2 font-semibold ${profile.credits < 1 ? "bg-amber-100 text-amber-950" : "bg-brand-50 text-brand-900"}`}>
+        <h1 className="text-title font-bold">{t.credits.title}</h1>
+        <p className="text-small text-ink-muted">{t.credits.subtitle}</p>
+        <p className={`mt-3 inline-flex items-center gap-2 rounded-control px-3 py-2 font-semibold ${profile.credits < 1 ? "bg-warning-50 text-warning-800" : "bg-brand-50 text-brand-900"}`}>
           <CreditIcon size={18} />
           {t.credits.balance(profile.credits)}
         </p>
       </header>
       <BuyCredits packs={packs} next={nextPath} supportHref={supportWhatsappHref()} />
-      <Link href="/app/profile#history" className="inline-flex min-h-11 items-center justify-center text-sm font-medium text-brand-700">
+      <Link href="/app/profile#history" className="inline-flex min-h-11 items-center justify-center text-small font-medium text-brand-700">
         {t.credits.history}
       </Link>
     </div>

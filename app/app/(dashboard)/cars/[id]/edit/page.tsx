@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
-import { BackLink } from "@/components/button";
+import { BackLink } from "@/components/ui";
 import { Plate } from "@/components/plate";
 import { getT } from "@/lib/i18n.server";
 import { getCurrentProfile } from "@/lib/profile";
@@ -24,7 +24,7 @@ export default async function EditCarPage({ params }: PageProps<"/app/cars/[id]/
   return (
     <div className="mx-auto flex max-w-md flex-col gap-2">
       <BackLink href={`/app/cars/${car.id}`}>{t.findings.backToCar}</BackLink>
-      <h1 className="text-2xl font-bold">{t.car.editTitle}</h1>
+      <h1 className="text-title font-bold">{t.car.editTitle}</h1>
       <Plate reg={car.reg_number} className="self-start" />
       <EditCarForm
         carId={car.id}

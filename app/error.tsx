@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, LinkButton } from "@/components/button";
+import { Button, LinkButton } from "@/components/ui";
 import { AlertIcon } from "@/components/icons";
 import { StatusPage } from "@/components/status-page";
 import { en as t } from "@/lib/strings";

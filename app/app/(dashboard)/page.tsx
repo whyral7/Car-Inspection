@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LinkButton, StickyActions } from "@/components/button";
+import { LinkButton, StickyBar } from "@/components/ui";
 import { CarIcon, CreditIcon, PlusIcon } from "@/components/icons";
 import { InstallPrompt } from "@/components/install-prompt";
 import { PHOTO, STORAGE_BUCKETS } from "@/lib/config";
@@ -96,42 +96,42 @@ export default async function AppHome({ searchParams }: PageProps<"/app">) {
   return (
     <div className="flex flex-col gap-4">
       {deleted === "1" && (
-        <p role="status" className="rounded-xl bg-slate-800 px-4 py-3 text-sm font-medium text-white">
+        <p role="status" className="rounded-control bg-ink px-4 py-3 text-small font-medium text-white">
           {t.car.deleted}
         </p>
       )}
 
       {noCredits ? (
-        <section className="flex flex-col gap-3 rounded-2xl border border-amber-300 bg-amber-50 p-4">
-          <p className="font-semibold text-amber-950">{t.dashboard.noCreditsTitle}</p>
-          <p className="text-sm text-amber-950">{t.dashboard.noCreditsBody}</p>
+        <section className="flex flex-col gap-3 rounded-card border border-warning-200 bg-warning-50 p-4">
+          <p className="font-semibold text-warning-800">{t.dashboard.noCreditsTitle}</p>
+          <p className="text-small text-warning-800">{t.dashboard.noCreditsBody}</p>
           <LinkButton href="/app/credits" className="min-h-11">
             {t.profile.buy}
           </LinkButton>
         </section>
       ) : (
-        <Link href="/app/credits" className="flex min-h-14 items-center gap-3 rounded-2xl border border-line bg-white px-4 py-2 active:bg-slate-50">
+        <Link href="/app/credits" className="flex min-h-14 items-center gap-3 rounded-card border border-line bg-surface px-4 py-2 active:bg-canvas">
           <CreditIcon className="text-brand-700" />
           <span className="min-w-0 flex-1">
             <span className="font-semibold">{t.dashboard.creditsLeft(profile.credits)}</span>
-            <span className="block text-sm text-slate-600">{t.dashboard.creditsHint}</span>
+            <span className="block text-small text-ink-muted">{t.dashboard.creditsHint}</span>
           </span>
-          <span className="text-sm font-semibold text-brand-700">{t.dashboard.buyMore}</span>
+          <span className="text-small font-semibold text-brand-700">{t.dashboard.buyMore}</span>
         </Link>
       )}
 
       <InstallPrompt eligible={anyPublished} />
 
-      <h1 className="text-xl font-bold">{t.dashboard.myCars}</h1>
+      <h1 className="text-title font-bold">{t.dashboard.myCars}</h1>
 
       {cards.length === 0 ? (
-        <div className="flex flex-col items-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center">
+        <div className="flex flex-col items-center rounded-card border border-dashed border-line bg-surface px-6 py-10 text-center">
           <span className="flex size-16 items-center justify-center rounded-full bg-brand-50 text-brand-700">
             <CarIcon size={32} />
           </span>
-          <h2 className="mt-4 text-lg font-semibold">{t.dashboard.emptyTitle}</h2>
-          <p className="mt-1 max-w-xs text-slate-700">{t.dashboard.emptyBody}</p>
-          <ol className="mt-4 flex flex-col gap-1 text-left text-sm text-slate-700">
+          <h2 className="mt-4 text-heading font-semibold">{t.dashboard.emptyTitle}</h2>
+          <p className="mt-1 max-w-xs text-ink-muted">{t.dashboard.emptyBody}</p>
+          <ol className="mt-4 flex flex-col gap-1 text-left text-small text-ink-muted">
             {t.dashboard.emptySteps.map((step, i) => (
               <li key={step}>
                 <span className="font-semibold text-brand-800">{i + 1}.</span> {step}
@@ -148,12 +148,12 @@ export default async function AppHome({ searchParams }: PageProps<"/app">) {
           <CarList cars={cards} />
           {/* Sticky once the list is long enough to scroll; otherwise it simply follows the list. */}
           {cards.length > 3 ? (
-            <StickyActions>
+            <StickyBar>
               <LinkButton href="/app/cars/new">
                 <PlusIcon />
                 {t.dashboard.addCar}
               </LinkButton>
-            </StickyActions>
+            </StickyBar>
           ) : (
             <LinkButton href="/app/cars/new">
               <PlusIcon />

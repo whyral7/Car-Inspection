@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { en as t } from "@/lib/strings";
-import { BAND_COLORS, BRAND, INK, SIGNAL } from "./colors";
+import { BAND_COLORS, BRAND, INK } from "./colors";
 import type { ReportView } from "./view";
 
 // The link preview image WhatsApp shows above a shared report link: 1200x630 PNG, flat colours so it
@@ -58,7 +58,7 @@ export async function reportOgImage(view: ReportView, logo: string | null, photo
 
             <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 28 }}>
               <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-                <div style={{ display: "flex", background: SIGNAL.plate, border: `4px solid ${INK[900]}`, borderRadius: 10, padding: "4px 14px", fontSize: 40, fontWeight: 700, letterSpacing: 4 }}>
+                <div style={{ display: "flex", background: "#ffffff", border: `4px solid ${INK[900]}`, borderRadius: 10, padding: "4px 14px", fontSize: 40, fontWeight: 700, letterSpacing: 4 }}>
                   {view.car.regNumber}
                 </div>
                 <div style={{ display: "flex", marginTop: 18, fontSize: photo ? 46 : 60, fontWeight: 700, lineHeight: 1.08 }}>{clip(view.car.title || view.car.regNumber, Math.round(44 * width))}</div>

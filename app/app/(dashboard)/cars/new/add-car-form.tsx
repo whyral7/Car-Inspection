@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
-import { Button } from "@/components/button";
+import { Button } from "@/components/ui";
 import { CarFields, carFormValues } from "@/components/car-fields";
-import { FormError, focusFirstError } from "@/components/field";
+import { FormError, focusFirstError } from "@/components/ui";
 import { useT } from "@/components/i18n-provider";
 import { CheckIcon, InfoIcon, PencilIcon, SearchIcon } from "@/components/icons";
 import { Plate } from "@/components/plate";
@@ -19,8 +19,8 @@ type Lookup = Exclude<LookupState, { error: string }>;
 
 const notices = (t: Strings): Record<Lookup["status"], { text: string; tone: string } | null> => ({
   found: null,
-  not_found: { text: t.cars.notFound, tone: "border-amber-300 bg-amber-50 text-amber-900" },
-  unavailable: { text: t.cars.unavailable, tone: "border-amber-300 bg-amber-50 text-amber-900" },
+  not_found: { text: t.cars.notFound, tone: "border-warning-200 bg-warning-50 text-warning-800" },
+  unavailable: { text: t.cars.unavailable, tone: "border-warning-200 bg-warning-50 text-warning-800" },
   manual: null,
 });
 
@@ -61,7 +61,7 @@ export function AddCarForm() {
   return (
     <form onSubmit={onRegSubmit} className="mt-6 flex flex-col gap-4" noValidate>
       <div>
-        <label htmlFor="reg_number" className="mb-1.5 block text-sm font-semibold text-slate-800">
+        <label htmlFor="reg_number" className="mb-1.5 block text-small font-semibold text-ink">
           {t.cars.regNumber}
         </label>
         {/* Styled like a number plate, so it's obvious what to type. */}
@@ -84,14 +84,14 @@ export function AddCarForm() {
           // Room for pasted spaces and hyphens; they're stripped as the user types.
           maxLength={20}
           autoFocus
-          className="block min-h-16 w-full rounded-xl border-2 border-ink bg-white px-4 text-center text-2xl font-bold tracking-[0.12em] text-ink uppercase placeholder:font-semibold placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-brand-100 aria-invalid:border-red-600"
+          className="block min-h-16 w-full rounded-control border-2 border-ink bg-surface px-4 text-center text-title font-bold tracking-[0.12em] text-ink uppercase placeholder:font-semibold placeholder:text-ink-subtle focus:outline-none focus:ring-4 focus:ring-brand-100 aria-invalid:border-danger-600"
         />
         {regError ? (
-          <p id={errorId} className="mt-1.5 text-sm font-medium text-red-700">
+          <p id={errorId} className="mt-1.5 text-small font-medium text-danger-700">
             {regError}
           </p>
         ) : (
-          <p id="reg_number-hint" className="mt-1.5 text-sm text-slate-600">
+          <p id="reg_number-hint" className="mt-1.5 text-small text-ink-muted">
             {t.cars.regHint}
           </p>
         )}
@@ -107,7 +107,7 @@ export function AddCarForm() {
         )}
       </Button>
       <div className="flex flex-col items-center">
-        <p className="text-sm text-slate-600">{t.cars.noRc}</p>
+        <p className="text-small text-ink-muted">{t.cars.noRc}</p>
         <Button type="button" variant="ghost" loading={looking === "manual"} disabled={looking !== null} onClick={() => void runLookup(true)} className="min-h-11 px-3">
           {t.cars.enterManually}
         </Button>
@@ -159,18 +159,18 @@ function CarDetailsStep({ lookup, onChangeReg }: { lookup: Lookup; onChangeReg: 
 
   return (
     <div className="mt-6 flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-white p-4">
+      <div className="flex items-center justify-between gap-3 rounded-card border border-line bg-surface p-4">
         <div className="min-w-0">
-          <p className="mb-1 text-sm text-slate-600">{t.cars.regNumber}</p>
+          <p className="mb-1 text-small text-ink-muted">{t.cars.regNumber}</p>
           <Plate reg={lookup.regNumber} />
         </div>
-        <Button type="button" variant="secondary" onClick={onChangeReg} disabled={isPending} className="min-h-11 shrink-0 px-4 text-sm">
+        <Button type="button" variant="secondary" onClick={onChangeReg} disabled={isPending} className="min-h-11 shrink-0 px-4 text-small">
           {t.cars.change}
         </Button>
       </div>
 
       {lookup.existingCarId && (
-        <p className="flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <p className="flex items-start gap-2 rounded-control border border-warning-200 bg-warning-50 px-4 py-3 text-small text-warning-800">
           <InfoIcon size={18} className="mt-px" />
           <span>
             {t.cars.duplicate}{" "}
@@ -180,7 +180,7 @@ function CarDetailsStep({ lookup, onChangeReg }: { lookup: Lookup; onChangeReg: 
           </span>
         </p>
       )}
-      {notice && <p className={`rounded-xl border px-4 py-3 text-sm ${notice.tone}`}>{notice.text}</p>}
+      {notice && <p className={`rounded-control border px-4 py-3 text-small ${notice.tone}`}>{notice.text}</p>}
 
       {!editing ? (
         <RcSummary values={lookup.values} pending={isPending} onConfirm={() => save(lookup.values)} onEdit={() => setEditing(true)} error={state.formError} />
@@ -208,16 +208,16 @@ function RcSummary({ values, pending, onConfirm, onEdit, error }: { values: CarF
   ].filter(Boolean);
 
   return (
-    <section className="flex flex-col gap-3 rounded-2xl border border-brand-200 bg-white p-4">
-      <p className="flex items-center gap-2 text-sm font-semibold text-brand-800">
+    <section className="flex flex-col gap-3 rounded-card border border-brand-200 bg-surface p-4">
+      <p className="flex items-center gap-2 text-small font-semibold text-brand-800">
         <CheckIcon size={18} />
         {t.cars.foundShort}
       </p>
       <div>
-        <p className="text-xl font-bold">{title}</p>
-        {facts.length > 0 && <p className="text-slate-700">{facts.join(" · ")}</p>}
+        <p className="text-title font-bold">{title}</p>
+        {facts.length > 0 && <p className="text-ink-muted">{facts.join(" · ")}</p>}
         {values.insurance_valid_upto && (
-          <p className="text-sm text-slate-700">
+          <p className="text-small text-ink-muted">
             {t.cars.insurance}: {formatDate(values.insurance_valid_upto)}
           </p>
         )}

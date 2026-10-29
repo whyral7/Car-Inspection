@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import type { AnalyseResponse } from "@/app/api/photos/[photoId]/analyse/route";
-import { BackLink, Button, LinkButton, StickyActions } from "@/components/button";
+import { BackLink, Button, LinkButton, StickyBar } from "@/components/ui";
 import { CheckIcon, ChevronDownIcon, ChevronRightIcon, PencilIcon, PlusIcon, RefreshIcon, SparklesIcon, Spinner, TrashIcon, UndoIcon, ZoomInIcon } from "@/components/icons";
-import { Field, FormError, SelectField, TextAreaField } from "@/components/field";
-import { Segmented } from "@/components/segmented";
+import { Field, FormError, SelectField, TextAreaField } from "@/components/ui";
+import { Segmented } from "@/components/ui";
 import { runWithConcurrency } from "@/lib/concurrency";
 import { AI } from "@/lib/config";
 import { FINDING_LIMITS, FINDING_TYPES } from "@/lib/findings";
@@ -46,14 +46,14 @@ const UNDO_MS = 6000;
 const typeOptions = (t: Strings) => FINDING_TYPES.map((value) => ({ value, label: t.findings.types[value] }));
 const severityOptions = (t: Strings) =>
   [
-  { value: "minor", label: t.findings.severities.minor, selectedClass: "border-amber-500 bg-amber-100 text-amber-900" },
-  { value: "moderate", label: t.findings.severities.moderate, selectedClass: "border-orange-600 bg-orange-600 text-white" },
-  { value: "major", label: t.findings.severities.major, selectedClass: "border-red-600 bg-red-600 text-white" },
+  { value: "minor", label: t.findings.severities.minor, selectedClass: "border-warning-500 bg-warning-50 text-warning-800" },
+  { value: "moderate", label: t.findings.severities.moderate, selectedClass: "border-warning-700 bg-warning-700 text-white" },
+  { value: "major", label: t.findings.severities.major, selectedClass: "border-danger-600 bg-danger-600 text-white" },
 ] as const satisfies readonly { value: Severity; label: string; selectedClass: string }[];
 const severityChip: Record<Severity, string> = {
-  minor: "bg-amber-100 text-amber-900",
-  moderate: "bg-orange-100 text-orange-900",
-  major: "bg-red-100 text-red-800",
+  minor: "bg-warning-50 text-warning-800",
+  moderate: "bg-warning-50 text-orange-900",
+  major: "bg-danger-50 text-danger-800",
 };
 
 const kmFormat = new Intl.NumberFormat("en-IN");
@@ -237,17 +237,17 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
       <BackLink href={`/app/cars/${carId}`}>{t.findings.backToCar}</BackLink>
 
       <header>
-        <h1 className="text-xl font-bold">{t.findings.title}</h1>
-        <p className="text-sm text-slate-700">
+        <h1 className="text-title font-bold">{t.findings.title}</h1>
+        <p className="text-small text-ink-muted">
           <span className="font-semibold tracking-wider">{regNumber}</span>
           {carTitle && ` · ${carTitle}`}
         </p>
-        <p className="mt-2 text-sm text-slate-700">{t.findings.subtitle}</p>
+        <p className="mt-2 text-small text-ink-muted">{t.findings.subtitle}</p>
       </header>
 
       {photos.length === 0 ? (
-        <section className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-5">
-          <p className="text-slate-800">{t.findings.noPhotos}</p>
+        <section className="flex flex-col gap-3 rounded-card border border-line bg-surface p-5">
+          <p className="text-ink">{t.findings.noPhotos}</p>
           <LinkButton href={`/app/cars/${carId}/inspect`}>{t.findings.takePhotos}</LinkButton>
         </section>
       ) : (
@@ -260,7 +260,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
 
       {attention.length > 0 && (
         <section aria-labelledby="needs-review" className="flex flex-col gap-3">
-          <h2 id="needs-review" className="text-lg font-bold">
+          <h2 id="needs-review" className="text-heading font-bold">
             {t.findings.sections.attention(attention.length)}
           </h2>
           {attention.map(photoGroup)}
@@ -269,7 +269,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
 
       {withNotes.length > 0 && (
         <section aria-labelledby="accepted-notes" className="flex flex-col gap-3">
-          <h2 id="accepted-notes" className="text-lg font-bold">
+          <h2 id="accepted-notes" className="text-heading font-bold">
             {t.findings.sections.accepted}
           </h2>
           {withNotes.map(photoGroup)}
@@ -277,13 +277,13 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
       )}
 
       {quiet.length > 0 && (
-        <details className="group rounded-2xl border border-line bg-white">
+        <details className="group rounded-card border border-line bg-surface">
           <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 [&::-webkit-details-marker]:hidden">
             <span>
               <span className="block font-semibold">{t.findings.sections.quiet(quiet.length)}</span>
-              <span className="block text-sm text-slate-700">{t.findings.sections.quietHint}</span>
+              <span className="block text-small text-ink-muted">{t.findings.sections.quietHint}</span>
             </span>
-            <ChevronDownIcon size={20} className="shrink-0 text-slate-500 transition-transform group-open:rotate-180" />
+            <ChevronDownIcon size={20} className="shrink-0 text-ink-subtle transition-transform group-open:rotate-180" />
           </summary>
           <div className="flex flex-col gap-3 border-t border-line p-3">{quiet.map(photoGroup)}</div>
         </details>
@@ -291,9 +291,9 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
 
       <Group groupKey={GENERAL} title={t.findings.general} subtitle={t.findings.generalHint} photoId={null} findings={generalFindings} {...groupProps} />
 
-      <StickyActions>
+      <StickyBar>
         {undo && (
-          <p role="status" className="flex items-center gap-2 rounded-xl bg-ink px-3 py-1 text-sm text-white">
+          <p role="status" className="flex items-center gap-2 rounded-control bg-ink px-3 py-1 text-small text-white">
             <span className="flex-1">{t.findings.deleted}</span>
             <button type="button" onClick={undoDelete} className="inline-flex min-h-11 items-center gap-1.5 px-2 font-semibold">
               <UndoIcon size={16} />
@@ -303,7 +303,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
         )}
         {active > 0 ? (
           <>
-            <p className="flex items-center justify-center gap-2 text-sm text-slate-800">
+            <p className="flex items-center justify-center gap-2 text-small text-ink">
               <Spinner className="text-brand-700" />
               {t.findings.analysing(photos.length - active, photos.length)}
             </p>
@@ -316,13 +316,13 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
             <Button onClick={() => void acceptAllAndContinue(toReview.map((f) => f.id))} loading={continuing}>
               {t.findings.acceptAllContinue(toReview.length)}
             </Button>
-            <Link href={checklistHref} className="-mb-1 inline-flex min-h-10 items-center justify-center text-sm font-semibold text-brand-700">
+            <Link href={checklistHref} className="-mb-1 inline-flex min-h-10 items-center justify-center text-small font-semibold text-brand-700">
               {t.findings.continueWithout}
             </Link>
           </>
         ) : (
           <>
-            <p className={`text-center text-sm ${failed.length ? "font-medium text-red-800" : "text-brand-800"}`}>
+            <p className={`text-center text-small ${failed.length ? "font-medium text-danger-800" : "text-brand-800"}`}>
               {failed.length ? t.findings.someFailed(failed.length) : t.findings.allReviewed}
             </p>
             <LinkButton href={checklistHref}>
@@ -331,7 +331,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
             </LinkButton>
           </>
         )}
-      </StickyActions>
+      </StickyBar>
     </div>
   );
 }
@@ -341,22 +341,22 @@ function AnalysisProgress({ total, active, failed, onRetry }: { total: number; a
   const done = total - active;
   const label = t.findings.analysing(done, total);
   return (
-    <section aria-live="polite" className="rounded-2xl border border-line bg-white p-4">
+    <section aria-live="polite" className="rounded-card border border-line bg-surface p-4">
       {active > 0 ? (
         <>
           <p className="flex items-center gap-2 font-semibold">
             <Spinner className="text-brand-700" />
             {label}
           </p>
-          <p className="mt-1 text-sm text-slate-700">{t.findings.analysingHint}</p>
-          <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={total} aria-valuenow={done}>
+          <p className="mt-1 text-small text-ink-muted">{t.findings.analysingHint}</p>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-sunken" role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={total} aria-valuenow={done}>
             <div className="h-full rounded-full bg-brand-600 transition-[width]" style={{ width: `${(done / total) * 100}%` }} />
           </div>
         </>
       ) : failed > 0 ? (
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm font-medium text-red-800">{t.findings.someFailed(failed)}</p>
-          <Button variant="secondary" onClick={onRetry} className="min-h-11 shrink-0 px-4 text-sm">
+          <p className="text-small font-medium text-danger-800">{t.findings.someFailed(failed)}</p>
+          <Button variant="secondary" onClick={onRetry} className="min-h-11 shrink-0 px-4 text-small">
             <RefreshIcon size={18} />
             {t.findings.retryFailed}
           </Button>
@@ -404,12 +404,12 @@ function OdometerCard({ carId, initialKm, photo }: { carId: string; initialKm: n
 
   if (confirmed !== null && !changing) {
     return (
-      <section className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-white p-4">
+      <section className="flex items-center justify-between gap-3 rounded-card border border-line bg-surface p-4">
         <div className="min-w-0">
-          <h2 className="text-sm text-slate-600">{t.findings.odometer.title}</h2>
+          <h2 className="text-small text-ink-muted">{t.findings.odometer.title}</h2>
           <p className="flex items-center gap-1.5 font-semibold"><CheckIcon size={18} className="text-brand-700" />{t.findings.odometer.confirmed(kmFormat.format(confirmed))}</p>
         </div>
-        <Button variant="secondary" onClick={() => setChanging(true)} className="min-h-11 shrink-0 px-4 text-sm">
+        <Button variant="secondary" onClick={() => setChanging(true)} className="min-h-11 shrink-0 px-4 text-small">
           {t.findings.odometer.change}
         </Button>
       </section>
@@ -425,10 +425,10 @@ function OdometerCard({ carId, initialKm, photo }: { carId: string; initialKm: n
         : t.findings.odometer.notDetected;
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-3 rounded-2xl border border-amber-300 bg-amber-50 p-4" noValidate>
+    <form onSubmit={onSubmit} className="flex flex-col gap-3 rounded-card border border-warning-200 bg-warning-50 p-4" noValidate>
       <div>
         <h2 className="font-semibold">{t.findings.odometer.title}</h2>
-        <p className="mt-1 flex items-center gap-2 text-sm text-slate-700">
+        <p className="mt-1 flex items-center gap-2 text-small text-ink-muted">
           {checking && <Spinner className="text-brand-700" />}
           {message}
         </p>
@@ -485,7 +485,7 @@ function PhotoGroup({ photo, findings, onRetry, ...actions }: { photo: PhotoStat
             onClick={() => setExpanded((v) => !v)}
             aria-expanded={expanded}
             aria-label={`${label}: ${expanded ? t.findings.shrinkPhoto : t.findings.enlargePhoto}`}
-            className={`relative block shrink-0 overflow-hidden rounded-xl bg-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 ${expanded ? "w-full" : "size-24"}`}
+            className={`relative block shrink-0 overflow-hidden rounded-control bg-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 ${expanded ? "w-full" : "size-24"}`}
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- private signed URL, not optimisable */}
             <img src={photo.url} alt="" loading="lazy" decoding="async" className={`size-full ${expanded ? "object-contain" : "object-cover"}`} />
@@ -506,16 +506,16 @@ function PhotoGroup({ photo, findings, onRetry, ...actions }: { photo: PhotoStat
 function PhotoStatus({ photo, findingCount, carId, onRetry }: { photo: PhotoState; findingCount: number; carId: string; onRetry: () => void }) {
   const t = useT();
   const s = t.findings.photoStatus;
-  if (photo.run === "queued" || (!photo.run && photo.aiStatus === "pending")) return <p className="text-sm text-slate-700">{s.queued}</p>;
+  if (photo.run === "queued" || (!photo.run && photo.aiStatus === "pending")) return <p className="text-small text-ink-muted">{s.queued}</p>;
   if (photo.run === "running")
     return (
-      <p className="flex items-center gap-2 text-sm text-slate-700">
+      <p className="flex items-center gap-2 text-small text-ink-muted">
         <Spinner className="text-brand-700" />
         {s.pending}
       </p>
     );
   const retake = (
-    <Link href={`/app/cars/${carId}/inspect?angle=${photo.angleKey}`} className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-brand-700">
+    <Link href={`/app/cars/${carId}/inspect?angle=${photo.angleKey}`} className="inline-flex min-h-11 items-center gap-1.5 text-small font-semibold text-brand-700">
       <RefreshIcon size={16} />
       {t.findings.retakePhoto}
     </Link>
@@ -523,16 +523,16 @@ function PhotoStatus({ photo, findingCount, carId, onRetry }: { photo: PhotoStat
   if (photo.limitReached)
     return (
       <div>
-        <p className="text-sm font-medium text-red-800">{s.limit}</p>
+        <p className="text-small font-medium text-danger-800">{s.limit}</p>
         {retake}
       </div>
     );
   if (photo.run === "error" || photo.aiStatus === "failed")
     return (
       <div>
-        <p className="text-sm font-medium text-red-800">{s.failed}</p>
+        <p className="text-small font-medium text-danger-800">{s.failed}</p>
         <div className="flex flex-wrap gap-x-4">
-          <button type="button" onClick={onRetry} className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-brand-700">
+          <button type="button" onClick={onRetry} className="inline-flex min-h-11 items-center gap-1.5 text-small font-semibold text-brand-700">
             <RefreshIcon size={16} />
             {t.findings.tryAgain}
           </button>
@@ -543,11 +543,11 @@ function PhotoStatus({ photo, findingCount, carId, onRetry }: { photo: PhotoStat
   if (photo.aiStatus === "unclear")
     return (
       <div>
-        <p className="text-sm font-medium text-amber-900">{s.unclear}</p>
+        <p className="text-small font-medium text-warning-800">{s.unclear}</p>
         {retake}
       </div>
     );
-  return <p className="text-sm text-slate-700">{findingCount === 0 ? s.noDamage : s.done}</p>;
+  return <p className="text-small text-ink-muted">{findingCount === 0 ? s.noDamage : s.done}</p>;
 }
 
 function Group({
@@ -575,12 +575,12 @@ function Group({
   const t = useT();
   const adding = editing === `new:${groupKey}`;
   return (
-    <section className="rounded-2xl border border-line bg-white p-4" aria-label={title}>
+    <section className="rounded-card border border-line bg-surface p-4" aria-label={title}>
       <div className="flex flex-wrap items-start gap-3">
         {media}
         <div className="min-w-0 flex-1">
           <h2 className="font-semibold">{title}</h2>
-          {subtitle && <p className="text-sm text-slate-700">{subtitle}</p>}
+          {subtitle && <p className="text-small text-ink-muted">{subtitle}</p>}
           {status}
         </div>
       </div>
@@ -604,7 +604,7 @@ function Group({
           <FindingForm title={t.findings.addTitle} initial={null} onCancel={() => setEditing(null)} onSave={(v) => onSave(v, { photoId })} />
         </div>
       ) : (
-        <Button variant="ghost" onClick={() => setEditing(`new:${groupKey}`)} className="mt-2 -ml-2 min-h-11 px-2 text-sm">
+        <Button variant="ghost" onClick={() => setEditing(`new:${groupKey}`)} className="mt-2 -ml-2 min-h-11 px-2 text-small">
           <PlusIcon size={18} />
           {t.findings.add}
         </Button>
@@ -616,35 +616,35 @@ function Group({
 function FindingCard({ finding, onAccept, onEdit, onDelete }: { finding: FindingRow; onAccept: (accepted: boolean) => void; onEdit: () => void; onDelete: () => void }) {
   const t = useT();
   // Edit and Delete are compact (icon over a short label) so the row fits a 360px screen in any language.
-  const compact = "min-h-12 w-16 shrink-0 flex-col !gap-0.5 !px-1 text-xs";
+  const compact = "min-h-12 w-16 shrink-0 flex-col !gap-0.5 !px-1 text-caption";
 
   return (
-    <article className={`rounded-xl border p-3 ${finding.accepted ? "border-line bg-white" : "border-amber-400 bg-amber-50"}`}>
+    <article className={`rounded-control border p-3 ${finding.accepted ? "border-line bg-surface" : "border-warning-500 bg-warning-50"}`}>
       <div className="flex flex-wrap items-center gap-1.5">
         <span className="font-semibold">{t.findings.types[finding.type]}</span>
-        <span className={`rounded-lg px-2 py-0.5 text-xs font-semibold ${severityChip[finding.severity]}`}>{t.findings.severities[finding.severity]}</span>
+        <span className={`rounded-chip px-2 py-0.5 text-caption font-semibold ${severityChip[finding.severity]}`}>{t.findings.severities[finding.severity]}</span>
         {finding.source === "ai" && (
-          <span className="inline-flex items-center gap-1 rounded-lg bg-white px-2 py-0.5 text-xs font-semibold text-slate-800 ring-1 ring-slate-300">
+          <span className="inline-flex items-center gap-1 rounded-chip bg-surface px-2 py-0.5 text-caption font-semibold text-ink ring-1 ring-line">
             <SparklesIcon size={12} />
             {t.findings.aiSuggestion}
           </span>
         )}
-        <span className={`ml-auto inline-flex items-center gap-1 text-xs font-semibold ${finding.accepted ? "text-brand-800" : "text-amber-900"}`}>
+        <span className={`ml-auto inline-flex items-center gap-1 text-caption font-semibold ${finding.accepted ? "text-brand-800" : "text-warning-800"}`}>
           {finding.accepted && <CheckIcon size={14} />}
           {finding.accepted ? t.findings.accepted : t.findings.needsReview}
         </span>
       </div>
-      {finding.location && <p className="mt-1 text-sm font-medium text-slate-900">{finding.location}</p>}
-      {finding.note && <p className="mt-0.5 text-sm text-slate-700">{finding.note}</p>}
+      {finding.location && <p className="mt-1 text-small font-medium text-ink">{finding.location}</p>}
+      {finding.note && <p className="mt-0.5 text-small text-ink-muted">{finding.note}</p>}
 
       <div className="mt-2 flex gap-2">
         {finding.accepted ? (
-          <Button variant="secondary" onClick={() => onAccept(false)} className="min-h-12 min-w-0 flex-1 px-2 text-sm">
+          <Button variant="secondary" onClick={() => onAccept(false)} className="min-h-12 min-w-0 flex-1 px-2 text-small">
             <UndoIcon size={16} />
             {t.findings.unaccept}
           </Button>
         ) : (
-          <Button onClick={() => onAccept(true)} className="min-h-12 min-w-0 flex-1 px-2 text-sm">
+          <Button onClick={() => onAccept(true)} className="min-h-12 min-w-0 flex-1 px-2 text-small">
             <CheckIcon size={16} />
             {t.findings.accept}
           </Button>
@@ -653,7 +653,7 @@ function FindingCard({ finding, onAccept, onEdit, onDelete }: { finding: Finding
           <PencilIcon size={16} />
           {t.findings.edit}
         </Button>
-        <Button variant="secondary" onClick={onDelete} className={`${compact} !text-red-700`} aria-label={`${t.findings.delete}: ${t.findings.types[finding.type]}`}>
+        <Button variant="secondary" onClick={onDelete} className={`${compact} !text-danger-700`} aria-label={`${t.findings.delete}: ${t.findings.types[finding.type]}`}>
           <TrashIcon size={16} />
           {t.findings.delete}
         </Button>
@@ -699,7 +699,7 @@ function FindingForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-3 rounded-xl border border-brand-200 bg-brand-50/50 p-3" noValidate>
+    <form onSubmit={onSubmit} className="flex flex-col gap-3 rounded-control border border-brand-200 bg-brand-50/50 p-3" noValidate>
       <h3 className="font-semibold">{title}</h3>
       <SelectField
         label={t.findings.type}
@@ -714,7 +714,7 @@ function FindingForm({
         error={errors.type}
       />
       <div>
-        <p className="mb-1.5 text-sm font-medium text-slate-700">{t.findings.severity}</p>
+        <p className="mb-1.5 text-small font-medium text-ink-muted">{t.findings.severity}</p>
         <Segmented
           label={t.findings.severity}
           options={severityOptions(t)}
@@ -724,7 +724,7 @@ function FindingForm({
             setErrors((x) => ({ ...x, severity: undefined }));
           }}
         />
-        {errors.severity && <p className="mt-1.5 text-sm text-red-600">{errors.severity}</p>}
+        {errors.severity && <p className="mt-1.5 text-small text-danger-600">{errors.severity}</p>}
       </div>
       <Field
         label={t.findings.location}

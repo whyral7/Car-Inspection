@@ -2,12 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BackLink, Button, StickyActions } from "@/components/button";
+import { BackLink, Button, StickyBar } from "@/components/ui";
 import { useOnline } from "@/components/connection-banner";
-import { FormError, TextAreaField } from "@/components/field";
+import { FormError, TextAreaField } from "@/components/ui";
 import { useT } from "@/components/i18n-provider";
 import { AlertIcon, CheckIcon, ChevronRightIcon, CloudUploadIcon, HelpIcon, PlusIcon, XIcon } from "@/components/icons";
-import { Segmented, type SegmentOption } from "@/components/segmented";
+import { Segmented, type SegmentOption } from "@/components/ui";
 import { CHECKLIST_GROUPS, CHECKLIST_KEYS, checklistProgress, type ChecklistKey } from "@/lib/checklist";
 import { FINDING_LIMITS } from "@/lib/findings";
 import { checklistOutbox } from "@/lib/outbox";
@@ -32,10 +32,10 @@ type Items = Record<ChecklistKey, Item>;
 const RETRY_MS = 15_000;
 
 const resultOptions = (t: Strings): readonly SegmentOption<ChecklistResult>[] => [
-  { value: "ok", label: t.checklist.results.ok, icon: <CheckIcon size={16} />, selectedClass: "border-emerald-700 bg-emerald-700 text-white" },
-  { value: "attention", label: t.checklist.results.attention, icon: <AlertIcon size={16} />, selectedClass: "border-amber-500 bg-amber-400 text-amber-950" },
-  { value: "fail", label: t.checklist.results.fail, icon: <XIcon size={16} />, selectedClass: "border-red-700 bg-red-700 text-white" },
-  { value: "na", label: t.checklist.results.na, selectedClass: "border-slate-700 bg-slate-700 text-white" },
+  { value: "ok", label: t.checklist.results.ok, icon: <CheckIcon size={16} />, selectedClass: "border-success-700 bg-success-700 text-white" },
+  { value: "attention", label: t.checklist.results.attention, icon: <AlertIcon size={16} />, selectedClass: "border-warning-500 bg-warning-500 text-warning-800" },
+  { value: "fail", label: t.checklist.results.fail, icon: <XIcon size={16} />, selectedClass: "border-danger-700 bg-danger-700 text-white" },
+  { value: "na", label: t.checklist.results.na, selectedClass: "border-ink-muted bg-ink-muted text-white" },
 ];
 
 type Props = {
@@ -198,30 +198,30 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
       <BackLink href={`/app/cars/${carId}`}>{t.checklist.backToCar}</BackLink>
 
       <header>
-        <h1 className="text-xl font-bold">{t.checklist.title}</h1>
-        <p className="text-sm text-slate-700">
+        <h1 className="text-title font-bold">{t.checklist.title}</h1>
+        <p className="text-small text-ink-muted">
           <span className="font-semibold tracking-wider">{regNumber}</span>
           {carTitle && ` · ${carTitle}`}
         </p>
-        <p className="mt-2 text-sm text-slate-700">{t.checklist.subtitle}</p>
+        <p className="mt-2 text-small text-ink-muted">{t.checklist.subtitle}</p>
       </header>
 
-      <section className="rounded-2xl border border-line bg-white p-4" aria-label={label}>
-        <p className="text-2xl font-bold">{label}</p>
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={progress.total} aria-valuenow={progress.done}>
+      <section className="rounded-card border border-line bg-surface p-4" aria-label={label}>
+        <p className="text-title font-bold">{label}</p>
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-sunken" role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={progress.total} aria-valuenow={progress.done}>
           <div className="h-full rounded-full bg-brand-600 transition-[width]" style={{ width: `${(progress.done / progress.total) * 100}%` }} />
         </div>
       </section>
 
       {waiting > 0 && (
-        <p role="status" className="flex items-start gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800">
+        <p role="status" className="flex items-start gap-2 rounded-control border border-line bg-surface px-4 py-3 text-small text-ink">
           <CloudUploadIcon size={18} className="mt-px text-brand-700" />
           {t.checklist.waitingCount(waiting)}
         </p>
       )}
 
       {CHECKLIST_GROUPS.map((group) => (
-        <section key={group.key} className="rounded-2xl border border-line bg-white">
+        <section key={group.key} className="rounded-card border border-line bg-surface">
           <h2 className="border-b border-line px-4 py-3 font-semibold">{t.checklist.groups[group.key]}</h2>
           <ul className="divide-y divide-line">
             {group.items.map((key) => (
@@ -242,10 +242,10 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
         </section>
       ))}
 
-      <StickyActions>
+      <StickyBar>
         {confirmRest ? (
           <div role="alertdialog" aria-labelledby="mark-rest" className="flex flex-col gap-2">
-            <p id="mark-rest" className="text-sm font-medium text-slate-900">
+            <p id="mark-rest" className="text-small font-medium text-ink">
               {t.checklist.markRestConfirm(remaining)}
             </p>
             <div className="grid grid-cols-2 gap-2">
@@ -257,7 +257,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
           </div>
         ) : (
           <>
-            <p aria-live="polite" className={`text-center text-sm ${progress.complete ? "text-brand-800" : "text-slate-800"}`}>
+            <p aria-live="polite" className={`text-center text-small ${progress.complete ? "text-brand-800" : "text-ink"}`}>
               {progress.complete ? (finished ? t.checklist.finished : t.checklist.allDone) : t.checklist.finishHint(remaining)}
             </p>
             <FormError message={finishError ?? (!online && progress.complete ? t.checklist.finishOffline : null)} />
@@ -276,7 +276,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
             )}
           </>
         )}
-      </StickyActions>
+      </StickyBar>
     </div>
   );
 }
@@ -308,24 +308,24 @@ function ChecklistRow({
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="font-semibold">{label}</p>
-          <p className="text-sm text-slate-700">{hint}</p>
+          <p className="text-small text-ink-muted">{hint}</p>
         </div>
         <SaveState state={item.save} onRetry={onRetry} />
       </div>
       {item.helpOpen && (
-        <p id={helpId} className="rounded-xl bg-brand-50 p-3 text-sm text-brand-900">
+        <p id={helpId} className="rounded-control bg-brand-50 p-3 text-small text-brand-900">
           {how}
         </p>
       )}
       <Segmented label={label} options={resultOptions(t)} value={item.result} onChange={onChoose} columns="grid-cols-2 min-[420px]:grid-cols-4" />
       <div className="flex flex-wrap gap-x-4">
         {!item.noteOpen && (
-          <button type="button" onClick={onOpenNote} className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-brand-700">
+          <button type="button" onClick={onOpenNote} className="inline-flex min-h-11 items-center gap-1.5 text-small font-semibold text-brand-700">
             <PlusIcon size={16} />
             {t.checklist.addNote}
           </button>
         )}
-        <button type="button" onClick={onToggleHelp} aria-expanded={item.helpOpen} aria-controls={helpId} className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-brand-700">
+        <button type="button" onClick={onToggleHelp} aria-expanded={item.helpOpen} aria-controls={helpId} className="inline-flex min-h-11 items-center gap-1.5 text-small font-semibold text-brand-700">
           <HelpIcon size={16} />
           {t.checklist.howToCheck}
         </button>
@@ -347,24 +347,24 @@ function ChecklistRow({
 
 function SaveState({ state, onRetry }: { state: SaveState; onRetry: () => void }) {
   const t = useT();
-  if (state === "saving") return <span className="shrink-0 text-xs text-slate-600">{t.checklist.saving}</span>;
+  if (state === "saving") return <span className="shrink-0 text-caption text-ink-muted">{t.checklist.saving}</span>;
   if (state === "saved")
     return (
-      <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-brand-800">
+      <span className="inline-flex shrink-0 items-center gap-1 text-caption font-semibold text-brand-800">
         <CheckIcon size={14} />
         {t.checklist.saved}
       </span>
     );
   if (state === "waiting")
     return (
-      <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-slate-700">
+      <span className="inline-flex shrink-0 items-center gap-1 text-caption font-semibold text-ink-muted">
         <CloudUploadIcon size={14} />
         {t.checklist.waiting}
       </span>
     );
   if (state === "error")
     return (
-      <button type="button" onClick={onRetry} className="min-h-11 shrink-0 text-right text-xs font-semibold text-red-800">
+      <button type="button" onClick={onRetry} className="min-h-11 shrink-0 text-right text-caption font-semibold text-danger-800">
         {t.checklist.saveFailed}
       </button>
     );

@@ -4,6 +4,7 @@ import { ContactButtons, ReportView } from "@/components/report/report-view";
 import { APP_NAME } from "@/lib/config";
 import { contentVersion, getPublishedReport } from "@/lib/report/load";
 import { reportPdfPath, reportUrl, telHref } from "@/lib/report/share";
+import { REPORT } from "@/lib/config";
 import { buildReportView, parseHiddenSections, summaryParts } from "@/lib/report/view";
 import { en } from "@/lib/strings";
 import { getT } from "@/lib/i18n.server";
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: PageProps<"/r/[slug]">): Prom
   const description = t.publicReport.ogDescription(view.car.regNumber, dealer, summaryParts(view));
   // Changes whenever anything drawn on the image changes, so WhatsApp and CDNs fetch a fresh one.
   const lead = view.photos?.[0] ? loaded.images.find((img) => img.angleKey === view.photos![0].key)?.version : null;
-  const v = contentVersion({ car, reg: view.car.regNumber, score: view.scoreText, dealer, logo: loaded.logoPath, parts: summaryParts(view), lead });
+  const v = contentVersion({ og: REPORT.ogVersion, car, reg: view.car.regNumber, score: view.scoreText, dealer, logo: loaded.logoPath, parts: summaryParts(view), lead });
   const image = { url: `${url}/og.png?v=${v}`, width: 1200, height: 630, alt: t.publicReport.ogAlt(car, view.scoreText), type: "image/png" };
 
   return {
@@ -56,7 +57,7 @@ export default async function PublicReportPage({ params }: PageProps<"/r/[slug]"
       </main>
       {canContact && (
         // Always in reach while the buyer scrolls through the photos.
-        <aside aria-label={t.publicReport.contactBar} className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-white shadow-[0_-2px_8px_rgb(15_23_42/0.06)]">
+        <aside aria-label={t.publicReport.contactBar} className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-surface shadow-[0_-2px_8px_rgb(15_23_42/0.06)]">
           <div className="mx-auto w-full max-w-2xl px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
             <ContactButtons view={view} t={t} />
           </div>

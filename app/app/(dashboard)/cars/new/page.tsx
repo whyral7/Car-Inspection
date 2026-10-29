@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BackLink } from "@/components/button";
+import { BackLink } from "@/components/ui";
 import { getT } from "@/lib/i18n.server";
 import { AddCarForm } from "./add-car-form";
 
@@ -13,8 +13,8 @@ export default async function NewCarPage() {
   return (
     <div className="mx-auto flex max-w-md flex-col">
       <BackLink href="/app">{t.car.backToCars}</BackLink>
-      <h1 className="mt-2 text-2xl font-bold">{t.cars.addTitle}</h1>
-      <p className="mt-1 text-slate-700">{t.cars.addSubtitle}</p>
+      <h1 className="mt-2 text-title font-bold">{t.cars.addTitle}</h1>
+      <p className="mt-1 text-ink-muted">{t.cars.addSubtitle}</p>
       <AddCarForm />
     </div>
   );

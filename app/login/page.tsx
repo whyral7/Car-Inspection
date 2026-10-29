@@ -18,8 +18,8 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-8">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <Link href="/" className="flex min-h-11 items-center gap-2 text-lg font-bold text-brand-700" aria-label={`${t.appName}: ${t.common.goToSite}`}>
-          <span aria-hidden className="flex size-8 items-center justify-center rounded-lg bg-brand-700 text-sm text-white">
+        <Link href="/" className="flex min-h-11 items-center gap-2 text-heading font-bold text-brand-700" aria-label={`${t.appName}: ${t.common.goToSite}`}>
+          <span aria-hidden className="flex size-8 items-center justify-center rounded-chip bg-brand-700 text-small text-white">
             T
           </span>
           {t.appName}
@@ -27,7 +27,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
         <LanguageToggle />
       </div>
       <LoginForm nextPath={nextPath} />
-      <p className="mt-4 text-center text-sm leading-10 text-slate-700">
+      <p className="mt-4 text-center text-small leading-10 text-ink-muted">
         {t.login.agree}{" "}
         <Link href="/terms" className="py-2.5 font-semibold text-brand-700 underline">
           {t.login.terms}
@@ -38,7 +38,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
         </Link>
         .
       </p>
-      <p className="mt-auto pt-8 text-center text-sm text-slate-600">{t.disclaimer}</p>
+      <p className="mt-auto pt-8 text-center text-small text-ink-muted">{t.disclaimer}</p>
     </main>
   );
 }

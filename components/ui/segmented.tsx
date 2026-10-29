@@ -6,11 +6,11 @@ export type SegmentOption<V extends string> = {
   value: V;
   label: string;
   icon?: ReactNode;
-  /** Classes for the selected state, e.g. "bg-red-600 text-white border-red-600". */
+  /** Classes for the selected state, e.g. "bg-danger-700 text-white ring-danger-700". */
   selectedClass?: string;
 };
 
-const defaultSelected = "border-brand-700 bg-brand-700 text-white";
+const defaultSelected = "bg-brand-700 text-white shadow-card ring-brand-700";
 
 /** A row of big tap targets that behaves like a radio group (arrow keys move the selection). */
 export function Segmented<V extends string>({
@@ -48,7 +48,7 @@ export function Segmented<V extends string>({
     <div
       role="radiogroup"
       aria-label={label}
-      className={`grid gap-1.5 ${columns ?? ""} ${className}`}
+      className={`grid gap-2 ${columns ?? ""} ${className}`}
       style={columns ? undefined : { gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
     >
       {options.map((o, i) => {
@@ -66,8 +66,8 @@ export function Segmented<V extends string>({
             disabled={disabled}
             onClick={() => onChange(o.value)}
             onKeyDown={(e) => onKeyDown(e, i)}
-            className={`min-h-11 rounded-xl border px-1 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-500 ${
-              selected ? (o.selectedClass ?? defaultSelected) : "border-slate-300 bg-white text-ink active:bg-slate-100"
+            className={`min-h-12 rounded-control px-2 text-small font-semibold ring-1 transition-[background-color,color,box-shadow] duration-150 ring-inset focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:bg-sunken disabled:text-ink-subtle disabled:ring-line ${
+              selected ? (o.selectedClass ?? defaultSelected) : "bg-surface text-ink ring-line-strong/60 hover:bg-canvas active:bg-sunken"
             }`}
           >
             <span className="inline-flex items-center justify-center gap-1.5">
