@@ -2,6 +2,8 @@
 
 Date: 29 October 2026 · Build: `master` at `4a354b3` · Auditor: Claude (no code changed)
 
+> **Status:** fixed on branch `ux-improvements`. See [ux-audit-fixes.md](ux-audit-fixes.md) for what changed and what was deferred.
+
 ## How this audit was done
 
 - I ran the app locally (`next dev`, plus a production build for the speed numbers) against the real Supabase project.

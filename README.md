@@ -40,7 +40,12 @@ app/                    routes (App Router)
   manifest.ts           PWA manifest
 components/             shared UI (angle-hint.tsx: SVG outline per photo angle)
 lib/
-  strings.ts            every UI string (add Hindi here later)
+  strings.ts            every English UI string; strings.hi.ts is the Hindi copy (same shape)
+  strings-legal.ts      legal page templates (English only)
+  i18n.ts, i18n.server.ts, i18n.actions.ts  language picking (lang cookie, then Accept-Language), getT() on the server
+  outbox.ts             on-phone queue (IndexedDB) for photos and checklist answers taken offline
+  inspection.ts         next step, steps done and provisional score for a car (+ tests)
+  images/quality.ts     dark / bright / blurry check before upload (+ tests)
   config.ts             app constants
   env.ts, env.server.ts validated env access
   supabase/             browser, server, proxy and service-role clients + DB types
@@ -177,12 +182,25 @@ In Supabase go to **Authentication → Sign In / Providers → Phone** and enabl
 
 - **For development (free, no SMS):** under *Test Phone Numbers and OTPs* add e.g. `919999999999=123456`. Logging in with `99999 99999` then accepts `123456` and no SMS is sent. If the dashboard requires SMS provider fields before it will save, pick Twilio and enter placeholder values; test numbers never hit the provider.
 - **For real SMS:** configure Twilio, Twilio Verify, MessageBird, Vonage or Textlocal. SMS to Indian numbers needs a DLT-registered sender and template with your provider.
+- **Auto-fill the code on Android:** the login screen reads the code from the SMS (WebOTP) when the message's last line is `@your-domain.com #123456`. In **Authentication → SMS template** end the message with `@<your domain> #{{ .Code }}` (for example `Your Treadmark code is {{ .Code }}` on one line, then `@treadmark.in #{{ .Code }}`), and register that template with your DLT provider. Without it, people type the code as before.
 
 ### 5. Run
 ```bash
 npm run dev
 ```
 Open http://localhost:3000, tap **Log in with phone**, enter the test number and OTP, pick who you are, fill in your name and city (dealers can add a business name, address and logo), and you'll land on **My cars**.
+
+## Languages
+
+The app, login and public report come in English and Hindi. People switch with the **English / हिन्दी** toggle on the login and profile screens; the choice is saved in a `lang` cookie, and first-time visitors get the language their phone asks for. The landing, legal pages, PDF and WhatsApp preview image stay English.
+
+- Server components: `const t = await getT()` from `lib/i18n.server.ts`. Client components: `const t = useT()` from `components/i18n-provider.tsx`.
+- Validation schemas return string keys (like `"cars.errors.make"`); show them with `errorText(t, key)`.
+- **To add a language:** copy `lib/strings.hi.ts` to `lib/strings.<code>.ts`, translate it (TypeScript fails the build if a key is missing or a function has the wrong arguments), then add the code to `LOCALES` and `dictionary()` in `lib/i18n.ts` and a name in `common.languageNames`.
+
+## Working offline
+
+Photos and checklist answers are written to an on-phone queue (`lib/outbox.ts`, IndexedDB) before they are uploaded. If the signal drops, they stay on the phone, show as "waiting", and upload by themselves when the connection is back, even after the page is reloaded. The service worker (`public/sw.js`, production builds only) shows `public/offline.html` when a page can't load.
 
 ## Test on your phone (same Wi-Fi)
 
