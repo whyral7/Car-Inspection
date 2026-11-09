@@ -6,20 +6,24 @@ import { APP_NAME, CREDIT_PACKS, FREE_CREDITS, SAMPLE_REPORT_PATH } from "@/lib/
 import { pricePerReportPaise } from "@/lib/credits/packs";
 import { formatRupees } from "@/lib/format";
 import { supportWhatsappHref } from "@/lib/site";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
+import type { Strings } from "@/lib/strings";
 
-const h = t.home;
+type Home = Strings["home"];
 
-export const metadata: Metadata = {
-  title: { absolute: h.metaTitle },
-  description: h.metaDescription,
-  alternates: { canonical: "/" },
-  openGraph: { title: h.metaTitle, description: h.metaDescription, url: "/" },
-  twitter: { title: h.metaTitle, description: h.metaDescription },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const h = (await getT()).home;
+  return {
+    title: { absolute: h.metaTitle },
+    description: h.metaDescription,
+    alternates: { canonical: "/" },
+    openGraph: { title: h.metaTitle, description: h.metaDescription, url: "/" },
+    twitter: { title: h.metaTitle, description: h.metaDescription },
+  };
+}
 
-function WhatsappLink({ className }: { className: string }) {
-  const href = supportWhatsappHref();
+function WhatsappLink({ className, h }: { className: string; h: Home }) {
+  const href = supportWhatsappHref(h.whatsappMessage);
   const external = href.startsWith("https:");
   return (
     <a href={href} className={className} {...(external ? { target: "_blank", rel: "noopener" } : {})}>
@@ -30,7 +34,7 @@ function WhatsappLink({ className }: { className: string }) {
 }
 
 /** A small static picture of a report, so visitors see what buyers get before tapping the sample. */
-function ReportPreview() {
+function ReportPreview({ h }: { h: Home }) {
   const p = h.preview;
   return (
     <div aria-hidden className="mx-auto w-full max-w-xs rounded-lg border border-border bg-surface p-4 shadow-sheet">
@@ -69,7 +73,9 @@ function ReportPreview() {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const t = await getT();
+  const h = t.home;
   const cheapest = Math.min(...CREDIT_PACKS.map(pricePerReportPaise));
   const jsonLd = {
     "@context": "https://schema.org",
@@ -101,7 +107,7 @@ export default function Home() {
             </div>
             <p className="type-caption text-text-subtle">{h.ctaNote}</p>
           </div>
-          <ReportPreview />
+          <ReportPreview h={h} />
         </div>
       </section>
 
@@ -175,13 +181,13 @@ export default function Home() {
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <LinkButton href="/login">{h.cta}</LinkButton>
-            <WhatsappLink className="flex min-h-12 items-center justify-center gap-2 rounded-md border border-button-secondary-border bg-button-secondary-bg px-5 type-title-sm text-button-secondary-fg active:bg-button-secondary-bg-hover" />
+            <WhatsappLink h={h} className="flex min-h-12 items-center justify-center gap-2 rounded-md border border-button-secondary-border bg-button-secondary-bg px-5 type-title-sm text-button-secondary-fg active:bg-button-secondary-bg-hover" />
           </div>
         </div>
       </section>
 
       {/* Always-visible WhatsApp button, the way Indian dealers expect to ask a question. */}
-      <WhatsappLink className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-30 flex min-h-12 items-center gap-2 rounded-md bg-text px-4 type-title-sm text-bg shadow-bar active:bg-ink-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring" />
+      <WhatsappLink h={h} className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-30 flex min-h-12 items-center gap-2 rounded-md bg-text px-4 type-title-sm text-bg shadow-bar active:bg-ink-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring" />
     </>
   );
 }

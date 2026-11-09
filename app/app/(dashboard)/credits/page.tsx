@@ -3,15 +3,19 @@ import Link from "next/link";
 import { CREDIT_PACKS } from "@/lib/config";
 import { pricePerReportPaise } from "@/lib/credits/packs";
 import { getCurrentProfile } from "@/lib/profile";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 import { safeNextPath } from "@/lib/validation/auth";
 import { BuyCredits } from "./buy-credits";
 
-export const metadata: Metadata = { title: t.credits.title };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.credits.title };
+}
 
 // Packs and prices come from CREDIT_PACKS in lib/config.ts. ?next=/app/... sends the dealer back
 // (e.g. to the report they were about to publish) after paying.
 export default async function CreditsPage({ searchParams }: PageProps<"/app/credits">) {
+  const t = await getT();
   const { profile } = await getCurrentProfile();
   const { next } = await searchParams;
   const nextPath = typeof next === "string" && next.startsWith("/app/") ? safeNextPath(next) : null;

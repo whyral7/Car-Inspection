@@ -1,11 +1,12 @@
 "use client";
 
 import { useRef, useState, type TouchEvent } from "react";
-import { t } from "@/lib/strings";
+import { useT } from "@/components/i18n-provider";
 import type { ReportPhoto } from "@/lib/report/view";
 
 /** Thumbnail grid (small copies, lazy loaded) that opens the full photo in a swipeable viewer. */
 export function PhotoGallery({ photos }: { photos: ReportPhoto[] }) {
+  const t = useT();
   const dialog = useRef<HTMLDialogElement>(null);
   const touchX = useRef<number | null>(null);
   const [index, setIndex] = useState(0);

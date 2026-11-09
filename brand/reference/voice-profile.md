@@ -23,7 +23,7 @@ Treadmark writes like an inspector signing a report: the reading first, then wha
 - "You" for the reader; "we" only when Treadmark takes responsibility.
 - Formats: ₹4,85,000 · ₹5.60–5.85 lakh · 48,320 km · 9 Nov 2026 · 2.1 mm · 118 µm.
 - Scores: 8.4/10 with a grade word. No stars, no percentages.
-- Hindi: written natively, formal आप, everyday words (गाड़ी, not वाहन); loanwords people say (report, RC, km) stay in Latin script.
+- Hindi: written natively, formal आप, everyday words (गाड़ी, डिक्की, स्टेपनी; not वाहन). Acronyms, units and brand names stay in Latin script (RC, PUC, OTP, PDF, AI, km, WhatsApp, Treadmark); loanwords people say in Hindi are written in Devanagari (रिपोर्ट, फ़ोटो, क्रेडिट).
 - Tagline: "Every car, properly checked." · हर गाड़ी की पक्की जाँच
 
 ## Examples

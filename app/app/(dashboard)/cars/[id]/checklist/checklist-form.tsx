@@ -9,7 +9,8 @@ import { CheckIcon } from "@/components/icons";
 import { Segmented, type SegmentOption } from "@/components/segmented";
 import { CHECKLIST_GROUPS, CHECKLIST_KEYS, checklistProgress, type ChecklistKey } from "@/lib/checklist";
 import { FINDING_LIMITS } from "@/lib/findings";
-import { t } from "@/lib/strings";
+import { useT } from "@/components/i18n-provider";
+import type { Strings } from "@/lib/strings";
 import type { ChecklistResult } from "@/lib/supabase/database.types";
 import { finishInspection, saveChecklistItem } from "./actions";
 
@@ -21,7 +22,7 @@ type Item = {
 };
 type Items = Record<ChecklistKey, Item>;
 
-const resultOptions: readonly SegmentOption<ChecklistResult>[] = [
+const resultOptions = (t: Strings): readonly SegmentOption<ChecklistResult>[] => [
   // Brand ChecklistItem spec: the selected rating takes its verdict tint, edge and word colour.
   { value: "ok", label: t.checklist.results.ok, selectedClass: "border-verdict-pass-fg bg-verdict-pass-bg text-verdict-pass-fg" },
   { value: "attention", label: t.checklist.results.attention, selectedClass: "border-verdict-attention-fg bg-verdict-attention-bg text-verdict-attention-fg" },
@@ -38,6 +39,7 @@ type Props = {
 };
 
 export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }: Props) {
+  const t = useT();
   const router = useRouter();
   const [items, setItems] = useState<Items>(() => {
     const entries = CHECKLIST_KEYS.map((key) => {
@@ -176,6 +178,7 @@ function ChecklistRow({
   onOpenNote: () => void;
   onRetry: () => void;
 }) {
+  const t = useT();
   const { label, hint } = t.checklist.items[itemKey];
   return (
     <div className="flex flex-col gap-2.5">
@@ -186,7 +189,7 @@ function ChecklistRow({
         </div>
         <SaveState state={item.save} onRetry={onRetry} />
       </div>
-      <Segmented label={label} options={resultOptions} value={item.result} onChange={onChoose} />
+      <Segmented label={label} options={resultOptions(t)} value={item.result} onChange={onChoose} />
       {item.noteOpen ? (
         <TextAreaField
           label={t.checklist.noteLabel}
@@ -207,6 +210,7 @@ function ChecklistRow({
 }
 
 function SaveState({ state, onRetry }: { state: Item["save"]; onRetry: () => void }) {
+  const t = useT();
   if (state === "saving") return <span className="shrink-0 text-xs text-text-subtle">{t.checklist.saving}</span>;
   if (state === "saved")
     return (

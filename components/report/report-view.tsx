@@ -6,7 +6,7 @@ import { PhotoGallery } from "@/components/report/photo-gallery";
 import { formatPhone, telHref, whatsappChatUrl } from "@/lib/report/share";
 import type { DetailRow, ReportCheckItem, ReportView as View } from "@/lib/report/view";
 import { scoreBars } from "@/lib/score";
-import { t } from "@/lib/strings";
+import type { Strings } from "@/lib/strings";
 import type { ChecklistResult, Severity } from "@/lib/supabase/database.types";
 
 // Verdicts always carry a word and a glyph as well as a colour (brand rule), never colour alone.
@@ -78,7 +78,8 @@ function CheckList({ items }: { items: ReportCheckItem[] }) {
 }
 
 /** Score out of 10 in ink, five rising bars (the highest filled one in olive) and the grade word. */
-export function ScoreBadge({ view, className = "" }: { view: Pick<View, "score" | "scoreText" | "band">; className?: string }) {
+// Strings come in as a prop: this renders on the server (public report) and inside the dealer's client preview.
+export function ScoreBadge({ view, t, className = "" }: { view: Pick<View, "score" | "scoreText" | "band">; t: Strings; className?: string }) {
   const filled = scoreBars(view.score);
   return (
     <div
@@ -108,7 +109,7 @@ export function ScoreBadge({ view, className = "" }: { view: Pick<View, "score" 
 }
 
 /** "Call dealer" and "WhatsApp dealer" (or owner). In the sharer's own preview they are shown but do nothing. */
-export function ContactButtons({ view, preview = false }: { view: View; preview?: boolean }) {
+export function ContactButtons({ view, t, preview = false }: { view: View; t: Strings; preview?: boolean }) {
   const { userType, phone } = view.dealer;
   const message = t.publicReport.contactMessage(view.car.title || view.car.regNumber, view.car.regNumber, userType !== "buyer");
   const call = telHref(phone);
@@ -139,7 +140,7 @@ export function ContactButtons({ view, preview = false }: { view: View; preview?
   );
 }
 
-export function ReportView({ view, pdfHref }: { view: View; pdfHref?: string | null }) {
+export function ReportView({ view, t, pdfHref }: { view: View; t: Strings; pdfHref?: string | null }) {
   const phone = formatPhone(view.dealer.phone);
   const place = [view.dealer.address, view.dealer.city].filter(Boolean).join(", ");
 
@@ -166,7 +167,7 @@ export function ReportView({ view, pdfHref }: { view: View; pdfHref?: string | n
             <p className="inline-block rounded-xs border-[1.5px] border-plate-border px-2 py-0.5 font-mono text-base font-medium tracking-[0.08em]">{view.car.regNumber}</p>
             <h1 className="mt-2 type-heading-2 text-text">{view.car.title}</h1>
           </div>
-          <ScoreBadge view={view} />
+          <ScoreBadge view={view} t={t} />
         </div>
         {view.car.details.length > 0 && (
           <div className="mt-3">

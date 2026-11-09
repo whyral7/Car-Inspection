@@ -4,11 +4,14 @@ import { z } from "zod";
 import { isChecklistKey, type ChecklistKey } from "@/lib/checklist";
 import { carTitle } from "@/lib/format";
 import { getCurrentProfile } from "@/lib/profile";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 import type { ChecklistResult } from "@/lib/supabase/database.types";
 import { ChecklistForm } from "./checklist-form";
 
-export const metadata: Metadata = { title: t.checklist.title };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.checklist.title };
+}
 
 export default async function ChecklistPage({ params }: PageProps<"/app/cars/[id]/checklist">) {
   const { id } = await params;

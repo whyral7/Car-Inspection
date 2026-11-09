@@ -3,12 +3,16 @@ import Link from "next/link";
 import { LogoutButton } from "@/components/logout-button";
 import { getCurrentProfile, isProfileComplete } from "@/lib/profile";
 import { logoUrl } from "@/lib/storage";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 import { OnboardingForm } from "./onboarding-form";
 
-export const metadata: Metadata = { title: t.onboarding.title };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.onboarding.title };
+}
 
 export default async function OnboardingPage() {
+  const t = await getT();
   const { user, profile } = await getCurrentProfile();
   const editing = isProfileComplete(profile);
 

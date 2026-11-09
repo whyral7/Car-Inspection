@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { STORAGE_BUCKETS } from "@/lib/config";
 import { getCurrentProfile, isProfileComplete } from "@/lib/profile";
-import { t } from "@/lib/strings";
+import { getT, getTranslateMessage } from "@/lib/i18n.server";
 import { onboardingSchema, type OnboardingField } from "@/lib/validation/profile";
 
 export type OnboardingState = {
@@ -12,6 +12,8 @@ export type OnboardingState = {
 };
 
 export async function saveProfile(formData: FormData): Promise<OnboardingState> {
+  const t = await getT();
+  const tr = await getTranslateMessage();
   const { supabase, user, profile } = await getCurrentProfile();
 
   const parsed = onboardingSchema(user.id).safeParse({
@@ -27,7 +29,7 @@ export async function saveProfile(formData: FormData): Promise<OnboardingState> 
     const fieldErrors: OnboardingState["fieldErrors"] = {};
     for (const issue of parsed.error.issues) {
       const key = issue.path[0] as OnboardingField;
-      fieldErrors[key] ??= issue.message;
+      fieldErrors[key] ??= tr(issue.message);
     }
     return { fieldErrors };
   }

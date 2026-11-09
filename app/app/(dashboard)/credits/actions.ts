@@ -6,7 +6,7 @@ import { findPack, packKeySchema } from "@/lib/credits/packs";
 import { serverEnv } from "@/lib/env.server";
 import { getCurrentProfile } from "@/lib/profile";
 import { createOrder } from "@/lib/razorpay/api";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /** Open orders a dealer may start in an hour, so a stuck button can't flood Razorpay. */
@@ -32,6 +32,7 @@ export type OrderStatus = { status: "created" | "paid" | "failed" | "unknown"; c
  * then opens Razorpay Checkout with the order id. Credits are added later by the webhook, never here.
  */
 export async function createCreditOrder(packKey: string): Promise<OrderResult> {
+  const t = await getT();
   const key = packKeySchema.safeParse(packKey);
   const pack = key.success ? findPack(key.data) : null;
   if (!pack) return { ok: false, error: t.common.somethingWrong };

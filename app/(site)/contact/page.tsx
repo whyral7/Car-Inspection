@@ -4,13 +4,15 @@ import { buttonClass } from "@/components/button";
 import { ChatIcon } from "@/components/icons";
 import { BUSINESS } from "@/lib/config";
 import { formatPhone, whatsappChatUrl } from "@/lib/report/share";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.legal.contact.title, alternates: { canonical: "/contact" } };
+}
 
-const copy = t.legal.contact;
-
-export const metadata: Metadata = { title: copy.title, alternates: { canonical: "/contact" } };
-
-export default function ContactPage() {
+export default async function ContactPage() {
+  const t = await getT();
+  const copy = t.legal.contact;
   const chat = whatsappChatUrl(BUSINESS.whatsapp, t.home.whatsappMessage);
   const rows = [
     { label: copy.business, value: BUSINESS.legalName },

@@ -12,7 +12,7 @@ import { carTitle, formatDate, formatDateTime, isPastDate } from "@/lib/format";
 import { photoProgress } from "@/lib/photos/angles";
 import { getCurrentProfile } from "@/lib/profile";
 import { conditionScore, formatScore, scoreBand } from "@/lib/score";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 
 const getCar = cache(async (id: string) => {
   if (!z.uuid().safeParse(id).success) notFound();
@@ -33,6 +33,7 @@ const isFuel = (v: string | null): v is Fuel => (FUELS as readonly string[]).inc
 const isTransmission = (v: string | null): v is Transmission => (TRANSMISSIONS as readonly string[]).includes(v ?? "");
 
 export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
+  const t = await getT();
   const { id } = await params;
   const car = await getCar(id);
   const { supabase } = await getCurrentProfile();

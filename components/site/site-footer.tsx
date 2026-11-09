@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { BUSINESS } from "@/lib/config";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 
-const links = [
-  { href: "/privacy", label: t.site.footer.privacy },
-  { href: "/terms", label: t.site.footer.terms },
-  { href: "/refunds", label: t.site.footer.refunds },
-  { href: "/contact", label: t.site.footer.contact },
-];
-
-export function SiteFooter() {
+export async function SiteFooter() {
+  const t = await getT();
+  const links = [
+    { href: "/privacy", label: t.site.footer.privacy },
+    { href: "/terms", label: t.site.footer.terms },
+    { href: "/refunds", label: t.site.footer.refunds },
+    { href: "/contact", label: t.site.footer.contact },
+  ];
   return (
     <footer className="border-t border-border bg-surface pb-[env(safe-area-inset-bottom)]">
       {/* Bottom padding keeps the last line clear of the floating WhatsApp button. */}

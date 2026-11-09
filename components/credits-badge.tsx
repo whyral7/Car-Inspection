@@ -1,6 +1,7 @@
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 
-export function CreditsBadge({ credits }: { credits: number }) {
+export async function CreditsBadge({ credits }: { credits: number }) {
+  const t = await getT();
   const low = credits <= 1;
   return (
     <span

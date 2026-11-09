@@ -4,11 +4,15 @@ import { LinkButton } from "@/components/button";
 import { StatusBadge } from "@/components/status-badge";
 import { carTitle } from "@/lib/format";
 import { getCurrentProfile } from "@/lib/profile";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 
-export const metadata: Metadata = { title: t.dashboard.myCars };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.dashboard.myCars };
+}
 
 export default async function AppHome() {
+  const t = await getT();
   const { supabase, profile } = await getCurrentProfile();
   const { data: cars, error } = await supabase
     .from("cars")

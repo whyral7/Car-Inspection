@@ -1,5 +1,5 @@
-// All user-facing copy lives here so a Hindi version can be added later
-// (e.g. export a `hi` object with the same shape and pick by locale).
+// All user-facing copy lives here. English is the source; lib/strings.hi.ts holds the Hindi with the same
+// shape (the Strings type enforces it). Screens get the reader's language from getT() (server) or useT() (client).
 
 /** Business details filled into the legal templates (BUSINESS in lib/config.ts). */
 type LegalBusiness = { legalName: string; address: string; city: string; email: string; grievanceOfficer: string };
@@ -8,6 +8,12 @@ export const en = {
   appName: "Treadmark",
   tagline: "Every car, properly checked. Inspection reports you can share on WhatsApp.",
   disclaimer: "Visual and documented inspection. Not a mechanical certification.",
+
+  language: {
+    /** The toggle shows the language you can switch TO. */
+    switchTo: "हिंदी",
+    switchToLabel: "हिंदी में देखें",
+  },
 
   common: {
     loading: "Please wait…",
@@ -280,6 +286,8 @@ export const en = {
     terms: "Terms",
     and: "and",
     privacy: "Privacy policy",
+    /** Closes the agreement line; Hindi puts the verb here. */
+    agreeEnd: ".",
     verify: "Verify and continue",
     resend: "Resend OTP",
     resendIn: (seconds: number) => `Resend OTP in ${seconds}s`,
@@ -837,4 +845,17 @@ export const en = {
   },
 } as const;
 
+/** The shape every language must fill: the English object with its literal strings widened to string. */
+type Widen<T> = T extends string
+  ? string
+  : T extends (...args: infer A) => infer R
+    ? (...args: A) => Widen<R>
+    : T extends readonly (infer U)[]
+      ? readonly Widen<U>[]
+      : T extends object
+        ? { readonly [K in keyof T]: Widen<T[K]> }
+        : T;
+export type Strings = Widen<typeof en>;
+
+/** English. Use getT() / useT() in screens so readers get their own language; this stays for tests, the PDF and legal text. */
 export const t = en;

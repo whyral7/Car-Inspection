@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { BUSINESS } from "@/lib/config";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 
 type Section = { heading: string; body: readonly string[] };
 
-export function LegalPage({ title, intro, sections }: { title: string; intro: string; sections: readonly Section[] }) {
+export async function LegalPage({ title, intro, sections }: { title: string; intro: string; sections: readonly Section[] }) {
+  const t = await getT();
   return (
     <article className="mx-auto w-full max-w-2xl px-4 py-8">
       <Link href="/" className="-ml-1 inline-flex min-h-11 items-center px-1 text-sm font-medium text-accent">

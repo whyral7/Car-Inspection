@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CreditsBadge } from "@/components/credits-badge";
+import { LanguageToggle } from "@/components/language-toggle";
 import { LogoutButton } from "@/components/logout-button";
 import { displayName, getCurrentProfile, isProfileComplete } from "@/lib/profile";
 import { logoUrl } from "@/lib/storage";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 
 export default async function DashboardLayout({ children }: LayoutProps<"/app">) {
+  const t = await getT();
   const { profile } = await getCurrentProfile();
   if (!isProfileComplete(profile)) redirect("/app/onboarding");
 
@@ -21,6 +23,7 @@ export default async function DashboardLayout({ children }: LayoutProps<"/app">)
             {/* eslint-disable-next-line @next/next/no-img-element -- static brand SVG; the small lockup suits a header */}
             <img src="/brand/treadmark-lockup-small-color.svg" alt={t.appName} width={116} height={24} className="h-6 w-auto" />
           </Link>
+          <LanguageToggle />
           <Link href="/app/credits" className="flex min-h-11 items-center">
             <CreditsBadge credits={profile.credits} />
           </Link>
