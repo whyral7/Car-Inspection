@@ -262,6 +262,11 @@ Leave `RAZORPAY_API_URL` and `DEV_LAN_ORIGIN` unset. `NEXT_PUBLIC_*` values are 
 | `npm run lint` | ESLint |
 | `npm run typecheck` | Generate route types + `tsc --noEmit` |
 | `npm test` | Unit tests (vitest) |
+| `npm run brand:check` | Brand rules: no raw colours, default palette, banned copy, stars or /100 scores |
+
+CI (`.github/workflows/ci.yml`) runs lint, typecheck, tests, the brand check and a build on every pull request and push to `master`.
+
+Languages: English and Hindi. The reader picks with the हिंदी / English toggle (saved in the `tm_lang` cookie). Copy lives in `lib/strings.ts` and `lib/strings.hi.ts`. See every shared component in both languages and both themes at `/dev/brand` (dev server, or set `SHOW_BRAND_PAGE=1`).
 
 ## Security notes
 - RLS is on for every table: a user only sees their own rows. Users can't change their own `credits`, insert payments or publish reports; column grants block it at the database level.

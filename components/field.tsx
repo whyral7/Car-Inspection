@@ -8,27 +8,28 @@ type FieldProps = {
   prefix?: string;
 } & Omit<ComponentProps<"input">, "name" | "prefix">;
 
+// Brand TextField spec (brand/reference/components/TextField.md): 48px, 16px text, 3:1 edge, 2px error edge.
 export const inputClass =
-  "block min-h-12 w-full rounded-xl border border-slate-300 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-100 aria-invalid:border-red-500";
+  "block min-h-12 w-full rounded-md border border-input-border bg-input-bg px-4 type-body text-input-fg placeholder:text-input-placeholder hover:border-input-border-hover focus:border-input-border-focus focus:outline-2 focus:outline-offset-2 focus:outline-focus-ring disabled:bg-input-disabled-bg aria-invalid:border-2 aria-invalid:border-input-border-error";
 
 export function Field({ label, name, error, hint, prefix, className, ...props }: FieldProps) {
   const errorId = error ? `${name}-error` : undefined;
   return (
     <div className={className}>
-      <label htmlFor={name} className="mb-1.5 block text-sm font-medium text-slate-700">
+      <label htmlFor={name} className="mb-1.5 block type-label text-input-label">
         {label}
       </label>
       <div className="flex items-stretch gap-2">
         {prefix && (
-          <span className="flex min-h-12 items-center rounded-xl border border-slate-300 bg-slate-100 px-3 text-base font-medium text-slate-700">
+          <span className="flex min-h-12 items-center rounded-md border border-input-border bg-surface-sunken px-3 font-mono text-base font-medium text-text-muted">
             {prefix}
           </span>
         )}
         <input id={name} name={name} aria-invalid={Boolean(error)} aria-describedby={errorId} className={inputClass} {...props} />
       </div>
-      {hint && !error && <p className="mt-1.5 text-sm text-slate-500">{hint}</p>}
+      {hint && !error && <p className="mt-1.5 type-caption text-input-help">{hint}</p>}
       {error && (
-        <p id={errorId} className="mt-1.5 text-sm text-red-600">
+        <p id={errorId} className="mt-1.5 type-caption-strong text-input-error">
           {error}
         </p>
       )}
@@ -48,7 +49,7 @@ export function SelectField({ label, name, options, placeholder, error, classNam
   const errorId = error ? `${name}-error` : undefined;
   return (
     <div className={className}>
-      <label htmlFor={name} className="mb-1.5 block text-sm font-medium text-slate-700">
+      <label htmlFor={name} className="mb-1.5 block type-label text-input-label">
         {label}
       </label>
       <select id={name} name={name} aria-invalid={Boolean(error)} aria-describedby={errorId} className={inputClass} {...props}>
@@ -60,7 +61,7 @@ export function SelectField({ label, name, options, placeholder, error, classNam
         ))}
       </select>
       {error && (
-        <p id={errorId} className="mt-1.5 text-sm text-red-600">
+        <p id={errorId} className="mt-1.5 type-caption-strong text-input-error">
           {error}
         </p>
       )}
@@ -71,7 +72,7 @@ export function SelectField({ label, name, options, placeholder, error, classNam
 export function FormError({ message }: { message?: string | null }) {
   if (!message) return null;
   return (
-    <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+    <p role="alert" className="rounded-md bg-fail-tint px-4 py-3 type-body-sm text-text">
       {message}
     </p>
   );
@@ -87,12 +88,12 @@ export function TextAreaField({ label, name, error, className, ...props }: TextA
   const errorId = error ? `${name}-error` : undefined;
   return (
     <div className={className}>
-      <label htmlFor={name} className="mb-1.5 block text-sm font-medium text-slate-700">
+      <label htmlFor={name} className="mb-1.5 block type-label text-input-label">
         {label}
       </label>
       <textarea id={name} name={name} rows={2} aria-invalid={Boolean(error)} aria-describedby={errorId} className={`${inputClass} py-3`} {...props} />
       {error && (
-        <p id={errorId} className="mt-1.5 text-sm text-red-600">
+        <p id={errorId} className="mt-1.5 type-caption-strong text-input-error">
           {error}
         </p>
       )}

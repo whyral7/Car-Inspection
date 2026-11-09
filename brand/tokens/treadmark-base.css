@@ -1,0 +1,38 @@
+/* Treadmark base layer. Import AFTER treadmark-tokens.css.
+   Maps the brand font stacks onto the next/font variables from brand/next/fonts.ts,
+   and adds one class per type style so components never hand-set font sizes. */
+:root {
+  --font-sans: var(--font-martel-sans), system-ui, sans-serif;
+  --font-display: var(--font-martel-sans), system-ui, sans-serif;
+  --font-hindi: var(--font-martel-sans), "Noto Sans Devanagari", sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, Menlo, monospace;
+}
+html { background: var(--bg); color: var(--text); font: var(--type-body); -webkit-font-smoothing: antialiased; }
+:lang(hi) { line-height: 1.6; }                       /* Devanagari needs room for matras */
+/* The type styles set their own line height, so Hindi pages loosen them: headings to 1.35, text to 1.6.
+   Attribute selectors also catch responsive variants such as sm:type-display-xl. */
+:lang(hi) :is([class*="type-display"], [class*="type-heading"]) { line-height: 1.35; }
+:lang(hi) :is([class*="type-body"], [class*="type-title"], [class*="type-label"], [class*="type-caption"], [class*="type-overline"], [class*="type-micro"]) { line-height: 1.6; }
+:focus-visible { outline: var(--focus-ring-width) solid var(--focus-ring); outline-offset: var(--focus-ring-offset); }
+.tabular { font-variant-numeric: tabular-nums; }
+.caps { text-transform: uppercase; letter-spacing: var(--tracking-caps); } /* not .overline: Tailwind owns that name */
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; } }
+
+/* Type styles: class="type-label" etc. */
+.type-body { font: var(--type-body); }
+.type-body-lg { font: var(--type-body-lg); }
+.type-body-sm { font: var(--type-body-sm); }
+.type-caption { font: var(--type-caption); }
+.type-caption-strong { font: var(--type-caption-strong); }
+.type-code { font: var(--type-code); }
+.type-code-sm { font: var(--type-code-sm); }
+.type-code-strong { font: var(--type-code-strong); }
+.type-display-lg { font: var(--type-display-lg); }
+.type-display-xl { font: var(--type-display-xl); }
+.type-heading-1 { font: var(--type-heading-1); }
+.type-heading-2 { font: var(--type-heading-2); }
+.type-label { font: var(--type-label); }
+.type-micro { font: var(--type-micro); }
+.type-overline { font: var(--type-overline); }
+.type-reading { font: var(--type-reading); }
+.type-title-sm { font: var(--type-title-sm); }

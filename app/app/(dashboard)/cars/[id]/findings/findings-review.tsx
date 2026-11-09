@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import type { AnalyseResponse } from "@/app/api/photos/[photoId]/analyse/route";
+import { CheckIcon } from "@/components/icons";
+import { BottomBar } from "@/components/bottom-bar";
 import { Button, LinkButton } from "@/components/button";
 import { Field, FormError, SelectField, TextAreaField } from "@/components/field";
 import { Segmented } from "@/components/segmented";
@@ -10,7 +12,8 @@ import { runWithConcurrency } from "@/lib/concurrency";
 import { AI } from "@/lib/config";
 import { FINDING_LIMITS, FINDING_TYPES } from "@/lib/findings";
 import type { AngleKey } from "@/lib/photos/angles";
-import { t } from "@/lib/strings";
+import { useT } from "@/components/i18n-provider";
+import type { Strings } from "@/lib/strings";
 import type { AiStatus, FindingRow, FindingType, Severity } from "@/lib/supabase/database.types";
 import { confirmOdometer, deleteFinding, saveFinding, setFindingsAccepted, type FindingFormInput, type SaveFindingResult } from "./actions";
 
@@ -38,21 +41,22 @@ type Props = {
 };
 
 const GENERAL = "general";
-const typeOptions = FINDING_TYPES.map((value) => ({ value, label: t.findings.types[value] }));
-const severityOptions = [
-  { value: "minor", label: t.findings.severities.minor, selectedClass: "border-amber-500 bg-amber-100 text-amber-900" },
-  { value: "moderate", label: t.findings.severities.moderate, selectedClass: "border-orange-600 bg-orange-600 text-white" },
-  { value: "major", label: t.findings.severities.major, selectedClass: "border-red-600 bg-red-600 text-white" },
-] as const satisfies readonly { value: Severity; label: string; selectedClass: string }[];
+const typeOptions = (t: Strings) => FINDING_TYPES.map((value) => ({ value, label: t.findings.types[value] }));
+const severityOptions = (t: Strings) => [
+  { value: "minor", label: t.findings.severities.minor, selectedClass: "border-verdict-attention-fg bg-verdict-attention-bg text-verdict-attention-fg" },
+  { value: "moderate", label: t.findings.severities.moderate, selectedClass: "border-attention bg-attention text-on-attention" },
+  { value: "major", label: t.findings.severities.major, selectedClass: "border-fail bg-fail text-on-fail" },
+] satisfies readonly { value: Severity; label: string; selectedClass: string }[];
 const severityChip: Record<Severity, string> = {
-  minor: "bg-amber-100 text-amber-900",
-  moderate: "bg-orange-100 text-orange-900",
-  major: "bg-red-100 text-red-800",
+  minor: "bg-attention-tint text-attention",
+  moderate: "bg-attention-tint text-attention",
+  major: "bg-fail-tint text-fail",
 };
 
 const kmFormat = new Intl.NumberFormat("en-IN");
 
 export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initialPhotos, initialFindings }: Props) {
+  const t = useT();
   const [photos, setPhotos] = useState<PhotoState[]>(initialPhotos);
   const [findings, setFindings] = useState<FindingRow[]>(initialFindings);
   // "<finding id>" while editing one, "new:<photo id | general>" while adding, else null.
@@ -156,22 +160,22 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
 
   return (
     <div className="flex flex-col gap-4">
-      <Link href={`/app/cars/${carId}`} className="-ml-1 inline-flex min-h-11 items-center self-start px-1 text-sm font-medium text-brand-700">
+      <Link href={`/app/cars/${carId}`} className="-ml-1 inline-flex min-h-11 items-center self-start px-1 text-sm font-medium text-accent">
         ← {t.findings.backToCar}
       </Link>
 
       <header>
         <h1 className="text-xl font-bold">{t.findings.title}</h1>
-        <p className="text-sm text-slate-600">
-          <span className="font-semibold tracking-wider">{regNumber}</span>
+        <p className="text-sm text-text-muted">
+          <span className="font-mono font-medium tracking-[0.08em]">{regNumber}</span>
           {carTitle && ` · ${carTitle}`}
         </p>
-        <p className="mt-2 text-sm text-slate-600">{t.findings.subtitle}</p>
+        <p className="mt-2 text-sm text-text-muted">{t.findings.subtitle}</p>
       </header>
 
       {photos.length === 0 ? (
-        <section className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-5">
-          <p className="text-slate-700">{t.findings.noPhotos}</p>
+        <section className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-5">
+          <p className="text-text-muted">{t.findings.noPhotos}</p>
           <LinkButton href={`/app/cars/${carId}/inspect`}>{t.findings.takePhotos}</LinkButton>
         </section>
       ) : (
@@ -194,8 +198,8 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
 
       <Group groupKey={GENERAL} title={t.findings.general} subtitle={t.findings.generalHint} photoId={null} findings={generalFindings} {...groupProps} />
 
-      <div className="sticky bottom-0 -mx-4 flex flex-col gap-2 border-t border-slate-200 bg-white/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur">
-        <p className={`text-center text-sm ${toReview.length ? "text-slate-700" : "text-brand-800"}`}>
+      <BottomBar>
+        <p className={`text-center text-sm ${toReview.length ? "text-text-muted" : "text-accent"}`}>
           {toReview.length ? t.findings.toReview(toReview.length) : t.findings.allReviewed}
         </p>
         {toReview.length > 0 && (
@@ -204,7 +208,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
           </Button>
         )}
         <LinkButton href={`/app/cars/${carId}/checklist`}>{t.findings.continue}</LinkButton>
-      </div>
+      </BottomBar>
     </div>
   );
 }
@@ -214,34 +218,39 @@ function Spinner({ className = "" }: { className?: string }) {
 }
 
 function AnalysisProgress({ total, active, failed, onRetry }: { total: number; active: number; failed: number; onRetry: () => void }) {
+  const t = useT();
   const done = total - active;
   return (
-    <section aria-live="polite" className="rounded-2xl border border-slate-200 bg-white p-4">
+    <section aria-live="polite" className="rounded-lg border border-border bg-surface p-4">
       {active > 0 ? (
         <>
           <p className="flex items-center gap-2 font-semibold">
-            <Spinner className="text-brand-700" />
+            <Spinner className="text-accent" />
             {t.findings.analysing(done, total)}
           </p>
-          <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={done}>
-            <div className="h-full rounded-full bg-brand-600 transition-[width]" style={{ width: `${(done / total) * 100}%` }} />
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-surface-sunken" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={done}>
+            <div className="h-full rounded-full bg-accent transition-[width]" style={{ width: `${(done / total) * 100}%` }} />
           </div>
         </>
       ) : failed > 0 ? (
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm font-medium text-red-700">{t.findings.someFailed(failed)}</p>
+          <p className="text-sm font-medium text-fail">{t.findings.someFailed(failed)}</p>
           <Button variant="secondary" onClick={onRetry} className="min-h-11 shrink-0 px-4 text-sm">
             {t.findings.retryFailed}
           </Button>
         </div>
       ) : (
-        <p className="font-medium text-brand-800">✓ {t.findings.analysisDone}</p>
+        <p className="flex items-center gap-1.5 font-medium text-pass">
+          <CheckIcon size={16} />
+          {t.findings.analysisDone}
+        </p>
       )}
     </section>
   );
 }
 
 function OdometerCard({ carId, initialKm, photo }: { carId: string; initialKm: number | null; photo: PhotoState | undefined }) {
+  const t = useT();
   const [confirmed, setConfirmed] = useState<number | null>(initialKm);
   const [changing, setChanging] = useState(false);
   // null until the dealer types, so a reading that arrives from the AI later still fills the box.
@@ -273,10 +282,13 @@ function OdometerCard({ carId, initialKm, photo }: { carId: string; initialKm: n
 
   if (confirmed !== null && !changing) {
     return (
-      <section className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+      <section className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface p-4">
         <div className="min-w-0">
-          <h2 className="text-sm text-slate-600">{t.findings.odometer.title}</h2>
-          <p className="font-semibold">✓ {t.findings.odometer.confirmed(kmFormat.format(confirmed))}</p>
+          <h2 className="text-sm text-text-muted">{t.findings.odometer.title}</h2>
+          <p className="flex items-center gap-1.5 font-mono font-medium">
+            <CheckIcon size={16} className="text-pass" />
+            {t.findings.odometer.confirmed(kmFormat.format(confirmed))}
+          </p>
         </div>
         <Button variant="secondary" onClick={() => setChanging(true)} className="min-h-11 shrink-0 px-4 text-sm">
           {t.findings.odometer.change}
@@ -294,11 +306,11 @@ function OdometerCard({ carId, initialKm, photo }: { carId: string; initialKm: n
         : t.findings.odometer.notDetected;
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-3 rounded-2xl border border-amber-300 bg-amber-50 p-4" noValidate>
+    <form onSubmit={onSubmit} className="flex flex-col gap-3 rounded-lg border border-attention bg-attention-tint p-4" noValidate>
       <div>
         <h2 className="font-semibold">{t.findings.odometer.title}</h2>
-        <p className="mt-1 flex items-center gap-2 text-sm text-slate-700">
-          {checking && <Spinner className="text-brand-700" />}
+        <p className="mt-1 flex items-center gap-2 text-sm text-text-muted">
+          {checking && <Spinner className="text-accent" />}
           {message}
         </p>
       </div>
@@ -337,6 +349,7 @@ type GroupActions = {
 };
 
 function PhotoGroup({ photo, findings, onRetry, ...actions }: { photo: PhotoState; findings: FindingRow[]; onRetry: () => void } & GroupActions) {
+  const t = useT();
   const [expanded, setExpanded] = useState(false);
   const { label } = t.photos.angles[photo.angleKey];
 
@@ -353,7 +366,7 @@ function PhotoGroup({ photo, findings, onRetry, ...actions }: { photo: PhotoStat
             onClick={() => setExpanded((v) => !v)}
             aria-expanded={expanded}
             aria-label={label}
-            className={`block shrink-0 overflow-hidden rounded-xl bg-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 ${expanded ? "w-full" : "size-20"}`}
+            className={`block shrink-0 overflow-hidden rounded-md bg-ink-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring ${expanded ? "w-full" : "size-20"}`}
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- private signed URL, not optimisable */}
             <img src={photo.url} alt="" loading="lazy" decoding="async" className={`size-full ${expanded ? "object-contain" : "object-cover"}`} />
@@ -367,32 +380,33 @@ function PhotoGroup({ photo, findings, onRetry, ...actions }: { photo: PhotoStat
 }
 
 function PhotoStatus({ photo, findingCount, carId, onRetry }: { photo: PhotoState; findingCount: number; carId: string; onRetry: () => void }) {
+  const t = useT();
   const s = t.findings.photoStatus;
-  if (photo.run === "queued" || (!photo.run && photo.aiStatus === "pending")) return <p className="text-sm text-slate-500">{s.queued}</p>;
+  if (photo.run === "queued" || (!photo.run && photo.aiStatus === "pending")) return <p className="text-sm text-text-subtle">{s.queued}</p>;
   if (photo.run === "running")
     return (
-      <p className="flex items-center gap-2 text-sm text-slate-600">
-        <Spinner className="text-brand-700" />
+      <p className="flex items-center gap-2 text-sm text-text-muted">
+        <Spinner className="text-accent" />
         {s.pending}
       </p>
     );
   const retake = (
-    <Link href={`/app/cars/${carId}/inspect?angle=${photo.angleKey}`} className="inline-flex min-h-11 items-center text-sm font-semibold text-brand-700">
+    <Link href={`/app/cars/${carId}/inspect?angle=${photo.angleKey}`} className="inline-flex min-h-11 items-center text-sm font-semibold text-accent">
       {t.findings.retakePhoto}
     </Link>
   );
   if (photo.limitReached)
     return (
       <div>
-        <p className="text-sm text-red-700">{s.limit}</p>
+        <p className="text-sm text-fail">{s.limit}</p>
         {retake}
       </div>
     );
   if (photo.run === "error" || photo.aiStatus === "failed")
     return (
       <div className="flex flex-wrap items-center gap-x-4">
-        <p className="text-sm text-red-700">{s.failed}</p>
-        <button type="button" onClick={onRetry} className="inline-flex min-h-11 items-center text-sm font-semibold text-brand-700">
+        <p className="text-sm text-fail">{s.failed}</p>
+        <button type="button" onClick={onRetry} className="inline-flex min-h-11 items-center text-sm font-semibold text-accent">
           {t.findings.tryAgain}
         </button>
       </div>
@@ -400,11 +414,11 @@ function PhotoStatus({ photo, findingCount, carId, onRetry }: { photo: PhotoStat
   if (photo.aiStatus === "unclear")
     return (
       <div>
-        <p className="text-sm text-amber-800">{s.unclear}</p>
+        <p className="text-sm text-attention">{s.unclear}</p>
         {retake}
       </div>
     );
-  return <p className="text-sm text-slate-500">{findingCount === 0 ? s.noDamage : s.done}</p>;
+  return <p className="text-sm text-text-subtle">{findingCount === 0 ? s.noDamage : s.done}</p>;
 }
 
 function Group({
@@ -429,14 +443,15 @@ function Group({
   media?: ReactNode;
   status?: ReactNode;
 } & GroupActions) {
+  const t = useT();
   const adding = editing === `new:${groupKey}`;
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-4" aria-label={title}>
+    <section className="rounded-lg border border-border bg-surface p-4" aria-label={title}>
       <div className="flex flex-wrap items-start gap-3">
         {media}
         <div className="min-w-0 flex-1">
           <h2 className="font-semibold">{title}</h2>
-          {subtitle && <p className="text-sm text-slate-500">{subtitle}</p>}
+          {subtitle && <p className="text-sm text-text-subtle">{subtitle}</p>}
           {status}
         </div>
       </div>
@@ -469,28 +484,29 @@ function Group({
 }
 
 function FindingCard({ finding, onAccept, onEdit, onDelete }: { finding: FindingRow; onAccept: (accepted: boolean) => void; onEdit: () => void; onDelete: () => void }) {
+  const t = useT();
   const [confirming, setConfirming] = useState(false);
   const small = "min-h-11 flex-1 px-2 text-sm";
 
   return (
-    <article className={`rounded-xl border p-3 ${finding.accepted ? "border-slate-200 bg-white" : "border-amber-300 bg-amber-50"}`}>
+    <article className={`rounded-md border p-3 ${finding.accepted ? "border-border bg-surface" : "border-attention bg-attention-tint"}`}>
       <div className="flex flex-wrap items-center gap-1.5">
         <span className="font-semibold">{t.findings.types[finding.type]}</span>
-        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${severityChip[finding.severity]}`}>{t.findings.severities[finding.severity]}</span>
-        <span className="ml-auto text-xs font-medium text-slate-500">
-          {finding.accepted ? `✓ ${t.findings.accepted}` : t.findings.needsReview} · {finding.source === "ai" ? t.findings.fromAi : t.findings.fromDealer}
+        <span className={`rounded-sm px-2 py-0.5 type-caption-strong ${severityChip[finding.severity]}`}>{t.findings.severities[finding.severity]}</span>
+        <span className="ml-auto text-xs font-medium text-text-subtle">
+          {finding.accepted ? t.findings.accepted : t.findings.needsReview} · {finding.source === "ai" ? t.findings.fromAi : t.findings.fromDealer}
         </span>
       </div>
-      {finding.location && <p className="mt-1 text-sm font-medium text-slate-800">{finding.location}</p>}
-      {finding.note && <p className="mt-0.5 text-sm text-slate-600">{finding.note}</p>}
+      {finding.location && <p className="mt-1 text-sm font-medium text-text">{finding.location}</p>}
+      {finding.note && <p className="mt-0.5 text-sm text-text-muted">{finding.note}</p>}
 
       {confirming ? (
         <div className="mt-2 flex items-center gap-2">
-          <p className="flex-1 text-sm font-medium text-red-700">{t.findings.confirmDelete}</p>
+          <p className="flex-1 text-sm font-medium text-fail">{t.findings.confirmDelete}</p>
           <Button variant="secondary" onClick={() => setConfirming(false)} className="min-h-11 px-3 text-sm">
             {t.findings.cancel}
           </Button>
-          <Button onClick={onDelete} className="min-h-11 bg-red-600 px-3 text-sm active:bg-red-700">
+          <Button variant="danger" onClick={onDelete} className="min-h-11 px-3 text-sm">
             {t.findings.delete}
           </Button>
         </div>
@@ -508,7 +524,7 @@ function FindingCard({ finding, onAccept, onEdit, onDelete }: { finding: Finding
           <Button variant="secondary" onClick={onEdit} className={small}>
             {t.findings.edit}
           </Button>
-          <Button variant="secondary" onClick={() => setConfirming(true)} className={`${small} text-red-700`}>
+          <Button variant="secondary" onClick={() => setConfirming(true)} className={`${small} text-fail`}>
             {t.findings.delete}
           </Button>
         </div>
@@ -530,6 +546,7 @@ function FindingForm({
   onSave: (values: FindingFormValues) => Promise<SaveFindingResult>;
   onCancel: () => void;
 }) {
+  const t = useT();
   const [type, setType] = useState<FindingType | "">(initial?.type ?? "");
   const [severity, setSeverity] = useState<Severity | null>(initial?.severity ?? null);
   const [location, setLocation] = useState(initial?.location ?? "");
@@ -553,7 +570,7 @@ function FindingForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-3 rounded-xl border border-brand-200 bg-brand-50/50 p-3" noValidate>
+    <form onSubmit={onSubmit} className="flex flex-col gap-3 rounded-md border border-accent bg-accent-tint/50 p-3" noValidate>
       <h3 className="font-semibold">{title}</h3>
       <SelectField
         label={t.findings.type}
@@ -563,22 +580,22 @@ function FindingForm({
           setType(e.target.value as FindingType);
           setErrors((x) => ({ ...x, type: undefined }));
         }}
-        options={typeOptions}
+        options={typeOptions(t)}
         placeholder={t.cars.choose}
         error={errors.type}
       />
       <div>
-        <p className="mb-1.5 text-sm font-medium text-slate-700">{t.findings.severity}</p>
+        <p className="mb-1.5 text-sm font-medium text-text-muted">{t.findings.severity}</p>
         <Segmented
           label={t.findings.severity}
-          options={severityOptions}
+          options={severityOptions(t)}
           value={severity}
           onChange={(v) => {
             setSeverity(v);
             setErrors((x) => ({ ...x, severity: undefined }));
           }}
         />
-        {errors.severity && <p className="mt-1.5 text-sm text-red-600">{errors.severity}</p>}
+        {errors.severity && <p className="mt-1.5 text-sm text-fail">{errors.severity}</p>}
       </div>
       <Field
         label={t.findings.location}

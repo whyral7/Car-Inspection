@@ -48,7 +48,7 @@ describe("buildReportView", () => {
     const view = buildReportView(input(), [], now);
     expect(view.score).toBe(6.6);
     expect(view.scoreText).toBe("6.6");
-    expect(view.band).toBe("fair");
+    expect(view.band).toBe("good");
   });
 
   it("shows only accepted notes, worst first, then in photo order", () => {

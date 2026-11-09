@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      # Brand rules: no raw colours, default palette, banned copy, stars or /100 scores (brand/scripts/check-brand.mjs).
+      - run: npm run brand:check
+      # Catches server/client component mistakes the typechecker can't see. Placeholder values only: the
+      # build never calls these services. Real keys live in Vercel, never here.
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
+          SUPABASE_SERVICE_ROLE_KEY: placeholder
+          RC_PROVIDER: mock
+          NEXT_PUBLIC_APP_URL: http://localhost:3000

@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { buttonClass } from "@/components/button";
+import { ChatIcon } from "@/components/icons";
 import { BUSINESS } from "@/lib/config";
 import { formatPhone, whatsappChatUrl } from "@/lib/report/share";
-import { t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.legal.contact.title, alternates: { canonical: "/contact" } };
+}
 
-const copy = t.legal.contact;
-
-export const metadata: Metadata = { title: copy.title, alternates: { canonical: "/contact" } };
-
-export default function ContactPage() {
+export default async function ContactPage() {
+  const t = await getT();
+  const copy = t.legal.contact;
   const chat = whatsappChatUrl(BUSINESS.whatsapp, t.home.whatsappMessage);
   const rows = [
     { label: copy.business, value: BUSINESS.legalName },
@@ -20,18 +24,18 @@ export default function ContactPage() {
 
   return (
     <article className="mx-auto w-full max-w-2xl px-4 py-8">
-      <Link href="/" className="-ml-1 inline-flex min-h-11 items-center px-1 text-sm font-medium text-brand-700">
+      <Link href="/" className="-ml-1 inline-flex min-h-11 items-center px-1 text-sm font-medium text-accent">
         ← {t.legal.back}
       </Link>
-      <h1 className="mt-2 text-2xl font-bold">{copy.title}</h1>
-      <p className="mt-2 text-slate-700">{copy.intro}</p>
-      <dl className="mt-6 divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
+      <h1 className="mt-2 type-heading-1">{copy.title}</h1>
+      <p className="mt-2 text-text-muted">{copy.intro}</p>
+      <dl className="mt-6 divide-y divide-border rounded-lg border border-border bg-surface">
         {rows.map((row) => (
           <div key={row.label} className="flex flex-col gap-0.5 p-4">
-            <dt className="text-sm text-slate-500">{row.label}</dt>
+            <dt className="text-sm text-text-subtle">{row.label}</dt>
             <dd className="font-medium break-words">
               {row.href ? (
-                <a href={row.href} className="text-brand-700 underline" {...(row.href.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}>
+                <a href={row.href} className="text-accent underline" {...(row.href.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}>
                   {row.value}
                 </a>
               ) : (
@@ -42,12 +46,12 @@ export default function ContactPage() {
         ))}
       </dl>
       {chat && (
-        <a href={chat} target="_blank" rel="noopener" className="mt-6 flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#128c7e] px-5 font-semibold text-white active:bg-[#075e54]">
-          <span aria-hidden>💬</span>
+        <a href={chat} target="_blank" rel="noopener" className={buttonClass("primary", "mt-6 w-full")}>
+          <ChatIcon size={18} />
           {t.home.whatsapp}
         </a>
       )}
-      <p className="mt-6 text-sm text-slate-500">{copy.paymentHelp}</p>
+      <p className="mt-6 text-sm text-text-subtle">{copy.paymentHelp}</p>
     </article>
   );
 }

@@ -52,9 +52,16 @@ Every new user gets 3 free credits. Publishing a report costs 1 credit, deducted
 - Compress images in the browser to max 1600px long edge, JPEG quality 0.8, before upload.
 - All secrets and AI/RC/Razorpay calls stay on the server (route handlers or server actions).
 - RC lookup goes through one interface in lib/rc/ with a mock provider; real providers plug in by env var.
-- Plain, friendly English in the UI; keep strings in one file so Hindi can be added later.
-- After each phase: run lint, typecheck and tests, fix failures, then summarise what changed and how to test it on a phone.
+- Plain, friendly English and Hindi in the UI: every string in `lib/strings.ts` with its Hindi in `lib/strings.hi.ts` (same shape; `lib/i18n.test.ts` fails on anything untranslated). Screens read the reader's language with `await getT()` (server) or `useT()` (client); the PDF, link previews and legal pages stay English.
+- After each phase: run lint, typecheck, tests and `npm run brand:check`, fix failures, then summarise what changed and how to test it on a phone.
 - Small, focused commits with clear messages.
+
+## Brand
+Treadmark's identity (Olive Khaki + Sandstone on ink and paper, Martel Sans + IBM Plex Mono, the tyre-and-tick logo) is applied through tokens. Rules live in `.claude/skills/treadmark-brand/SKILL.md` and the files under `brand/`; use that skill for any UI, report, PDF or copy work.
+- No raw colours, fonts or font sizes in app code: brand utilities (`bg-surface`, `text-text-muted`, `bg-button-primary-bg`, `text-pass`) and `type-*` classes only. Hex values are allowed only in `lib/report/colors.ts` (PDF and link previews) and `lib/config.ts` (browser chrome, Razorpay). `npm run brand:check` must pass.
+- Score: out of 10 with one decimal and a grade word (`scoreBand`: Excellent, Very good, Good, Below average, Poor) with five rising bars; no stars.
+- Verdicts: a word, a glyph (`components/icons.tsx`) and the verdict colour. Never olive or sandstone for a verdict; one primary (olive) action per screen; at most one sandstone highlight.
+- Copy follows `brand/reference/voice-profile.md`: fact then action, numbers over adjectives, no exclamation marks or emoji, no "accident-free", "guaranteed", "AI-powered" or unsourced trust claims.
 
 ## Phases
 1 Foundation, 2 Add a car, 3 Photo checklist, 4 AI damage notes + checklist + score, 5 Report PDF + public link + share, 6 Payments + landing page + deploy. Work on one phase at a time; never start the next phase unless I ask.

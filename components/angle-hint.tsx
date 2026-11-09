@@ -15,8 +15,11 @@ const outline = {
   strokeLinejoin: "round",
 } as const;
 
-/** White fill so a nearer shape hides the lines behind it. */
-const PAPER = "#fff";
+/**
+ * Fill in the tile's own background colour, so a nearer shape hides the lines behind it. The parent sets
+ * --angle-hint-paper to the colour it sits on; it defaults to the surface token.
+ */
+const PAPER = { fill: "var(--angle-hint-paper, var(--surface))" } as const;
 
 function Detail({ children }: { children: ReactNode }) {
   return (
@@ -27,7 +30,7 @@ function Detail({ children }: { children: ReactNode }) {
 }
 
 function Accent({ children }: { children: ReactNode }) {
-  return <g className="text-brand-600">{children}</g>;
+  return <g className="text-accent">{children}</g>;
 }
 
 /** Draws children and their mirror image about the vertical centre line. */
@@ -54,7 +57,7 @@ function Wheel({ cx, cy, rx, ry = rx }: { cx: number; cy: number; rx: number; ry
   }).join(" ");
   return (
     <g>
-      <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill={PAPER} />
+      <ellipse cx={cx} cy={cy} rx={rx} ry={ry} style={PAPER} />
       <ellipse cx={cx} cy={cy} rx={rx * 0.66} ry={ry * 0.66} />
       <Detail>
         <ellipse cx={cx} cy={cy} rx={rx * 0.16} ry={ry * 0.16} />
@@ -72,14 +75,14 @@ function Side() {
     <>
       <Shadow cy={124} rx={110} />
       <path
-        fill={PAPER}
+        style={PAPER}
         d="M20 106 C14 104 12 96 14 90 C15 85 18 82 26 80 C46 76 70 72 90 70 C102 60 112 52 124 48 C140 44 160 44 172 47 C184 52 194 62 202 66 L222 68 C228 69 230 74 229 82 L227 102 C226 106 222 107 216 107 L205 107 A22 22 0 0 0 161 107 L81 107 A22 22 0 0 0 37 107 Z"
       />
       {/* Glass */}
       <path d="M98 69 C107 61 114 56 125 53 L143 52 V69 Z" />
       <path d="M149 52 L166 52 C176 54 184 60 191 66 L149 68 Z" />
       {/* Mirror */}
-      <path d="M97 69 C92 66 88 62 84 62 C80 62 80 68 84 70 Z" fill={PAPER} />
+      <path d="M97 69 C92 66 88 62 84 62 C80 62 80 68 84 70 Z" style={PAPER} />
       <Detail>
         {/* Doors and handles */}
         <path d="M94 72 L90 104 M146 69 V106 M195 67 C195 76 193 82 185 84 C174 86 166 92 164 104" />
@@ -103,8 +106,8 @@ const BODY_FRONT_REAR =
 function Tyres() {
   return (
     <>
-      <rect x="48" y="108" width="20" height="19" rx="4" fill={PAPER} />
-      <rect x="172" y="108" width="20" height="19" rx="4" fill={PAPER} />
+      <rect x="48" y="108" width="20" height="19" rx="4" style={PAPER} />
+      <rect x="172" y="108" width="20" height="19" rx="4" style={PAPER} />
     </>
   );
 }
@@ -114,12 +117,12 @@ function Front() {
     <>
       <Shadow cy={127} rx={92} />
       <Tyres />
-      <path fill={PAPER} d="M66 70 L84 38 C86 34 89 32 94 32 H146 C151 32 154 34 156 38 L174 70" />
+      <path style={PAPER} d="M66 70 L84 38 C86 34 89 32 94 32 H146 C151 32 154 34 156 38 L174 70" />
       <path d="M74 68 L90 40 H150 L166 68 Z" />
-      <path fill={PAPER} d={BODY_FRONT_REAR} />
+      <path style={PAPER} d={BODY_FRONT_REAR} />
       <Symmetric>
         <path d="M68 68 L50 67" />
-        <path d="M50 61 H40 C36 61 33 64 33 67 C33 71 36 73 40 73 H50 Z" fill={PAPER} />
+        <path d="M50 61 H40 C36 61 33 64 33 67 C33 71 36 73 40 73 H50 Z" style={PAPER} />
         <path d="M50 82 C52 79 56 78 62 78 L94 82 C94 88 90 90 84 90 H56 C52 90 50 86 50 82 Z" />
         <Detail>
           <path d="M58 84 H72" />
@@ -144,9 +147,9 @@ function Rear() {
     <>
       <Shadow cy={127} rx={92} />
       <Tyres />
-      <path fill={PAPER} d="M70 70 L86 40 C88 36 91 34 96 34 H144 C149 34 152 36 154 40 L170 70" />
+      <path style={PAPER} d="M70 70 L86 40 C88 36 91 34 96 34 H144 C149 34 152 36 154 40 L170 70" />
       <path d="M78 68 L92 42 H148 L162 68 Z" />
-      <path fill={PAPER} d={BODY_FRONT_REAR} />
+      <path style={PAPER} d={BODY_FRONT_REAR} />
       <Symmetric>
         <path d="M46 80 C46 76 50 74 56 74 L84 76 L82 90 H52 C48 90 46 86 46 80 Z" />
         <Detail>
@@ -171,7 +174,7 @@ function CornerFront() {
     <>
       <Shadow cx={128} cy={121} rx={106} ry={6} />
       <path
-        fill={PAPER}
+        style={PAPER}
         d="M26 110 C22 108 20 102 20 96 L22 88 C23 85 26 84 30 84 C40 78 50 70 60 66 C66 56 74 48 82 45 C110 42 156 42 184 45 C196 50 204 58 210 62 L226 64 C230 65 231 70 230 76 L229 96 C228 99 226 100 222 100 L208 101 A13 16 0 0 0 184 103 L115 108 A17 20 0 0 0 81 110 L72 112 C60 113 40 112 26 110 Z"
       />
       {/* Front face edge, hood edge, windscreen */}
@@ -180,7 +183,7 @@ function CornerFront() {
       {/* Side glass */}
       <path d="M122 65 C127 58 132 51 138 48 H158 V64 Z" />
       <path d="M164 48 H180 C188 52 196 58 202 62 L164 63 Z" />
-      <path d="M120 64 C114 60 110 58 106 59 C103 61 104 66 108 67 Z" fill={PAPER} />
+      <path d="M120 64 C114 60 110 58 106 59 C103 61 104 66 108 67 Z" style={PAPER} />
       {/* Lamps, grille, plate */}
       <path d="M50 86 C56 84 64 83 70 83 C78 81 86 79 92 77 C90 82 84 86 76 87 L52 90 Z" />
       <path d="M24 90 C28 89 32 88 36 88 L35 93 L24 94 Z" />
@@ -205,7 +208,7 @@ function CornerRear() {
     <g transform={`translate(${W} 0) scale(-1 1)`}>
       <Shadow cx={128} cy={121} rx={106} ry={6} />
       <path
-        fill={PAPER}
+        style={PAPER}
         d="M26 110 C22 108 20 102 20 96 L22 86 C23 83 26 82 30 82 C36 78 42 74 48 70 C56 58 64 50 74 46 C100 42 140 42 160 44 C172 50 184 58 192 62 C206 64 220 68 226 72 C230 74 232 80 231 86 L230 96 C229 99 227 100 223 100 L212 101 A13 16 0 0 0 188 103 L115 108 A17 20 0 0 0 81 110 L72 112 C60 113 40 112 26 110 Z"
       />
       {/* Rear face edge, boot lid, rear glass */}
@@ -214,7 +217,7 @@ function CornerRear() {
       {/* Side glass */}
       <path d="M102 67 C107 59 112 52 118 48 H140 V65 Z" />
       <path d="M146 48 H160 C168 52 176 57 182 61 L146 64 Z" />
-      <path d="M184 61 C188 56 192 54 196 55 C199 57 198 62 194 63 Z" fill={PAPER} />
+      <path d="M184 61 C188 56 192 54 196 55 C199 57 198 62 194 63 Z" style={PAPER} />
       {/* Tail lamps, plate */}
       <path d="M48 84 C56 83 64 82 70 82 C78 80 86 78 94 77 C92 82 86 85 78 86 L50 89 Z" />
       <path d="M24 88 L36 87 L35 92 L24 93 Z" />
@@ -238,7 +241,7 @@ function Engine() {
   return (
     <>
       {/* Raised bonnet and its stay */}
-      <path d="M44 30 Q120 6 196 30 L186 40 Q120 22 54 40 Z" fill={PAPER} />
+      <path d="M44 30 Q120 6 196 30 L186 40 Q120 22 54 40 Z" style={PAPER} />
       <path d="M68 40 L80 62" />
       {/* Bay, slam panel, headlamps */}
       <path d="M30 44 L54 40 Q120 30 186 40 L210 44 L222 116 H18 Z" />
@@ -247,7 +250,7 @@ function Engine() {
         <path d="M22 106 H60 L57 115 H21 Z" />
       </Symmetric>
       {/* Engine cover */}
-      <rect x="84" y="54" width="74" height="40" rx="8" fill={PAPER} />
+      <rect x="84" y="54" width="74" height="40" rx="8" style={PAPER} />
       <Detail>
         <path d="M96 64 H146 M96 72 H146 M96 80 H146" />
         <circle cx="140" cy="86" r="3" />
@@ -283,7 +286,7 @@ function Chassis() {
         <path d="M24 10 V130 M216 10 V130" />
         <rect x="196" y="100" width="12" height="18" rx="2" />
       </Detail>
-      <rect x="40" y="34" width="160" height="72" rx="6" fill={PAPER} />
+      <rect x="40" y="34" width="160" height="72" rx="6" style={PAPER} />
       <circle cx="49" cy="43" r="2.5" />
       <circle cx="191" cy="43" r="2.5" />
       <circle cx="49" cy="97" r="2.5" />
@@ -316,8 +319,8 @@ function Odometer() {
       {/* Cluster hood */}
       <path d="M14 44 Q120 0 226 44 V112 Q120 128 14 112 Z" />
       {/* Rev counter and speedometer */}
-      <circle cx="66" cy="72" r="34" fill={PAPER} />
-      <circle cx="174" cy="72" r="34" fill={PAPER} />
+      <circle cx="66" cy="72" r="34" style={PAPER} />
+      <circle cx="174" cy="72" r="34" style={PAPER} />
       <Detail>
         <path d={ticks(66, 72, 30, 9)} />
         <path d={ticks(174, 72, 30, 13)} />
@@ -326,7 +329,7 @@ function Odometer() {
       </Detail>
       <path d="M66 72 L48 86 M174 72 L156 58" />
       {/* Display with the odometer reading */}
-      <rect x="104" y="56" width="32" height="44" rx="4" fill={PAPER} />
+      <rect x="104" y="56" width="32" height="44" rx="4" style={PAPER} />
       <Detail>
         <path d="M110 64 H130 M110 70 H124" />
       </Detail>
@@ -351,7 +354,7 @@ function Dashboard() {
       </Detail>
       <path d="M6 44 Q120 22 234 44 V70 Q234 78 226 78 H134 L128 130 M6 44 V70 Q6 78 14 78 H24" />
       {/* Instrument cluster with warning lights */}
-      <path d="M38 50 Q74 36 110 50 V68 H38 Z" fill={PAPER} />
+      <path d="M38 50 Q74 36 110 50 V68 H38 Z" style={PAPER} />
       <Detail>
         <circle cx="56" cy="60" r="7" />
         <circle cx="92" cy="60" r="7" />
@@ -361,10 +364,10 @@ function Dashboard() {
         <path d="M78 58 H86 V64 H78 Z M80 58 V56 M84 58 V56" strokeWidth={1.8} />
       </Accent>
       {/* Steering wheel */}
-      <circle cx="74" cy="96" r="34" fill={PAPER} />
+      <circle cx="74" cy="96" r="34" style={PAPER} />
       <circle cx="74" cy="96" r="27" />
       <path d="M48 90 C58 86 66 86 74 86 C82 86 90 86 100 90 M74 104 V122" />
-      <ellipse cx="74" cy="96" rx="11" ry="9" fill={PAPER} />
+      <ellipse cx="74" cy="96" rx="11" ry="9" style={PAPER} />
       {/* Centre screen and vents */}
       <rect x="146" y="40" width="54" height="30" rx="4" />
       <Detail>
@@ -382,16 +385,16 @@ function Seat({ cx }: { cx: number }) {
   return (
     <>
       <path d={`M${x(-6)} 30 V36 M${x(6)} 30 V36`} />
-      <rect x={x(-15)} y="12" width="30" height="18" rx="7" fill={PAPER} />
+      <rect x={x(-15)} y="12" width="30" height="18" rx="7" style={PAPER} />
       <path
-        fill={PAPER}
+        style={PAPER}
         d={`M${x(-28)} 42 Q${x(-30)} 36 ${x(-22)} 35 H${x(22)} Q${x(30)} 36 ${x(28)} 42 L${x(32)} 96 Q${x(32)} 100 ${x(28)} 100 H${x(-28)} Q${x(-32)} 100 ${x(-32)} 96 Z`}
       />
       <Detail>
         <path d={`M${x(-17)} 40 L${x(-19)} 96 M${x(17)} 40 L${x(19)} 96`} />
       </Detail>
       <path
-        fill={PAPER}
+        style={PAPER}
         d={`M${x(-36)} 100 H${x(36)} Q${x(41)} 100 ${x(41)} 106 V114 Q${x(41)} 120 ${x(35)} 120 H${x(-35)} Q${x(-41)} 120 ${x(-41)} 114 V106 Q${x(-41)} 100 ${x(-36)} 100 Z`}
       />
     </>
@@ -406,7 +409,7 @@ function FrontSeats() {
       {/* Centre console and gear lever */}
       <path d="M110 92 H130 V124 H110 Z" />
       <path d="M120 92 V80" />
-      <circle cx="120" cy="76" r="5" fill={PAPER} />
+      <circle cx="120" cy="76" r="5" style={PAPER} />
       <Detail>
         <path d="M114 106 H126" />
       </Detail>
@@ -424,14 +427,14 @@ function RearSeats() {
       {[66, 120, 174].map((cx) => (
         <g key={cx}>
           <path d={`M${cx - 6} 32 V38 M${cx + 6} 32 V38`} />
-          <rect x={cx - 15} y="16" width="30" height="16" rx="6" fill={PAPER} />
+          <rect x={cx - 15} y="16" width="30" height="16" rx="6" style={PAPER} />
         </g>
       ))}
-      <path fill={PAPER} d="M20 46 Q20 38 30 38 H210 Q220 38 220 46 L224 96 Q224 100 220 100 H20 Q16 100 16 96 Z" />
+      <path style={PAPER} d="M20 46 Q20 38 30 38 H210 Q220 38 220 46 L224 96 Q224 100 220 100 H20 Q16 100 16 96 Z" />
       <Detail>
         <path d="M100 38 V100 M44 44 L42 96 M196 44 L198 96" />
       </Detail>
-      <path fill={PAPER} d="M14 100 H226 Q232 100 232 106 V116 Q232 122 226 122 H14 Q8 122 8 116 V106 Q8 100 14 100 Z" />
+      <path style={PAPER} d="M14 100 H226 Q232 100 232 106 V116 Q232 122 226 122 H14 Q8 122 8 116 V106 Q8 100 14 100 Z" />
       <Detail>
         <path d="M120 100 V122" />
         <rect x="70" y="96" width="8" height="6" rx="1.5" />
@@ -445,7 +448,7 @@ function Boot() {
   return (
     <>
       {/* Open lid */}
-      <path d="M40 26 Q120 4 200 26 L192 36 Q120 16 48 36 Z" fill={PAPER} />
+      <path d="M40 26 Q120 4 200 26 L192 36 Q120 16 48 36 Z" style={PAPER} />
       {/* Opening, back wall, side walls */}
       <path d="M36 40 H204 L214 104 H26 Z" />
       <path d="M66 52 H174 L170 80 H70 Z" />
@@ -457,7 +460,7 @@ function Boot() {
       <Symmetric>
         <path d="M14 44 L32 42 L28 72 L14 74 Z" />
       </Symmetric>
-      <path d="M20 104 H220 V116 Q220 122 214 122 H26 Q20 122 20 116 Z" fill={PAPER} />
+      <path d="M20 104 H220 V116 Q220 122 214 122 H26 Q20 122 20 116 Z" style={PAPER} />
       <rect x="103" y="108" width="34" height="9" rx="1.5" />
     </>
   );
@@ -480,7 +483,7 @@ function Spare() {
         <rect x="40" y="6" width="160" height="128" rx="40" />
       </Detail>
       {/* Tyre, tread band, rim */}
-      <circle cx="120" cy="68" r="56" fill={PAPER} />
+      <circle cx="120" cy="68" r="56" style={PAPER} />
       <Detail>
         <circle cx="120" cy="68" r="50" strokeDasharray="4 5" />
       </Detail>
@@ -506,7 +509,7 @@ function Tyre({ corner }: { corner: NonNullable<Angle["corner"]> }) {
   return (
     <>
       {/* Tread face of the tyre, as seen with the wheel turned */}
-      <path d="M32 10 H100 Q114 66 100 122 H32 Q18 66 32 10 Z" fill={PAPER} />
+      <path d="M32 10 H100 Q114 66 100 122 H32 Q18 66 32 10 Z" style={PAPER} />
       <path d="M50 10 Q46 66 50 122 M66 10 V122 M82 10 Q86 66 82 122" />
       <Detail>
         <path d={chevrons} />
@@ -518,9 +521,9 @@ function Tyre({ corner }: { corner: NonNullable<Angle["corner"]> }) {
       {(Object.keys(wheels) as (keyof typeof wheels)[])
         .filter((k) => k !== corner)
         .map((k) => (
-          <rect key={k} x={wheels[k][0]} y={wheels[k][1]} width="10" height="22" rx="3" fill={PAPER} />
+          <rect key={k} x={wheels[k][0]} y={wheels[k][1]} width="10" height="22" rx="3" style={PAPER} />
         ))}
-      <path d="M170 14 C186 14 192 20 192 32 V104 C192 116 186 122 170 122 C154 122 148 116 148 104 V32 C148 20 154 14 170 14 Z" fill={PAPER} />
+      <path d="M170 14 C186 14 192 20 192 32 V104 C192 116 186 122 170 122 C154 122 148 116 148 104 V32 C148 20 154 14 170 14 Z" style={PAPER} />
       <path d="M154 46 Q170 38 186 46 L184 58 Q170 54 156 58 Z" />
       <path d="M156 92 Q170 96 184 92 L186 102 Q170 108 154 102 Z" />
       <Detail>

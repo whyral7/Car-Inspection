@@ -7,7 +7,7 @@ import { formatDate, formatDateTime, formatInrShort, carTitle, isPastDate } from
 import { adjustedRange, type Comparable } from "@/lib/price/estimate";
 import { ANGLES, isAngleKey, type AngleKey } from "@/lib/photos/angles";
 import { conditionScore, formatScore, scoreBand, type ScoreBand } from "@/lib/score";
-import { t } from "@/lib/strings";
+import { t as english, type Strings } from "@/lib/strings";
 import type { CarRow, ChecklistResult, FindingRow, FindingType, Severity, UserType } from "@/lib/supabase/database.types";
 import { displayName } from "@/lib/user-type";
 
@@ -114,15 +114,16 @@ const SEVERITY_RANK: Record<Severity, number> = { major: 0, moderate: 1, minor: 
 const ANGLE_ORDER = new Map<string, number>(ANGLES.map((a, i) => [a.key, i]));
 
 
-function checkItem(key: ChecklistKey, row: ReportInput["checklist"][number]): ReportCheckItem {
+function checkItem(t: Strings, key: ChecklistKey, row: ReportInput["checklist"][number]): ReportCheckItem {
   return { key, label: t.checklist.items[key].label, result: row.result, resultLabel: t.checklist.results[row.result], note: row.note || null };
 }
 
 /**
  * Builds the full report and then drops the hidden sections. The score always counts every accepted
  * note and checklist answer, hidden or not. Notes the dealer hasn't accepted never appear.
+ * Labels are in `t`'s language: the reader's on screen, English in the PDF and link preview.
  */
-export function buildReportView(input: ReportInput, hidden: readonly ReportSection[] = [], now = new Date()): ReportView {
+export function buildReportView(input: ReportInput, hidden: readonly ReportSection[] = [], now = new Date(), t: Strings = english): ReportView {
   const { car, dealer } = input;
   // Everyone who signed up before user types existed was a dealer.
   const userType = dealer.user_type ?? "dealer";
@@ -156,7 +157,7 @@ export function buildReportView(input: ReportInput, hidden: readonly ReportSecti
   const groupItems = (keys: readonly ChecklistKey[]) =>
     keys.flatMap((key) => {
       const row = answers.get(key);
-      return row ? [checkItem(key, row)] : [];
+      return row ? [checkItem(t, key, row)] : [];
     });
   const groups: ReportCheckGroup[] = CHECKLIST_GROUPS.filter((g) => g.key !== "documents")
     .map((g) => ({ key: g.key, label: t.checklist.groups[g.key], items: groupItems(g.items) }))
@@ -185,7 +186,7 @@ export function buildReportView(input: ReportInput, hidden: readonly ReportSecti
   const details = detailCandidates.filter((row): row is DetailRow => Boolean(row.value));
 
   const score = conditionScore({ findings: input.findings, checklist: input.checklist });
-  const price = input.price ? buildPrice(input.price, score, car.status !== "draft") : null;
+  const price = input.price ? buildPrice(input.price, score, car.status !== "draft", t) : null;
 
   const full: ReportView = {
     slug: input.slug,
@@ -227,8 +228,19 @@ export function applyHidden(view: ReportView, hidden: readonly ReportSection[]):
   };
 }
 
+/** Major damage and failed checks, shown above the score (brand rule). Only from sections the reader can see. */
+export function redFlags(view: ReportView): { key: string; title: string; body: string | null }[] {
+  const findings = (view.findings ?? [])
+    .filter((f) => f.severity === "major")
+    .map((f, i) => ({ key: `f${i}`, title: [f.typeLabel, f.location].filter(Boolean).join(" · "), body: f.note }));
+  const checks = [...(view.checklist?.groups.flatMap((g) => g.items) ?? []), ...(view.documents?.items ?? [])]
+    .filter((item) => item.result === "fail")
+    .map((item) => ({ key: `c${item.key}`, title: item.label, body: item.note }));
+  return [...findings, ...checks];
+}
+
 /** The short summary used in the link preview and page description, e.g. ["20 photos.", "3 damage notes."]. */
-export function summaryParts(view: ReportView): string[] {
+export function summaryParts(view: ReportView, t: Strings = english): string[] {
   const s = t.publicReport.summary;
   const parts: string[] = [];
   if (view.photos?.length) parts.push(s.photos(view.photos.length));
@@ -246,7 +258,7 @@ const hostOf = (url: string) => {
 };
 
 /** The estimate as shown: market range adjusted for the live condition score. */
-function buildPrice(p: NonNullable<ReportInput["price"]>, score: number, adjust: boolean): ReportPrice {
+function buildPrice(p: NonNullable<ReportInput["price"]>, score: number, adjust: boolean, t: Strings): ReportPrice {
   const { low, high, factor } = adjust ? adjustedRange(p.market_low_inr, p.market_high_inr, score) : { low: p.market_low_inr, high: p.market_high_inr, factor: 1 };
   const pct = Math.round((factor - 1) * 100);
   const range = (a: number, b: number) => (a === b ? formatInrShort(a) : `${formatInrShort(a)} – ${formatInrShort(b)}`);

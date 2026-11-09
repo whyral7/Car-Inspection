@@ -31,11 +31,21 @@ export function formatScore(score: number) {
   return score.toFixed(1);
 }
 
-export type ScoreBand = "good" | "fair" | "poor";
+export type ScoreBand = "excellent" | "very_good" | "good" | "below_average" | "poor";
 
-/** Colour band for the score badge: 8.0 and up is good, 6.0 to 7.9 fair, below 6.0 needs work. */
+/**
+ * Grade word for a score out of 10 (Treadmark brand style guide, section 7):
+ * 9.0-10 Excellent, 7.5-8.9 Very good, 6.0-7.4 Good, 4.5-5.9 Below average, under 4.5 Poor.
+ */
 export function scoreBand(score: number): ScoreBand {
-  if (score >= 8) return "good";
-  if (score >= 6) return "fair";
+  if (score >= 9) return "excellent";
+  if (score >= 7.5) return "very_good";
+  if (score >= 6) return "good";
+  if (score >= 4.5) return "below_average";
   return "poor";
+}
+
+/** Five rising score bars: bar n (1-5) fills when the score is at least 2n - 1, so 8.4 fills four. */
+export function scoreBars(score: number): number {
+  return [1, 3, 5, 7, 9].filter((t) => score >= t).length;
 }

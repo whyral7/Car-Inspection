@@ -1,20 +1,26 @@
-// All user-facing copy lives here so a Hindi version can be added later
-// (e.g. export a `hi` object with the same shape and pick by locale).
+// All user-facing copy lives here. English is the source; lib/strings.hi.ts holds the Hindi with the same
+// shape (the Strings type enforces it). Screens get the reader's language from getT() (server) or useT() (client).
 
 /** Business details filled into the legal templates (BUSINESS in lib/config.ts). */
 type LegalBusiness = { legalName: string; address: string; city: string; email: string; grievanceOfficer: string };
 
 export const en = {
   appName: "Treadmark",
-  tagline: "Trusted inspection reports for used cars, ready to share on WhatsApp.",
+  tagline: "Every car, properly checked. Inspection reports you can share on WhatsApp.",
   disclaimer: "Visual and documented inspection. Not a mechanical certification.",
+
+  language: {
+    /** The toggle shows the language you can switch TO. */
+    switchTo: "हिंदी",
+    switchToLabel: "हिंदी में देखें",
+  },
 
   common: {
     loading: "Please wait…",
     save: "Save",
     logout: "Log out",
     back: "Back",
-    somethingWrong: "Something went wrong. Please try again.",
+    somethingWrong: "That didn't work. Check your internet and try again.",
     offline: "You seem to be offline. Check your internet and try again.",
   },
 
@@ -25,7 +31,7 @@ export const en = {
       "Shoot 20 guided photos, get AI damage notes and share a branded used-car inspection report on WhatsApp in about 10 minutes. Start free with 3 reports.",
     nav: { login: "Log in", pricing: "Pricing" },
     eyebrow: "For used-car dealers in India",
-    headline: "Sell used cars faster with reports buyers trust",
+    headline: "Sell used cars faster with reports buyers can verify",
     subhead: "Shoot 20 guided photos, get AI damage notes and send a branded inspection report on WhatsApp. About 10 minutes a car.",
     cta: "Start free, 3 reports",
     ctaNote: "No card needed. Log in with your mobile number.",
@@ -280,6 +286,8 @@ export const en = {
     terms: "Terms",
     and: "and",
     privacy: "Privacy policy",
+    /** Closes the agreement line; Hindi puts the verb here. */
+    agreeEnd: ".",
     verify: "Verify and continue",
     resend: "Resend OTP",
     resendIn: (seconds: number) => `Resend OTP in ${seconds}s`,
@@ -599,7 +607,7 @@ export const en = {
       errors: {
         needsDetails: "Add the make, model and year on the car page first, so we can find similar cars.",
         limit: (n: number) => `You've searched ${n} times today for this car. Try again tomorrow.`,
-        notEnoughData: "We couldn't find enough similar cars for sale to give an honest range. Try again later.",
+        notEnoughData: "We couldn't find enough similar cars for sale to give a fair range. Try again later.",
         failed: "Couldn't get a price estimate. Please try again in a minute.",
       },
     },
@@ -651,9 +659,11 @@ export const en = {
     score: "Condition score",
     outOf: "/10",
     bands: {
-      good: "Good condition",
-      fair: "Fair condition",
-      poor: "Needs work",
+      excellent: "Excellent",
+      very_good: "Very good",
+      good: "Good",
+      below_average: "Below average",
+      poor: "Poor",
     },
     details: "Car details",
     regNumber: "Number plate",
@@ -663,6 +673,7 @@ export const en = {
     findings: "Damage notes",
     findingCount: (n: number) => (n === 1 ? "1 note" : `${n} notes`),
     noFindings: "No visible damage was noted.",
+    flagsTitle: (n: number) => (n === 1 ? "1 thing to check before you buy" : `${n} things to check before you buy`),
     seenIn: (angle: string) => `Photo: ${angle}`,
     checklist: "Checklist",
     checklistSummary: (ok: number, attention: number, fail: number) =>
@@ -835,4 +846,17 @@ export const en = {
   },
 } as const;
 
+/** The shape every language must fill: the English object with its literal strings widened to string. */
+type Widen<T> = T extends string
+  ? string
+  : T extends (...args: infer A) => infer R
+    ? (...args: A) => Widen<R>
+    : T extends readonly (infer U)[]
+      ? readonly Widen<U>[]
+      : T extends object
+        ? { readonly [K in keyof T]: Widen<T[K]> }
+        : T;
+export type Strings = Widen<typeof en>;
+
+/** English. Use getT() / useT() in screens so readers get their own language; this stays for tests, the PDF and legal text. */
 export const t = en;

@@ -6,13 +6,14 @@ import { Field, FormError, inputClass } from "@/components/field";
 import { Segmented } from "@/components/segmented";
 import { LOGO, STORAGE_BUCKETS } from "@/lib/config";
 import { compressImage } from "@/lib/images/compress";
-import { t } from "@/lib/strings";
+import { useT } from "@/components/i18n-provider";
+import type { Strings } from "@/lib/strings";
 import { createClient } from "@/lib/supabase/client";
 import type { UserType } from "@/lib/supabase/database.types";
 import { USER_TYPES } from "@/lib/user-type";
 import { saveProfile, type OnboardingState } from "./actions";
 
-const userTypeOptions = USER_TYPES.map((value) => ({ value, label: t.onboarding.userTypes[value] }));
+const userTypeOptions = (t: Strings) => USER_TYPES.map((value) => ({ value, label: t.onboarding.userTypes[value] }));
 
 type Initial = {
   user_type: UserType | null;
@@ -25,6 +26,7 @@ type Initial = {
 };
 
 export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: string; initial: Initial; cancelHref?: string }) {
+  const t = useT();
   const [state, setState] = useState<OnboardingState>({});
   const [userType, setUserType] = useState<UserType | null>(initial.user_type);
   const isDealer = userType === "dealer";
@@ -149,28 +151,28 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
       noValidate
     >
       <div>
-        <p className="mb-1.5 block text-sm font-medium text-slate-700">{t.onboarding.userType}</p>
+        <p className="mb-1.5 block text-sm font-medium text-text-muted">{t.onboarding.userType}</p>
         <Segmented
           label={t.onboarding.userType}
-          options={userTypeOptions}
+          options={userTypeOptions(t)}
           value={userType}
           onChange={(value) => {
             setUserType(value);
             clearFieldError("user_type");
           }}
         />
-        {errors.user_type && <p className="mt-1.5 text-sm text-red-600">{errors.user_type}</p>}
+        {errors.user_type && <p className="mt-1.5 text-sm text-fail">{errors.user_type}</p>}
       </div>
       <Field label={t.onboarding.ownerName} name="owner_name" autoComplete="name" defaultValue={initial.owner_name} error={errors.owner_name} required />
       <Field label={t.onboarding.city} name="city" autoComplete="address-level2" defaultValue={initial.city} error={errors.city} required />
 
       {/* Hidden rather than removed, so switching type and back keeps what was typed. */}
-      <section hidden={!isDealer} aria-labelledby="dealer-details" className="flex flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-4">
+      <section hidden={!isDealer} aria-labelledby="dealer-details" className="flex flex-col gap-5 rounded-lg border border-border bg-surface p-4">
         <div>
           <h2 id="dealer-details" className="font-semibold">
             {t.onboarding.dealerDetails}
           </h2>
-          <p className="text-sm text-slate-500">{t.onboarding.dealerDetailsHint}</p>
+          <p className="text-sm text-text-subtle">{t.onboarding.dealerDetailsHint}</p>
         </div>
         <Field
           label={t.onboarding.businessName}
@@ -180,7 +182,7 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
           error={errors.business_name}
         />
         <div>
-          <label htmlFor="address" className="mb-1.5 block text-sm font-medium text-slate-700">
+          <label htmlFor="address" className="mb-1.5 block text-sm font-medium text-text-muted">
             {t.onboarding.address}
           </label>
           <textarea
@@ -192,33 +194,33 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
             aria-invalid={Boolean(errors.address)}
             className={`${inputClass} py-3`}
           />
-          {errors.address && <p className="mt-1.5 text-sm text-red-600">{errors.address}</p>}
+          {errors.address && <p className="mt-1.5 text-sm text-fail">{errors.address}</p>}
         </div>
 
         <div>
-          <p className="mb-1.5 block text-sm font-medium text-slate-700">{t.onboarding.logo}</p>
+          <p className="mb-1.5 block text-sm font-medium text-text-muted">{t.onboarding.logo}</p>
           <div className="flex items-center gap-4">
-            <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-300 bg-white">
+            <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border-control bg-surface">
               {preview ? (
                 // eslint-disable-next-line @next/next/no-img-element -- blob: previews can't go through next/image
                 <img src={preview} alt="" className="size-full object-contain" />
               ) : (
-                <span className="text-2xl text-slate-300">🏷️</span>
+                <span className="type-caption text-text-subtle">{t.onboarding.logo}</span>
               )}
             </div>
             <div className="flex flex-col items-start gap-1">
-              <label className="inline-flex min-h-12 cursor-pointer items-center rounded-xl border border-slate-300 bg-white px-4 font-semibold active:bg-slate-100">
+              <label className="inline-flex min-h-12 cursor-pointer items-center rounded-md border border-border-control bg-surface px-4 font-semibold active:bg-surface-sunken">
                 {preview ? t.onboarding.changeLogo : t.onboarding.chooseLogo}
                 <input ref={fileInput} type="file" name="logo_file" accept={LOGO.mimeTypes.join(",")} onChange={onLogoChange} className="sr-only" />
               </label>
               {preview && (
-                <button type="button" onClick={removeLogo} className="min-h-11 px-1 text-sm font-medium text-slate-500">
+                <button type="button" onClick={removeLogo} className="min-h-11 px-1 text-sm font-medium text-text-subtle">
                   {t.onboarding.removeLogo}
                 </button>
               )}
             </div>
           </div>
-          <p className={`mt-1.5 text-sm ${logoError || errors.logo_path ? "text-red-600" : "text-slate-500"}`}>
+          <p className={`mt-1.5 text-sm ${logoError || errors.logo_path ? "text-fail" : "text-text-subtle"}`}>
             {logoError ?? errors.logo_path ?? t.onboarding.logoHint}
           </p>
         </div>
