@@ -228,6 +228,17 @@ export function applyHidden(view: ReportView, hidden: readonly ReportSection[]):
   };
 }
 
+/** Major damage and failed checks, shown above the score (brand rule). Only from sections the reader can see. */
+export function redFlags(view: ReportView): { key: string; title: string; body: string | null }[] {
+  const findings = (view.findings ?? [])
+    .filter((f) => f.severity === "major")
+    .map((f, i) => ({ key: `f${i}`, title: [f.typeLabel, f.location].filter(Boolean).join(" · "), body: f.note }));
+  const checks = [...(view.checklist?.groups.flatMap((g) => g.items) ?? []), ...(view.documents?.items ?? [])]
+    .filter((item) => item.result === "fail")
+    .map((item) => ({ key: `c${item.key}`, title: item.label, body: item.note }));
+  return [...findings, ...checks];
+}
+
 /** The short summary used in the link preview and page description, e.g. ["20 photos.", "3 damage notes."]. */
 export function summaryParts(view: ReportView, t: Strings = english): string[] {
   const s = t.publicReport.summary;

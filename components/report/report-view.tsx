@@ -1,37 +1,14 @@
 // The report body shared by the public page (/r/[slug]) and the dealer's preview. No hooks, so it
 // renders on the server for buyers and in the browser for the live preview.
 import type { ReactNode } from "react";
-import { AlertIcon, ChatIcon, CheckIcon, CrossCircleIcon, DownloadIcon, PhoneIcon } from "@/components/icons";
+import { ChatIcon, DownloadIcon, PhoneIcon } from "@/components/icons";
+import { RedFlag } from "@/components/red-flag";
 import { PhotoGallery } from "@/components/report/photo-gallery";
+import { VerdictBadge, resultVerdict, severityVerdict } from "@/components/verdict-badge";
 import { formatPhone, telHref, whatsappChatUrl } from "@/lib/report/share";
-import type { DetailRow, ReportCheckItem, ReportView as View } from "@/lib/report/view";
+import { redFlags, type DetailRow, type ReportCheckItem, type ReportView as View } from "@/lib/report/view";
 import { scoreBars } from "@/lib/score";
 import type { Strings } from "@/lib/strings";
-import type { ChecklistResult, Severity } from "@/lib/supabase/database.types";
-
-// Verdicts always carry a word and a glyph as well as a colour (brand rule), never colour alone.
-const severityChip: Record<Severity, string> = {
-  minor: "bg-verdict-attention-bg text-verdict-attention-fg",
-  moderate: "bg-verdict-attention-bg text-verdict-attention-fg",
-  major: "bg-verdict-fail-bg text-verdict-fail-fg",
-};
-const resultChip: Record<ChecklistResult, string> = {
-  ok: "bg-verdict-pass-bg text-verdict-pass-fg",
-  attention: "bg-verdict-attention-bg text-verdict-attention-fg",
-  fail: "bg-verdict-fail-bg text-verdict-fail-fg",
-  na: "bg-verdict-na-bg text-verdict-na-fg",
-};
-const resultGlyph: Record<ChecklistResult, ReactNode> = {
-  ok: <CheckIcon size={14} />,
-  attention: <AlertIcon size={14} />,
-  fail: <CrossCircleIcon size={14} />,
-  na: null,
-};
-const severityGlyph: Record<Severity, ReactNode> = {
-  minor: <AlertIcon size={14} />,
-  moderate: <AlertIcon size={14} />,
-  major: <CrossCircleIcon size={14} />,
-};
 
 function Section({ title, aside, children }: { title: string; aside?: string; children: ReactNode }) {
   return (
@@ -63,10 +40,9 @@ function CheckList({ items }: { items: ReportCheckItem[] }) {
     <ul className="divide-y divide-border">
       {items.map((item) => (
         <li key={item.key} className="flex items-start gap-3 py-2">
-          <span className={`mt-0.5 inline-flex w-24 shrink-0 items-center gap-1 rounded-sm px-2 py-1 type-caption-strong ${resultChip[item.result]}`}>
-            {resultGlyph[item.result]}
+          <VerdictBadge verdict={resultVerdict[item.result]} className="mt-0.5 w-24">
             {item.resultLabel}
-          </span>
+          </VerdictBadge>
           <span className="min-w-0 text-sm">
             <span className="block">{item.label}</span>
             {item.note && <span className="block text-text-muted">{item.note}</span>}
@@ -143,6 +119,7 @@ export function ContactButtons({ view, t, preview = false }: { view: View; t: St
 export function ReportView({ view, t, pdfHref }: { view: View; t: Strings; pdfHref?: string | null }) {
   const phone = formatPhone(view.dealer.phone);
   const place = [view.dealer.address, view.dealer.city].filter(Boolean).join(", ");
+  const flags = redFlags(view);
 
   return (
     <div className="flex flex-col gap-4">
@@ -160,6 +137,17 @@ export function ReportView({ view, t, pdfHref }: { view: View; t: Strings; pdfHr
         </div>
         <span className="shrink-0 type-overline uppercase tracking-[0.06em] text-text-subtle">{t.publicReport.heading}</span>
       </header>
+
+      {flags.length > 0 && (
+        <section aria-label={t.publicReport.flagsTitle(flags.length)} className="flex flex-col gap-2">
+          <h2 className="type-overline uppercase tracking-[0.06em] text-text-subtle">{t.publicReport.flagsTitle(flags.length)}</h2>
+          {flags.map((flag) => (
+            <RedFlag key={flag.key} title={flag.title}>
+              {flag.body}
+            </RedFlag>
+          ))}
+        </section>
+      )}
 
       <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
         <div className="flex items-start justify-between gap-3">
@@ -219,10 +207,9 @@ export function ReportView({ view, t, pdfHref }: { view: View; t: Strings; pdfHr
               {view.findings.map((f, i) => (
                 <li key={i} className="rounded-md border border-border p-3">
                   <div className="flex items-start gap-2">
-                    <span className={`mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-sm px-2 py-1 type-caption-strong ${severityChip[f.severity]}`}>
-                      {severityGlyph[f.severity]}
+                    <VerdictBadge verdict={severityVerdict[f.severity]} className="mt-0.5">
                       {f.severityLabel}
-                    </span>
+                    </VerdictBadge>
                     <p className="min-w-0">
                       <span className="font-semibold">{f.typeLabel}</span>
                       {f.location && <span className="text-text-muted"> · {f.location}</span>}

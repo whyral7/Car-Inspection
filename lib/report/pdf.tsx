@@ -6,8 +6,8 @@ import { formatPhone } from "@/lib/report/share";
 import { scoreBars } from "@/lib/score";
 import { t } from "@/lib/strings";
 import { FONT_FILES, PDF_ART } from "./brand-assets";
-import { C, RESULT_COLORS, SEVERITY_COLORS, type Verdict } from "./colors";
-import type { DetailRow, ReportCheckItem, ReportView } from "./view";
+import { C, RESULT_COLORS, SEVERITY_COLORS, VERDICT_COLORS, type Verdict } from "./colors";
+import { redFlags, type DetailRow, type ReportCheckItem, type ReportView } from "./view";
 
 // The same layout as the public page, on A4 Paper: header, car and score, photos, damage notes, checklist,
 // documents, disclaimer, seal. Treadmark brand: Martel Sans for text, IBM Plex Mono for plates, readings and prices.
@@ -77,6 +77,7 @@ const s = StyleSheet.create({
   disclaimer: { marginTop: 18, padding: 10, borderRadius: 6, backgroundColor: C.sunken, fontWeight: 600, textAlign: "center" },
   signoff: { marginTop: 14, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
   seal: { width: 64, height: 64 },
+  flag: { flexDirection: "row", gap: 8, padding: 8, borderRadius: 6, backgroundColor: VERDICT_COLORS.fail.bg, marginTop: 4 },
 });
 
 /** Verdict glyph (tick, triangle alert, cross in circle): every verdict carries a word and a glyph, never colour alone. */
@@ -144,6 +145,7 @@ export function ReportPdf({ view, reportUrl, logo, images }: Props) {
   const phone = formatPhone(view.dealer.phone);
   const place = [view.dealer.address, view.dealer.city].filter(Boolean).join(", ");
   const photos = view.photos?.filter((p) => images.has(p.key)) ?? null;
+  const flags = redFlags(view);
 
   return (
     <Document
@@ -192,6 +194,21 @@ export function ReportPdf({ view, reportUrl, logo, images }: Props) {
             <Text style={{ fontWeight: 700, marginTop: 4 }}>{t.publicReport.bands[view.band]}</Text>
           </View>
         </View>
+
+        {flags.length > 0 ? (
+          <View style={s.section} wrap={false}>
+            <Text style={s.reportTag}>{t.publicReport.flagsTitle(flags.length)}</Text>
+            {flags.map((flag) => (
+              <View key={flag.key} style={s.flag}>
+                <Glyph kind="fail" color={VERDICT_COLORS.fail.fg} />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontWeight: 700 }}>{flag.title}</Text>
+                  {flag.body ? <Text style={{ color: C.muted }}>{flag.body}</Text> : null}
+                </View>
+              </View>
+            ))}
+          </View>
+        ) : null}
 
         {view.price ? (
           <View style={s.section} wrap={false}>

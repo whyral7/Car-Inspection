@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import type { AnalyseResponse } from "@/app/api/photos/[photoId]/analyse/route";
 import { CheckIcon } from "@/components/icons";
+import { BottomBar } from "@/components/bottom-bar";
 import { Button, LinkButton } from "@/components/button";
 import { Field, FormError, SelectField, TextAreaField } from "@/components/field";
 import { Segmented } from "@/components/segmented";
@@ -197,7 +198,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
 
       <Group groupKey={GENERAL} title={t.findings.general} subtitle={t.findings.generalHint} photoId={null} findings={generalFindings} {...groupProps} />
 
-      <div className="sticky bottom-0 -mx-4 flex flex-col gap-2 border-t border-border bg-surface/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur">
+      <BottomBar>
         <p className={`text-center text-sm ${toReview.length ? "text-text-muted" : "text-accent"}`}>
           {toReview.length ? t.findings.toReview(toReview.length) : t.findings.allReviewed}
         </p>
@@ -207,7 +208,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
           </Button>
         )}
         <LinkButton href={`/app/cars/${carId}/checklist`}>{t.findings.continue}</LinkButton>
-      </div>
+      </BottomBar>
     </div>
   );
 }

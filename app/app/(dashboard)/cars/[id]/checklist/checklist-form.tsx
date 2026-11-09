@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { BottomBar } from "@/components/bottom-bar";
 import { Button } from "@/components/button";
 import { FormError, TextAreaField } from "@/components/field";
 import { CheckIcon } from "@/components/icons";
@@ -148,7 +149,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
         </section>
       ))}
 
-      <div className="sticky bottom-0 -mx-4 flex flex-col gap-2 border-t border-border bg-surface/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur">
+      <BottomBar progress={progress.total ? progress.done / progress.total : 0}>
         <p aria-live="polite" className={`text-center text-sm ${progress.complete ? "text-accent" : "text-text-muted"}`}>
           {progress.complete ? (finished ? t.checklist.finished : t.checklist.allDone) : t.checklist.finishHint(progress.total - progress.done)}
         </p>
@@ -156,7 +157,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
         <Button onClick={() => void onFinish()} loading={finishing} disabled={!progress.complete}>
           {finished ? t.checklist.backToCarDone : t.checklist.finish}
         </Button>
-      </div>
+      </BottomBar>
     </div>
   );
 }

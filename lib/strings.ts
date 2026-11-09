@@ -673,6 +673,7 @@ export const en = {
     findings: "Damage notes",
     findingCount: (n: number) => (n === 1 ? "1 note" : `${n} notes`),
     noFindings: "No visible damage was noted.",
+    flagsTitle: (n: number) => (n === 1 ? "1 thing to check before you buy" : `${n} things to check before you buy`),
     seenIn: (angle: string) => `Photo: ${angle}`,
     checklist: "Checklist",
     checklistSummary: (ok: number, attention: number, fail: number) =>

@@ -506,6 +506,7 @@ export const hi: Strings = {
     findings: "डैमेज नोट",
     findingCount: (n: number) => `${n} नोट`,
     noFindings: "कोई दिखने वाला डैमेज नहीं मिला।",
+    flagsTitle: (n: number) => plural(n, "ख़रीदने से पहले 1 बात जाँचें", `ख़रीदने से पहले ${n} बातें जाँचें`),
     seenIn: (angle: string) => `फ़ोटो: ${angle}`,
     checklist: "चेकलिस्ट",
     checklistSummary: (ok: number, attention: number, fail: number) =>
