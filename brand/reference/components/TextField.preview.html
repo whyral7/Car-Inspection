@@ -1,0 +1,16 @@
+<!-- @dsCard group="Forms" height=300 subtitle="Plate input, unit input, error" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>TextField</title></head>
+<body class="tm-root" style="margin:0">
+<div class="tm-pad tm-stack" style="max-width:420px">
+  <label class="tm-field"><span class="tm-field__label">Registration number</span>
+    <input class="tm-input tm-input--plate" value="MH12AB1234" inputmode="text" autocapitalize="characters" autocomplete="off">
+    <span class="tm-field__help">We fetch make, model and owners from the RC.</span></label>
+  <label class="tm-field"><span class="tm-field__label">Odometer</span>
+    <span class="tm-input-wrap"><input class="tm-input" inputmode="numeric" value="48,320"><span class="tm-unit">km</span></span></label>
+  <label class="tm-field tm-field--error"><span class="tm-field__label">Tread depth, front left</span>
+    <span class="tm-input-wrap"><input class="tm-input" inputmode="decimal" value="14" aria-invalid="true"><span class="tm-unit">mm</span></span>
+    <span class="tm-field__help">That's deeper than a new tyre (about 8 mm). Check the reading.</span></label>
+</div>
+</body></html>

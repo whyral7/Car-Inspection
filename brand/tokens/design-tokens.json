@@ -1,0 +1,1417 @@
+{
+  "$schema": "https://design-tokens.org/schema.json",
+  "primitive": {
+    "color": {
+      "white": {
+        "$value": "#FFFFFF",
+        "$type": "color",
+        "$description": "Pure white: cards and inputs in light theme, text on fills."
+      },
+      "paper-50": {
+        "$value": "#F6F4EF",
+        "$type": "color",
+        "$description": "Paper: certificate stock, the light page."
+      },
+      "paper-100": {
+        "$value": "#ECE8E0",
+        "$type": "color",
+        "$description": "Wells on paper."
+      },
+      "paper-200": {
+        "$value": "#E2DDD3",
+        "$type": "color",
+        "$description": "Hairlines on paper."
+      },
+      "ink-100": {
+        "$value": "#C2BDCB",
+        "$type": "color",
+        "$description": "Ink neutral scale."
+      },
+      "ink-200": {
+        "$value": "#9A94A6",
+        "$type": "color",
+        "$description": "Ink neutral scale."
+      },
+      "ink-300": {
+        "$value": "#857E96",
+        "$type": "color",
+        "$description": "Ink neutral scale."
+      },
+      "ink-400": {
+        "$value": "#7C7787",
+        "$type": "color",
+        "$description": "Ink neutral scale."
+      },
+      "ink-500": {
+        "$value": "#66626F",
+        "$type": "color",
+        "$description": "Ink neutral scale."
+      },
+      "ink-600": {
+        "$value": "#4A4753",
+        "$type": "color",
+        "$description": "Ink neutral scale."
+      },
+      "ink-700": {
+        "$value": "#352F42",
+        "$type": "color",
+        "$description": "Ink neutral scale."
+      },
+      "ink-750": {
+        "$value": "#2A2536",
+        "$type": "color",
+        "$description": "Ink neutral scale."
+      },
+      "ink-800": {
+        "$value": "#211D2B",
+        "$type": "color",
+        "$description": "Ink neutral scale."
+      },
+      "ink-900": {
+        "$value": "#1D1B24",
+        "$type": "color",
+        "$description": "Ink: the tyre ring, the wordmark, body text."
+      },
+      "ink-950": {
+        "$value": "#17141F",
+        "$type": "color",
+        "$description": "Night: the dark page."
+      },
+      "ink-1000": {
+        "$value": "#110E18",
+        "$type": "color",
+        "$description": "Ink neutral scale."
+      },
+      "olive-50": {
+        "$value": "#EEF1E2",
+        "$type": "color",
+        "$description": "Olive scale (brand value)."
+      },
+      "olive-100": {
+        "$value": "#E2EABF",
+        "$type": "color",
+        "$description": "Olive scale (interpolated step, held in reserve)."
+      },
+      "olive-200": {
+        "$value": "#D6E29A",
+        "$type": "color",
+        "$description": "Olive scale (brand value)."
+      },
+      "olive-300": {
+        "$value": "#C8D67B",
+        "$type": "color",
+        "$description": "Olive Light: the tick and accent on dark."
+      },
+      "olive-400": {
+        "$value": "#A0B15C",
+        "$type": "color",
+        "$description": "Olive scale (interpolated step, held in reserve)."
+      },
+      "olive-500": {
+        "$value": "#798D3E",
+        "$type": "color",
+        "$description": "Olive scale (interpolated step, held in reserve)."
+      },
+      "olive-600": {
+        "$value": "#556B1F",
+        "$type": "color",
+        "$description": "Olive Khaki, the primary."
+      },
+      "olive-700": {
+        "$value": "#44561A",
+        "$type": "color",
+        "$description": "Olive scale (brand value)."
+      },
+      "olive-800": {
+        "$value": "#37421A",
+        "$type": "color",
+        "$description": "Olive scale (interpolated step, held in reserve)."
+      },
+      "olive-900": {
+        "$value": "#2A3019",
+        "$type": "color",
+        "$description": "Olive scale (brand value)."
+      },
+      "olive-950": {
+        "$value": "#1D1F16",
+        "$type": "color",
+        "$description": "Olive scale (interpolated step, held in reserve)."
+      },
+      "sand-50": {
+        "$value": "#FBF6ED",
+        "$type": "color",
+        "$description": "Sandstone scale (derived step, held in reserve)."
+      },
+      "sand-100": {
+        "$value": "#F7EDDD",
+        "$type": "color",
+        "$description": "Sandstone scale (derived step, held in reserve)."
+      },
+      "sand-200": {
+        "$value": "#ECDCC1",
+        "$type": "color",
+        "$description": "Sandstone scale (derived step, held in reserve)."
+      },
+      "sand-300": {
+        "$value": "#D8C3A0",
+        "$type": "color",
+        "$description": "Sandstone, the secondary."
+      },
+      "sand-400": {
+        "$value": "#BDA884",
+        "$type": "color",
+        "$description": "Sandstone scale (derived step, held in reserve)."
+      },
+      "sand-500": {
+        "$value": "#A48F6C",
+        "$type": "color",
+        "$description": "Sandstone scale (derived step, held in reserve)."
+      },
+      "sand-600": {
+        "$value": "#887454",
+        "$type": "color",
+        "$description": "Sandstone scale (derived step, held in reserve)."
+      },
+      "sand-700": {
+        "$value": "#6C5B3F",
+        "$type": "color",
+        "$description": "Sandstone scale (derived step, held in reserve)."
+      },
+      "sand-800": {
+        "$value": "#51432B",
+        "$type": "color",
+        "$description": "Sandstone scale (derived step, held in reserve)."
+      },
+      "sand-900": {
+        "$value": "#3A2E1A",
+        "$type": "color",
+        "$description": "Sandstone scale (derived step, held in reserve)."
+      },
+      "sand-950": {
+        "$value": "#271E0D",
+        "$type": "color",
+        "$description": "Sandstone scale (derived step, held in reserve)."
+      },
+      "teal-50": {
+        "$value": "#E2F2EF",
+        "$type": "color",
+        "$description": "Pass verdict scale."
+      },
+      "teal-300": {
+        "$value": "#5ED3BF",
+        "$type": "color",
+        "$description": "Pass verdict scale."
+      },
+      "teal-700": {
+        "$value": "#0F6E63",
+        "$type": "color",
+        "$description": "Pass verdict scale."
+      },
+      "teal-950": {
+        "$value": "#0E2A26",
+        "$type": "color",
+        "$description": "Pass verdict scale."
+      },
+      "orange-50": {
+        "$value": "#FCEDE4",
+        "$type": "color",
+        "$description": "Attention verdict scale."
+      },
+      "orange-300": {
+        "$value": "#FB9A5B",
+        "$type": "color",
+        "$description": "Attention verdict scale."
+      },
+      "orange-700": {
+        "$value": "#B23A0A",
+        "$type": "color",
+        "$description": "Attention verdict scale."
+      },
+      "orange-950": {
+        "$value": "#33200F",
+        "$type": "color",
+        "$description": "Attention verdict scale."
+      },
+      "red-50": {
+        "$value": "#FCE8E6",
+        "$type": "color",
+        "$description": "Fail verdict scale."
+      },
+      "red-300": {
+        "$value": "#FF8A80",
+        "$type": "color",
+        "$description": "Fail verdict scale."
+      },
+      "red-700": {
+        "$value": "#B42318",
+        "$type": "color",
+        "$description": "Fail verdict scale."
+      },
+      "red-950": {
+        "$value": "#3A1716",
+        "$type": "color",
+        "$description": "Fail verdict scale."
+      },
+      "scrim-0": {
+        "$value": "rgba(29,27,36,0)",
+        "$type": "color",
+        "$description": "Ink at 0%: top of a photo scrim."
+      },
+      "scrim-75": {
+        "$value": "rgba(29,27,36,0.75)",
+        "$type": "color",
+        "$description": "Ink at 75%: bottom of a photo scrim, under white text."
+      }
+    },
+    "spacing": {
+      "space-0": {
+        "$value": "0",
+        "$type": "dimension",
+        "$description": "No space."
+      },
+      "space-0-5": {
+        "$value": "2px",
+        "$type": "dimension",
+        "$description": "Hairline gaps: score meta, label to sub-line."
+      },
+      "space-1": {
+        "$value": "4px",
+        "$type": "dimension",
+        "$description": "Icon to label; score bar gap."
+      },
+      "space-1-5": {
+        "$value": "6px",
+        "$type": "dimension",
+        "$description": "Label to input; glyph to word in a badge."
+      },
+      "space-2": {
+        "$value": "8px",
+        "$type": "dimension",
+        "$description": "Inside chips and badges; photo tile padding."
+      },
+      "space-2-5": {
+        "$value": "10px",
+        "$type": "dimension",
+        "$description": "Badge end padding."
+      },
+      "space-3": {
+        "$value": "12px",
+        "$type": "dimension",
+        "$description": "Between list rows' content; bottom bar vertical padding."
+      },
+      "space-4": {
+        "$value": "16px",
+        "$type": "dimension",
+        "$description": "Screen side gutter, card padding."
+      },
+      "space-5": {
+        "$value": "20px",
+        "$type": "dimension",
+        "$description": "Button horizontal padding."
+      },
+      "space-6": {
+        "$value": "24px",
+        "$type": "dimension",
+        "$description": "Between cards; large button padding."
+      },
+      "space-8": {
+        "$value": "32px",
+        "$type": "dimension",
+        "$description": "Between sections of a screen."
+      },
+      "space-12": {
+        "$value": "48px",
+        "$type": "dimension",
+        "$description": "Above a screen title; marketing rhythm."
+      },
+      "space-16": {
+        "$value": "64px",
+        "$type": "dimension",
+        "$description": "Marketing section spacing."
+      }
+    },
+    "radius": {
+      "radius-2xs": {
+        "$value": "2px",
+        "$type": "dimension",
+        "$description": "Score bars, progress tracks."
+      },
+      "radius-xs": {
+        "$value": "4px",
+        "$type": "dimension",
+        "$description": "Number plate."
+      },
+      "radius-sm": {
+        "$value": "6px",
+        "$type": "dimension",
+        "$description": "Badges, chips, checkboxes."
+      },
+      "radius-md": {
+        "$value": "10px",
+        "$type": "dimension",
+        "$description": "Buttons, inputs, photo thumbnails."
+      },
+      "radius-lg": {
+        "$value": "14px",
+        "$type": "dimension",
+        "$description": "Cards and list groups."
+      },
+      "radius-xl": {
+        "$value": "20px",
+        "$type": "dimension",
+        "$description": "Bottom sheets, dialogs; the app icon corner is 22.5% of its side."
+      },
+      "radius-full": {
+        "$value": "9999px",
+        "$type": "dimension",
+        "$description": "Circles: spinner, photo tick disc."
+      }
+    },
+    "size": {
+      "tap-min": {
+        "$value": "44px",
+        "$type": "dimension",
+        "$description": "Smallest tap target on any control; default button and rating height."
+      },
+      "control-height": {
+        "$value": "48px",
+        "$type": "dimension",
+        "$description": "Text field height."
+      },
+      "control-height-lg": {
+        "$value": "52px",
+        "$type": "dimension",
+        "$description": "Large button in the bottom bar."
+      },
+      "chip-height-sm": {
+        "$value": "24px",
+        "$type": "dimension",
+        "$description": "Highlight badge."
+      },
+      "chip-height": {
+        "$value": "28px",
+        "$type": "dimension",
+        "$description": "Verdict badge."
+      },
+      "icon-xs": {
+        "$value": "14px",
+        "$type": "dimension",
+        "$description": "Glyph inside a badge."
+      },
+      "icon-sm": {
+        "$value": "16px",
+        "$type": "dimension",
+        "$description": "Spinner, inline status glyph."
+      },
+      "icon-md": {
+        "$value": "18px",
+        "$type": "dimension",
+        "$description": "Button icon."
+      },
+      "icon-lg": {
+        "$value": "20px",
+        "$type": "dimension",
+        "$description": "Photo tile glyphs."
+      },
+      "icon-xl": {
+        "$value": "24px",
+        "$type": "dimension",
+        "$description": "Standalone icons; red-flag glyph."
+      },
+      "track-height": {
+        "$value": "4px",
+        "$type": "dimension",
+        "$description": "Progress and upload tracks."
+      },
+      "bottom-bar": {
+        "$value": "72px",
+        "$type": "dimension",
+        "$description": "Height of the sticky bottom action bar before the safe-area inset."
+      },
+      "score-bar-width": {
+        "$value": "10px",
+        "$type": "dimension",
+        "$description": "Width of one score bar (component)."
+      },
+      "score-bar-min": {
+        "$value": "16px",
+        "$type": "dimension",
+        "$description": "Shortest score bar (component)."
+      },
+      "score-bar-step": {
+        "$value": "7px",
+        "$type": "dimension",
+        "$description": "Height added per score bar (component); the tallest is 44px."
+      },
+      "photo-min": {
+        "$value": "104px",
+        "$type": "dimension",
+        "$description": "Smallest photo tile width (component)."
+      },
+      "plate-height": {
+        "$value": "26px",
+        "$type": "dimension",
+        "$description": "Number plate chip (component)."
+      }
+    },
+    "font": {
+      "font-size-11": {
+        "$value": "11px",
+        "$type": "dimension",
+        "$description": "Criticality label."
+      },
+      "font-size-12": {
+        "$value": "12px",
+        "$type": "dimension",
+        "$description": "Overline, highlight badge, photo labels."
+      },
+      "font-size-13": {
+        "$value": "13px",
+        "$type": "dimension",
+        "$description": "Caption, badge, code."
+      },
+      "font-size-14": {
+        "$value": "14px",
+        "$type": "dimension",
+        "$description": "Label, button text in rows."
+      },
+      "font-size-15": {
+        "$value": "15px",
+        "$type": "dimension",
+        "$description": "Button, row titles, readings."
+      },
+      "font-size-16": {
+        "$value": "16px",
+        "$type": "dimension",
+        "$description": "Body; never smaller in inputs."
+      },
+      "font-size-18": {
+        "$value": "18px",
+        "$type": "dimension",
+        "$description": "Body large; score unit."
+      },
+      "font-size-20": {
+        "$value": "20px",
+        "$type": "dimension",
+        "$description": "Plate input."
+      },
+      "font-size-22": {
+        "$value": "22px",
+        "$type": "dimension",
+        "$description": "Heading 2."
+      },
+      "font-size-24": {
+        "$value": "24px",
+        "$type": "dimension",
+        "$description": "Hindi heading."
+      },
+      "font-size-28": {
+        "$value": "28px",
+        "$type": "dimension",
+        "$description": "Heading 1."
+      },
+      "font-size-36": {
+        "$value": "36px",
+        "$type": "dimension",
+        "$description": "Display large."
+      },
+      "font-size-48": {
+        "$value": "48px",
+        "$type": "dimension",
+        "$description": "Display XL; the score."
+      },
+      "line-height-16": {
+        "$value": "16px",
+        "$type": "dimension",
+        "$description": "Line height."
+      },
+      "line-height-18": {
+        "$value": "18px",
+        "$type": "dimension",
+        "$description": "Line height."
+      },
+      "line-height-20": {
+        "$value": "20px",
+        "$type": "dimension",
+        "$description": "Line height."
+      },
+      "line-height-24": {
+        "$value": "24px",
+        "$type": "dimension",
+        "$description": "Line height."
+      },
+      "line-height-26": {
+        "$value": "26px",
+        "$type": "dimension",
+        "$description": "Line height."
+      },
+      "line-height-28": {
+        "$value": "28px",
+        "$type": "dimension",
+        "$description": "Line height."
+      },
+      "line-height-34": {
+        "$value": "34px",
+        "$type": "dimension",
+        "$description": "Line height."
+      },
+      "line-height-36": {
+        "$value": "36px",
+        "$type": "dimension",
+        "$description": "Line height."
+      },
+      "line-height-40": {
+        "$value": "40px",
+        "$type": "dimension",
+        "$description": "Line height."
+      },
+      "line-height-44": {
+        "$value": "44px",
+        "$type": "dimension",
+        "$description": "Line height."
+      },
+      "line-height-52": {
+        "$value": "52px",
+        "$type": "dimension",
+        "$description": "Line height."
+      },
+      "font-weight-regular": {
+        "$value": "400",
+        "$type": "dimension",
+        "$description": "Body."
+      },
+      "font-weight-medium": {
+        "$value": "500",
+        "$type": "dimension",
+        "$description": "Mono readings."
+      },
+      "font-weight-semibold": {
+        "$value": "600",
+        "$type": "dimension",
+        "$description": "Labels, buttons."
+      },
+      "font-weight-bold": {
+        "$value": "700",
+        "$type": "dimension",
+        "$description": "Headings."
+      },
+      "font-weight-extrabold": {
+        "$value": "800",
+        "$type": "dimension",
+        "$description": "Display, the score, the wordmark."
+      },
+      "tracking-tight": {
+        "$value": "-0.02em",
+        "$type": "dimension",
+        "$description": "The score."
+      },
+      "tracking-snug": {
+        "$value": "-0.01em",
+        "$type": "dimension",
+        "$description": "Display type."
+      },
+      "tracking-normal": {
+        "$value": "0",
+        "$type": "dimension",
+        "$description": "Default."
+      },
+      "tracking-button": {
+        "$value": "0.005em",
+        "$type": "dimension",
+        "$description": "Button labels."
+      },
+      "tracking-caps": {
+        "$value": "0.06em",
+        "$type": "dimension",
+        "$description": "Uppercase labels."
+      },
+      "tracking-wide": {
+        "$value": "0.08em",
+        "$type": "dimension",
+        "$description": "Overline, plates."
+      }
+    },
+    "borderWidth": {
+      "border-1": {
+        "$value": "1px",
+        "$type": "dimension",
+        "$description": "Hairlines and control edges."
+      },
+      "border-1-5": {
+        "$value": "1.5px",
+        "$type": "dimension",
+        "$description": "Dashed photo tile, number plate."
+      },
+      "border-2": {
+        "$value": "2px",
+        "$type": "dimension",
+        "$description": "Error edge, retake edge, focus ring."
+      }
+    },
+    "opacity": {
+      "opacity-disabled": {
+        "$value": "0.45",
+        "$type": "number",
+        "$description": "Disabled controls."
+      },
+      "opacity-loading": {
+        "$value": "0.7",
+        "$type": "number",
+        "$description": "Reserved for loading overlays."
+      }
+    },
+    "duration": {
+      "dur-fast": {
+        "$value": "120ms",
+        "$type": "duration",
+        "$description": "Press feedback, checkbox ticks."
+      },
+      "dur-base": {
+        "$value": "200ms",
+        "$type": "duration",
+        "$description": "Sheets, expanding rows, toasts."
+      },
+      "dur-slow": {
+        "$value": "320ms",
+        "$type": "duration",
+        "$description": "Score dial fill on the report."
+      },
+      "dur-spin": {
+        "$value": "700ms",
+        "$type": "duration",
+        "$description": "One spinner turn."
+      }
+    },
+    "shadow": {
+      "shadow-1": {
+        "$value": "0 1px 2px rgba(29,27,36,0.06), 0 1px 1px rgba(29,27,36,0.04)",
+        "$type": "shadow"
+      },
+      "shadow-2": {
+        "$value": "0 4px 12px rgba(29,27,36,0.08), 0 1px 3px rgba(29,27,36,0.06)",
+        "$type": "shadow"
+      },
+      "shadow-3": {
+        "$value": "0 12px 32px rgba(29,27,36,0.14), 0 2px 6px rgba(29,27,36,0.08)",
+        "$type": "shadow"
+      }
+    }
+  },
+  "semantic": {
+    "color": {
+      "bg": {
+        "$value": "{primitive.color.paper-50}",
+        "$type": "color",
+        "$description": "Page background (Paper). The report PDF page."
+      },
+      "surface": {
+        "$value": "{primitive.color.white}",
+        "$type": "color",
+        "$description": "Cards, sheets, list rows and inputs."
+      },
+      "surface-raised": {
+        "$value": "{primitive.color.white}",
+        "$type": "color",
+        "$description": "Menus, popovers and the sticky bottom bar; in dark it lifts above surface."
+      },
+      "surface-sunken": {
+        "$value": "{primitive.color.paper-100}",
+        "$type": "color",
+        "$description": "Wells: photo placeholders, the inside of a progress track."
+      },
+      "border": {
+        "$value": "{primitive.color.paper-200}",
+        "$type": "color",
+        "$description": "Hairlines between rows and around cards. Decorative only; never the only edge of a control."
+      },
+      "border-control": {
+        "$value": "{primitive.color.ink-400}",
+        "$type": "color",
+        "$description": "Input, checkbox and select borders. 3:1 or better on bg, surface and surface-sunken in both themes."
+      },
+      "text": {
+        "$value": "{primitive.color.ink-900}",
+        "$type": "color",
+        "$description": "Primary text (Ink) on bg, surface, surface-raised and every tint."
+      },
+      "text-muted": {
+        "$value": "{primitive.color.ink-600}",
+        "$type": "color",
+        "$description": "Secondary text and labels on bg, surface and surface-raised."
+      },
+      "text-subtle": {
+        "$value": "{primitive.color.ink-500}",
+        "$type": "color",
+        "$description": "Metadata, timestamps, helper text on bg, surface and surface-raised (4.5:1 or better)."
+      },
+      "accent": {
+        "$value": "{primitive.color.olive-600}",
+        "$type": "color",
+        "$description": "Olive Khaki: primary buttons, links, selected states, progress fill. In dark it becomes Olive Light, because dark olive disappears on a dark ground."
+      },
+      "accent-hover": {
+        "$value": "{primitive.color.olive-700}",
+        "$type": "color",
+        "$description": "Hover and pressed state of accent fills."
+      },
+      "accent-tint": {
+        "$value": "{primitive.color.olive-50}",
+        "$type": "color",
+        "$description": "Selected rows, info banners, the active step chip."
+      },
+      "on-accent": {
+        "$value": "{primitive.color.white}",
+        "$type": "color",
+        "$description": "Text and icons on an accent fill."
+      },
+      "focus-ring": {
+        "$value": "{primitive.color.olive-600}",
+        "$type": "color",
+        "$description": "Keyboard focus: 2px solid ring with a 2px gap in the page colour."
+      },
+      "highlight": {
+        "$value": "{primitive.color.sand-300}",
+        "$type": "color",
+        "$description": "Sandstone, the secondary colour: one offer badge, \"new\" tag or key number per screen. Strongest on surface, accent and ink grounds; on bg give it a 1px border. Never a verdict, never text."
+      },
+      "on-highlight": {
+        "$value": "{primitive.color.ink-900}",
+        "$type": "color",
+        "$description": "Text on a highlight fill (always ink, 9.9:1)."
+      },
+      "pass": {
+        "$value": "{primitive.color.teal-700}",
+        "$type": "color",
+        "$description": "Verdict Good / Pass. A blue-green, kept apart from olive by hue. Text and icons on surface and pass-tint. Always with a word and a check glyph."
+      },
+      "pass-tint": {
+        "$value": "{primitive.color.teal-50}",
+        "$type": "color",
+        "$description": "Background of pass badges and rows."
+      },
+      "on-pass": {
+        "$value": "{primitive.color.white}",
+        "$type": "color",
+        "$description": "Text and icons on a solid pass fill (the photo tick)."
+      },
+      "attention": {
+        "$value": "{primitive.color.orange-700}",
+        "$type": "color",
+        "$description": "Verdict Fair / Attention. Text and icons on surface and attention-tint. Always with a word and an alert glyph."
+      },
+      "attention-tint": {
+        "$value": "{primitive.color.orange-50}",
+        "$type": "color",
+        "$description": "Background of attention badges and rows."
+      },
+      "on-attention": {
+        "$value": "{primitive.color.white}",
+        "$type": "color",
+        "$description": "Text and icons on a solid attention fill."
+      },
+      "fail": {
+        "$value": "{primitive.color.red-700}",
+        "$type": "color",
+        "$description": "Verdict Poor / Fail and red flags. Text and icons on surface and fail-tint. Always with a word and a cross glyph."
+      },
+      "fail-tint": {
+        "$value": "{primitive.color.red-50}",
+        "$type": "color",
+        "$description": "Background of fail badges, red-flag banners."
+      },
+      "on-fail": {
+        "$value": "{primitive.color.white}",
+        "$type": "color",
+        "$description": "Text and icons on a solid fail fill."
+      },
+      "brand-olive": {
+        "$value": "{primitive.color.olive-600}",
+        "$type": "color",
+        "$description": "Olive Khaki for the logo tick, the seal, app icon tile and print. Same in both themes."
+      },
+      "brand-ink": {
+        "$value": "{primitive.color.ink-900}",
+        "$type": "color",
+        "$description": "The tyre ring and wordmark; dark marketing grounds."
+      },
+      "brand-paper": {
+        "$value": "{primitive.color.paper-50}",
+        "$type": "color",
+        "$description": "Light marketing ground; certificate stock."
+      },
+      "brand-night": {
+        "$value": "{primitive.color.ink-950}",
+        "$type": "color",
+        "$description": "Dark marketing ground behind the reverse logo."
+      },
+      "brand-olive-light": {
+        "$value": "{primitive.color.olive-300}",
+        "$type": "color",
+        "$description": "The tick on dark grounds (reverse logo). Graphics and dark-ground text only."
+      },
+      "brand-sandstone": {
+        "$value": "{primitive.color.sand-300}",
+        "$type": "color",
+        "$description": "Sandstone in print and marketing: one highlight per layout."
+      }
+    }
+  },
+  "component": {
+    "button": {
+      "primary-bg": {
+        "$value": "{semantic.color.accent}",
+        "$type": "color",
+        "$description": "Primary button fill."
+      },
+      "primary-bg-hover": {
+        "$value": "{semantic.color.accent-hover}",
+        "$type": "color",
+        "$description": "Primary button hover and pressed."
+      },
+      "primary-fg": {
+        "$value": "{semantic.color.on-accent}",
+        "$type": "color",
+        "$description": "Primary button label and icon."
+      },
+      "secondary-bg": {
+        "$value": "{semantic.color.surface}",
+        "$type": "color",
+        "$description": "Secondary button fill."
+      },
+      "secondary-bg-hover": {
+        "$value": "{semantic.color.surface-sunken}",
+        "$type": "color",
+        "$description": "Secondary button hover."
+      },
+      "secondary-fg": {
+        "$value": "{semantic.color.text}",
+        "$type": "color",
+        "$description": "Secondary button label."
+      },
+      "secondary-border": {
+        "$value": "{semantic.color.border-control}",
+        "$type": "color",
+        "$description": "Secondary button edge (3:1)."
+      },
+      "ghost-fg": {
+        "$value": "{semantic.color.accent}",
+        "$type": "color",
+        "$description": "Ghost button label."
+      },
+      "ghost-bg-hover": {
+        "$value": "{semantic.color.accent-tint}",
+        "$type": "color",
+        "$description": "Ghost button hover."
+      },
+      "danger-bg": {
+        "$value": "{semantic.color.surface}",
+        "$type": "color",
+        "$description": "Danger button fill (outlined, never a red fill)."
+      },
+      "danger-bg-hover": {
+        "$value": "{semantic.color.fail-tint}",
+        "$type": "color",
+        "$description": "Danger button hover."
+      },
+      "danger-fg": {
+        "$value": "{semantic.color.fail}",
+        "$type": "color",
+        "$description": "Danger button label."
+      },
+      "danger-border": {
+        "$value": "{semantic.color.fail}",
+        "$type": "color",
+        "$description": "Danger button edge."
+      }
+    },
+    "input": {
+      "bg": {
+        "$value": "{semantic.color.surface}",
+        "$type": "color",
+        "$description": "Text field fill."
+      },
+      "fg": {
+        "$value": "{semantic.color.text}",
+        "$type": "color",
+        "$description": "Typed value."
+      },
+      "placeholder": {
+        "$value": "{semantic.color.text-subtle}",
+        "$type": "color",
+        "$description": "Placeholder (never instead of a label)."
+      },
+      "border": {
+        "$value": "{semantic.color.border-control}",
+        "$type": "color",
+        "$description": "Field edge at rest (3:1)."
+      },
+      "border-hover": {
+        "$value": "{semantic.color.text-muted}",
+        "$type": "color",
+        "$description": "Field edge on hover."
+      },
+      "border-focus": {
+        "$value": "{semantic.color.accent}",
+        "$type": "color",
+        "$description": "Field edge while focused."
+      },
+      "border-error": {
+        "$value": "{semantic.color.fail}",
+        "$type": "color",
+        "$description": "Field edge in error."
+      },
+      "label": {
+        "$value": "{semantic.color.text}",
+        "$type": "color",
+        "$description": "Field label."
+      },
+      "help": {
+        "$value": "{semantic.color.text-subtle}",
+        "$type": "color",
+        "$description": "Help line under a field."
+      },
+      "error": {
+        "$value": "{semantic.color.fail}",
+        "$type": "color",
+        "$description": "Error line under a field."
+      },
+      "disabled-bg": {
+        "$value": "{semantic.color.surface-sunken}",
+        "$type": "color",
+        "$description": "Disabled field fill."
+      },
+      "unit": {
+        "$value": "{semantic.color.text-subtle}",
+        "$type": "color",
+        "$description": "Unit suffix (km, mm, µm, V)."
+      }
+    },
+    "verdict": {
+      "pass-bg": {
+        "$value": "{semantic.color.pass-tint}",
+        "$type": "color",
+        "$description": "Pass badge fill."
+      },
+      "pass-fg": {
+        "$value": "{semantic.color.pass}",
+        "$type": "color",
+        "$description": "Pass badge word and glyph."
+      },
+      "attention-bg": {
+        "$value": "{semantic.color.attention-tint}",
+        "$type": "color",
+        "$description": "Attention badge fill."
+      },
+      "attention-fg": {
+        "$value": "{semantic.color.attention}",
+        "$type": "color",
+        "$description": "Attention badge word and glyph."
+      },
+      "fail-bg": {
+        "$value": "{semantic.color.fail-tint}",
+        "$type": "color",
+        "$description": "Fail badge fill."
+      },
+      "fail-fg": {
+        "$value": "{semantic.color.fail}",
+        "$type": "color",
+        "$description": "Fail badge word and glyph."
+      },
+      "na-bg": {
+        "$value": "{semantic.color.surface-sunken}",
+        "$type": "color",
+        "$description": "Not-applicable badge fill."
+      },
+      "na-fg": {
+        "$value": "{semantic.color.text-muted}",
+        "$type": "color",
+        "$description": "Not-applicable badge word."
+      }
+    },
+    "highlight": {
+      "badge-bg": {
+        "$value": "{semantic.color.highlight}",
+        "$type": "color",
+        "$description": "Sandstone call-out badge fill."
+      },
+      "badge-fg": {
+        "$value": "{semantic.color.on-highlight}",
+        "$type": "color",
+        "$description": "Sandstone badge text."
+      },
+      "badge-border": {
+        "$value": "{semantic.color.border-control}",
+        "$type": "color",
+        "$description": "Sandstone badge edge when it sits on bg (Paper)."
+      }
+    },
+    "score": {
+      "fg": {
+        "$value": "{semantic.color.text}",
+        "$type": "color",
+        "$description": "Score number."
+      },
+      "sub": {
+        "$value": "{semantic.color.text-subtle}",
+        "$type": "color",
+        "$description": "Out-of label and context line."
+      },
+      "bar": {
+        "$value": "{semantic.color.border}",
+        "$type": "color",
+        "$description": "Unfilled score bar."
+      },
+      "bar-on": {
+        "$value": "{semantic.color.text}",
+        "$type": "color",
+        "$description": "Filled score bar."
+      },
+      "bar-tip": {
+        "$value": "{semantic.color.accent}",
+        "$type": "color",
+        "$description": "Highest filled bar."
+      }
+    },
+    "check": {
+      "bg": {
+        "$value": "{semantic.color.surface}",
+        "$type": "color",
+        "$description": "Checklist row fill."
+      },
+      "divider": {
+        "$value": "{semantic.color.border}",
+        "$type": "color",
+        "$description": "Line between checklist rows."
+      },
+      "hint": {
+        "$value": "{semantic.color.text-subtle}",
+        "$type": "color",
+        "$description": "How-to hint and criticality label."
+      },
+      "evidence": {
+        "$value": "{semantic.color.fail}",
+        "$type": "color",
+        "$description": "Evidence-required line."
+      }
+    },
+    "seg": {
+      "bg": {
+        "$value": "{semantic.color.surface}",
+        "$type": "color",
+        "$description": "Rating control fill."
+      },
+      "fg": {
+        "$value": "{semantic.color.text-muted}",
+        "$type": "color",
+        "$description": "Unselected rating label."
+      },
+      "border": {
+        "$value": "{semantic.color.border-control}",
+        "$type": "color",
+        "$description": "Rating control outer edge."
+      },
+      "divider": {
+        "$value": "{semantic.color.border}",
+        "$type": "color",
+        "$description": "Lines between rating options."
+      },
+      "na-bg-on": {
+        "$value": "{semantic.color.surface-sunken}",
+        "$type": "color",
+        "$description": "Selected N/A fill."
+      },
+      "na-fg-on": {
+        "$value": "{semantic.color.text}",
+        "$type": "color",
+        "$description": "Selected N/A label."
+      }
+    },
+    "photo": {
+      "bg": {
+        "$value": "{semantic.color.surface-sunken}",
+        "$type": "color",
+        "$description": "Empty photo tile."
+      },
+      "border": {
+        "$value": "{semantic.color.border-control}",
+        "$type": "color",
+        "$description": "Dashed edge of an empty tile."
+      },
+      "fg": {
+        "$value": "{semantic.color.text-muted}",
+        "$type": "color",
+        "$description": "Angle name on an empty tile."
+      },
+      "busy": {
+        "$value": "{semantic.color.accent}",
+        "$type": "color",
+        "$description": "Uploading tile edge, label and bar."
+      },
+      "track": {
+        "$value": "{semantic.color.border}",
+        "$type": "color",
+        "$description": "Upload progress track."
+      },
+      "fallback": {
+        "$value": "{primitive.color.ink-400}",
+        "$type": "color",
+        "$description": "Stand-in behind a photo that has not loaded."
+      },
+      "scrim-top": {
+        "$value": "{primitive.color.scrim-0}",
+        "$type": "color",
+        "$description": "Top of the scrim over a photo."
+      },
+      "scrim-bottom": {
+        "$value": "{primitive.color.scrim-75}",
+        "$type": "color",
+        "$description": "Bottom of the scrim, under the label."
+      },
+      "on-photo": {
+        "$value": "{primitive.color.white}",
+        "$type": "color",
+        "$description": "Label over a photo scrim (always white: the scrim is always dark)."
+      },
+      "ok-bg": {
+        "$value": "{semantic.color.pass}",
+        "$type": "color",
+        "$description": "Tick disc on a done photo."
+      },
+      "ok-fg": {
+        "$value": "{semantic.color.on-pass}",
+        "$type": "color",
+        "$description": "Tick on the disc."
+      },
+      "retake-bg": {
+        "$value": "{semantic.color.fail-tint}",
+        "$type": "color",
+        "$description": "Needs-retake tile fill."
+      },
+      "retake-fg": {
+        "$value": "{semantic.color.fail}",
+        "$type": "color",
+        "$description": "Needs-retake label and edge."
+      }
+    },
+    "flag": {
+      "fail-bg": {
+        "$value": "{semantic.color.fail-tint}",
+        "$type": "color",
+        "$description": "Red flag banner."
+      },
+      "fail-icon": {
+        "$value": "{semantic.color.fail}",
+        "$type": "color",
+        "$description": "Red flag glyph."
+      },
+      "attention-bg": {
+        "$value": "{semantic.color.attention-tint}",
+        "$type": "color",
+        "$description": "Amber flag banner."
+      },
+      "attention-icon": {
+        "$value": "{semantic.color.attention}",
+        "$type": "color",
+        "$description": "Amber flag glyph."
+      },
+      "title": {
+        "$value": "{semantic.color.text}",
+        "$type": "color",
+        "$description": "Flag title."
+      },
+      "body": {
+        "$value": "{semantic.color.text-muted}",
+        "$type": "color",
+        "$description": "Flag body line."
+      }
+    },
+    "bottombar": {
+      "bg": {
+        "$value": "{semantic.color.surface-raised}",
+        "$type": "color",
+        "$description": "Sticky bottom bar."
+      },
+      "border": {
+        "$value": "{semantic.color.border}",
+        "$type": "color",
+        "$description": "Top edge of the bottom bar."
+      },
+      "step": {
+        "$value": "{semantic.color.text-subtle}",
+        "$type": "color",
+        "$description": "Step count."
+      }
+    },
+    "progress": {
+      "track": {
+        "$value": "{semantic.color.surface-sunken}",
+        "$type": "color",
+        "$description": "Progress track."
+      },
+      "fill": {
+        "$value": "{semantic.color.accent}",
+        "$type": "color",
+        "$description": "Progress fill."
+      }
+    },
+    "report": {
+      "bg": {
+        "$value": "{semantic.color.surface}",
+        "$type": "color",
+        "$description": "Report header card."
+      },
+      "divider": {
+        "$value": "{semantic.color.border}",
+        "$type": "color",
+        "$description": "Line under the issuer row."
+      },
+      "facts": {
+        "$value": "{semantic.color.text-muted}",
+        "$type": "color",
+        "$description": "Facts line."
+      },
+      "id": {
+        "$value": "{semantic.color.text-subtle}",
+        "$type": "color",
+        "$description": "Report ID."
+      }
+    },
+    "plate": {
+      "border": {
+        "$value": "{semantic.color.text}",
+        "$type": "color",
+        "$description": "Number-plate outline."
+      }
+    }
+  },
+  "dark": {
+    "semantic": {
+      "color": {
+        "bg": {
+          "$value": "{primitive.color.ink-950}",
+          "$type": "color"
+        },
+        "surface": {
+          "$value": "{primitive.color.ink-800}",
+          "$type": "color"
+        },
+        "surface-raised": {
+          "$value": "{primitive.color.ink-750}",
+          "$type": "color"
+        },
+        "surface-sunken": {
+          "$value": "{primitive.color.ink-1000}",
+          "$type": "color"
+        },
+        "border": {
+          "$value": "{primitive.color.ink-700}",
+          "$type": "color"
+        },
+        "border-control": {
+          "$value": "{primitive.color.ink-300}",
+          "$type": "color"
+        },
+        "text": {
+          "$value": "{primitive.color.paper-50}",
+          "$type": "color"
+        },
+        "text-muted": {
+          "$value": "{primitive.color.ink-100}",
+          "$type": "color"
+        },
+        "text-subtle": {
+          "$value": "{primitive.color.ink-200}",
+          "$type": "color"
+        },
+        "accent": {
+          "$value": "{primitive.color.olive-300}",
+          "$type": "color"
+        },
+        "accent-hover": {
+          "$value": "{primitive.color.olive-200}",
+          "$type": "color"
+        },
+        "accent-tint": {
+          "$value": "{primitive.color.olive-900}",
+          "$type": "color"
+        },
+        "on-accent": {
+          "$value": "{primitive.color.ink-950}",
+          "$type": "color"
+        },
+        "focus-ring": {
+          "$value": "{primitive.color.olive-200}",
+          "$type": "color"
+        },
+        "highlight": {
+          "$value": "{primitive.color.sand-300}",
+          "$type": "color"
+        },
+        "on-highlight": {
+          "$value": "{primitive.color.ink-900}",
+          "$type": "color"
+        },
+        "pass": {
+          "$value": "{primitive.color.teal-300}",
+          "$type": "color"
+        },
+        "pass-tint": {
+          "$value": "{primitive.color.teal-950}",
+          "$type": "color"
+        },
+        "on-pass": {
+          "$value": "{primitive.color.ink-950}",
+          "$type": "color"
+        },
+        "attention": {
+          "$value": "{primitive.color.orange-300}",
+          "$type": "color"
+        },
+        "attention-tint": {
+          "$value": "{primitive.color.orange-950}",
+          "$type": "color"
+        },
+        "on-attention": {
+          "$value": "{primitive.color.ink-950}",
+          "$type": "color"
+        },
+        "fail": {
+          "$value": "{primitive.color.red-300}",
+          "$type": "color"
+        },
+        "fail-tint": {
+          "$value": "{primitive.color.red-950}",
+          "$type": "color"
+        },
+        "on-fail": {
+          "$value": "{primitive.color.ink-950}",
+          "$type": "color"
+        },
+        "brand-olive": {
+          "$value": "{primitive.color.olive-600}",
+          "$type": "color"
+        },
+        "brand-ink": {
+          "$value": "{primitive.color.ink-900}",
+          "$type": "color"
+        },
+        "brand-paper": {
+          "$value": "{primitive.color.paper-50}",
+          "$type": "color"
+        },
+        "brand-night": {
+          "$value": "{primitive.color.ink-950}",
+          "$type": "color"
+        },
+        "brand-olive-light": {
+          "$value": "{primitive.color.olive-300}",
+          "$type": "color"
+        },
+        "brand-sandstone": {
+          "$value": "{primitive.color.sand-300}",
+          "$type": "color"
+        }
+      }
+    }
+  }
+}

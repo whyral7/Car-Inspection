@@ -1,0 +1,204 @@
+/* Treadmark theme for Tailwind CSS v4.
+   In app/globals.css:  @import "tailwindcss";  @import "../brand/tokens/treadmark-tokens.css";
+                         @import "../brand/tokens/treadmark-base.css";  @import "../brand/tokens/treadmark-tailwind-v4.css";
+   Utilities read the CSS variables, so light/dark switch with data-theme or the phone setting.
+   Tailwind's default palette is removed on purpose: only brand colours exist (bg-surface, text-text-muted,
+   bg-button-primary-bg, border-border-control, text-pass, bg-olive-600 ...). */
+@theme inline {
+  --color-*: initial;
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-border: var(--border);
+  --color-border-control: var(--border-control);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-tint: var(--accent-tint);
+  --color-on-accent: var(--on-accent);
+  --color-focus-ring: var(--focus-ring);
+  --color-highlight: var(--highlight);
+  --color-on-highlight: var(--on-highlight);
+  --color-pass: var(--pass);
+  --color-pass-tint: var(--pass-tint);
+  --color-on-pass: var(--on-pass);
+  --color-attention: var(--attention);
+  --color-attention-tint: var(--attention-tint);
+  --color-on-attention: var(--on-attention);
+  --color-fail: var(--fail);
+  --color-fail-tint: var(--fail-tint);
+  --color-on-fail: var(--on-fail);
+  --color-brand-olive: var(--brand-olive);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-paper: var(--brand-paper);
+  --color-brand-night: var(--brand-night);
+  --color-brand-olive-light: var(--brand-olive-light);
+  --color-brand-sandstone: var(--brand-sandstone);
+  --color-button-primary-bg: var(--button-primary-bg);
+  --color-button-primary-bg-hover: var(--button-primary-bg-hover);
+  --color-button-primary-fg: var(--button-primary-fg);
+  --color-button-secondary-bg: var(--button-secondary-bg);
+  --color-button-secondary-bg-hover: var(--button-secondary-bg-hover);
+  --color-button-secondary-fg: var(--button-secondary-fg);
+  --color-button-secondary-border: var(--button-secondary-border);
+  --color-button-ghost-fg: var(--button-ghost-fg);
+  --color-button-ghost-bg-hover: var(--button-ghost-bg-hover);
+  --color-button-danger-bg: var(--button-danger-bg);
+  --color-button-danger-bg-hover: var(--button-danger-bg-hover);
+  --color-button-danger-fg: var(--button-danger-fg);
+  --color-button-danger-border: var(--button-danger-border);
+  --color-input-bg: var(--input-bg);
+  --color-input-fg: var(--input-fg);
+  --color-input-placeholder: var(--input-placeholder);
+  --color-input-border: var(--input-border);
+  --color-input-border-hover: var(--input-border-hover);
+  --color-input-border-focus: var(--input-border-focus);
+  --color-input-border-error: var(--input-border-error);
+  --color-input-label: var(--input-label);
+  --color-input-help: var(--input-help);
+  --color-input-error: var(--input-error);
+  --color-input-disabled-bg: var(--input-disabled-bg);
+  --color-input-unit: var(--input-unit);
+  --color-verdict-pass-bg: var(--verdict-pass-bg);
+  --color-verdict-pass-fg: var(--verdict-pass-fg);
+  --color-verdict-attention-bg: var(--verdict-attention-bg);
+  --color-verdict-attention-fg: var(--verdict-attention-fg);
+  --color-verdict-fail-bg: var(--verdict-fail-bg);
+  --color-verdict-fail-fg: var(--verdict-fail-fg);
+  --color-verdict-na-bg: var(--verdict-na-bg);
+  --color-verdict-na-fg: var(--verdict-na-fg);
+  --color-highlight-badge-bg: var(--highlight-badge-bg);
+  --color-highlight-badge-fg: var(--highlight-badge-fg);
+  --color-highlight-badge-border: var(--highlight-badge-border);
+  --color-score-fg: var(--score-fg);
+  --color-score-sub: var(--score-sub);
+  --color-score-bar: var(--score-bar);
+  --color-score-bar-on: var(--score-bar-on);
+  --color-score-bar-tip: var(--score-bar-tip);
+  --color-check-bg: var(--check-bg);
+  --color-check-divider: var(--check-divider);
+  --color-check-hint: var(--check-hint);
+  --color-check-evidence: var(--check-evidence);
+  --color-seg-bg: var(--seg-bg);
+  --color-seg-fg: var(--seg-fg);
+  --color-seg-border: var(--seg-border);
+  --color-seg-divider: var(--seg-divider);
+  --color-seg-na-bg-on: var(--seg-na-bg-on);
+  --color-seg-na-fg-on: var(--seg-na-fg-on);
+  --color-photo-bg: var(--photo-bg);
+  --color-photo-border: var(--photo-border);
+  --color-photo-fg: var(--photo-fg);
+  --color-photo-busy: var(--photo-busy);
+  --color-photo-track: var(--photo-track);
+  --color-photo-fallback: var(--photo-fallback);
+  --color-photo-scrim-top: var(--photo-scrim-top);
+  --color-photo-scrim-bottom: var(--photo-scrim-bottom);
+  --color-on-photo: var(--on-photo);
+  --color-photo-ok-bg: var(--photo-ok-bg);
+  --color-photo-ok-fg: var(--photo-ok-fg);
+  --color-photo-retake-bg: var(--photo-retake-bg);
+  --color-photo-retake-fg: var(--photo-retake-fg);
+  --color-flag-fail-bg: var(--flag-fail-bg);
+  --color-flag-fail-icon: var(--flag-fail-icon);
+  --color-flag-attention-bg: var(--flag-attention-bg);
+  --color-flag-attention-icon: var(--flag-attention-icon);
+  --color-flag-title: var(--flag-title);
+  --color-flag-body: var(--flag-body);
+  --color-bottombar-bg: var(--bottombar-bg);
+  --color-bottombar-border: var(--bottombar-border);
+  --color-bottombar-step: var(--bottombar-step);
+  --color-progress-track: var(--progress-track);
+  --color-progress-fill: var(--progress-fill);
+  --color-report-bg: var(--report-bg);
+  --color-report-divider: var(--report-divider);
+  --color-report-facts: var(--report-facts);
+  --color-report-id: var(--report-id);
+  --color-plate-border: var(--plate-border);
+  --color-paper-50: var(--paper-50);
+  --color-paper-100: var(--paper-100);
+  --color-paper-200: var(--paper-200);
+  --color-ink-100: var(--ink-100);
+  --color-ink-200: var(--ink-200);
+  --color-ink-300: var(--ink-300);
+  --color-ink-400: var(--ink-400);
+  --color-ink-500: var(--ink-500);
+  --color-ink-600: var(--ink-600);
+  --color-ink-700: var(--ink-700);
+  --color-ink-750: var(--ink-750);
+  --color-ink-800: var(--ink-800);
+  --color-ink-900: var(--ink-900);
+  --color-ink-950: var(--ink-950);
+  --color-ink-1000: var(--ink-1000);
+  --color-olive-50: var(--olive-50);
+  --color-olive-100: var(--olive-100);
+  --color-olive-200: var(--olive-200);
+  --color-olive-300: var(--olive-300);
+  --color-olive-400: var(--olive-400);
+  --color-olive-500: var(--olive-500);
+  --color-olive-600: var(--olive-600);
+  --color-olive-700: var(--olive-700);
+  --color-olive-800: var(--olive-800);
+  --color-olive-900: var(--olive-900);
+  --color-olive-950: var(--olive-950);
+  --color-sand-50: var(--sand-50);
+  --color-sand-100: var(--sand-100);
+  --color-sand-200: var(--sand-200);
+  --color-sand-300: var(--sand-300);
+  --color-sand-400: var(--sand-400);
+  --color-sand-500: var(--sand-500);
+  --color-sand-600: var(--sand-600);
+  --color-sand-700: var(--sand-700);
+  --color-sand-800: var(--sand-800);
+  --color-sand-900: var(--sand-900);
+  --color-sand-950: var(--sand-950);
+  --color-teal-50: var(--teal-50);
+  --color-teal-300: var(--teal-300);
+  --color-teal-700: var(--teal-700);
+  --color-teal-950: var(--teal-950);
+  --color-orange-50: var(--orange-50);
+  --color-orange-300: var(--orange-300);
+  --color-orange-700: var(--orange-700);
+  --color-orange-950: var(--orange-950);
+  --color-red-50: var(--red-50);
+  --color-red-300: var(--red-300);
+  --color-red-700: var(--red-700);
+  --color-red-950: var(--red-950);
+  --font-sans: var(--font-martel-sans), system-ui, sans-serif;
+  --font-display: var(--font-martel-sans), system-ui, sans-serif;
+  --font-hindi: var(--font-martel-sans), "Noto Sans Devanagari", sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, Menlo, monospace;
+  /* Tailwind spacing is already a 4px step (p-4 = 16px = space-4), so it is left as is. */
+  --radius-2xs: 2px;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --shadow-card: var(--shadow-1);
+  --shadow-bar: var(--shadow-2);
+  --shadow-sheet: var(--shadow-3);
+  --ease-brand: ease;
+}
+
+@utility type-body { font: var(--type-body); }
+@utility type-body-lg { font: var(--type-body-lg); }
+@utility type-body-sm { font: var(--type-body-sm); }
+@utility type-caption { font: var(--type-caption); }
+@utility type-caption-strong { font: var(--type-caption-strong); }
+@utility type-code { font: var(--type-code); }
+@utility type-code-sm { font: var(--type-code-sm); }
+@utility type-code-strong { font: var(--type-code-strong); }
+@utility type-display-lg { font: var(--type-display-lg); }
+@utility type-display-xl { font: var(--type-display-xl); }
+@utility type-heading-1 { font: var(--type-heading-1); }
+@utility type-heading-2 { font: var(--type-heading-2); }
+@utility type-label { font: var(--type-label); }
+@utility type-micro { font: var(--type-micro); }
+@utility type-overline { font: var(--type-overline); }
+@utility type-reading { font: var(--type-reading); }
+@utility type-title-sm { font: var(--type-title-sm); }

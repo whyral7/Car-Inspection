@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "brand:check": "node brand/scripts/check-brand.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.135.0",
