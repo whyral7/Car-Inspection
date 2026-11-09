@@ -51,7 +51,7 @@ export default async function PublicReportPage({ params }: PageProps<"/r/[slug]"
       </main>
       {canContact && (
         // Always in reach while the buyer scrolls through the photos.
-        <div className="fixed inset-x-0 bottom-0 z-10 border-t border-slate-200 bg-white/95 backdrop-blur">
+        <div className="fixed inset-x-0 bottom-0 z-10 border-t border-border bg-surface/95 backdrop-blur">
           <div className="mx-auto w-full max-w-2xl px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
             <ContactButtons view={view} />
           </div>

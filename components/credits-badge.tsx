@@ -5,8 +5,8 @@ export function CreditsBadge({ credits }: { credits: number }) {
   return (
     <span
       aria-label={t.dashboard.creditsLeft(credits)}
-      className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${
-        low ? "bg-amber-100 text-amber-800" : "bg-brand-100 text-brand-800"
+      className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-sm px-2 py-1 font-mono text-xs font-medium ${
+        low ? "bg-attention-tint text-attention" : "bg-accent-tint text-accent"
       }`}
     >
       {t.dashboard.creditsShort(credits)}

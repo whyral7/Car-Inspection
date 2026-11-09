@@ -12,20 +12,23 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 py-10">
-      <p className="text-xl font-bold text-brand-700">{t.appName}</p>
+      <Link href="/" className="self-start" aria-label={t.appName}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- static brand SVG; small lockup suits a page header */}
+        <img src="/brand/treadmark-lockup-small-color.svg" alt={t.appName} width={136} height={28} className="h-7 w-auto" />
+      </Link>
       <LoginForm nextPath={nextPath} />
-      <p className="mt-6 text-center text-sm text-slate-500">
+      <p className="mt-6 text-center text-sm text-text-subtle">
         {t.login.agree}{" "}
-        <Link href="/terms" className="font-medium text-brand-700 underline">
+        <Link href="/terms" className="font-medium text-accent underline">
           {t.login.terms}
         </Link>{" "}
         {t.login.and}{" "}
-        <Link href="/privacy" className="font-medium text-brand-700 underline">
+        <Link href="/privacy" className="font-medium text-accent underline">
           {t.login.privacy}
         </Link>
         .
       </p>
-      <p className="mt-auto pt-10 text-center text-sm text-slate-500">{t.disclaimer}</p>
+      <p className="mt-auto pt-10 text-center text-sm text-text-subtle">{t.disclaimer}</p>
     </main>
   );
 }

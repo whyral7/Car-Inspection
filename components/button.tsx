@@ -1,15 +1,19 @@
 import Link from "next/link";
 import type { ComponentProps } from "react";
 
-type Variant = "primary" | "secondary" | "ghost";
+// Brand Button spec (brand/reference/components/Button.md): component tokens only.
+type Variant = "primary" | "secondary" | "ghost" | "danger";
 
 const base =
-  "inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 text-base font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-not-allowed disabled:opacity-60";
+  "inline-flex min-h-12 items-center justify-center gap-2 rounded-md px-5 type-title-sm tracking-[0.005em] transition-[background-color,transform] duration-120 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring disabled:cursor-not-allowed disabled:opacity-45 disabled:active:scale-100";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-brand-700 text-white active:bg-brand-800",
-  secondary: "border border-slate-300 bg-white text-slate-900 active:bg-slate-100",
-  ghost: "text-brand-700 active:bg-brand-50",
+  primary: "bg-button-primary-bg text-button-primary-fg hover:bg-button-primary-bg-hover active:bg-button-primary-bg-hover",
+  secondary:
+    "border border-button-secondary-border bg-button-secondary-bg text-button-secondary-fg hover:bg-button-secondary-bg-hover active:bg-button-secondary-bg-hover",
+  ghost: "text-button-ghost-fg hover:bg-button-ghost-bg-hover active:bg-button-ghost-bg-hover",
+  danger:
+    "border border-button-danger-border bg-button-danger-bg text-button-danger-fg hover:bg-button-danger-bg-hover active:bg-button-danger-bg-hover",
 };
 
 export function buttonClass(variant: Variant = "primary", className = "") {

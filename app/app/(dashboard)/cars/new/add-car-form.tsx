@@ -15,9 +15,9 @@ const fuelOptions = FUELS.map((value) => ({ value, label: t.cars.fuels[value] })
 const transmissionOptions = TRANSMISSIONS.map((value) => ({ value, label: t.cars.transmissions[value] }));
 
 const notices: Record<Lookup["status"], { text: string; tone: string } | null> = {
-  found: { text: t.cars.found, tone: "bg-brand-50 text-brand-800" },
-  not_found: { text: t.cars.notFound, tone: "bg-amber-50 text-amber-800" },
-  unavailable: { text: t.cars.unavailable, tone: "bg-amber-50 text-amber-800" },
+  found: { text: t.cars.found, tone: "bg-accent-tint text-accent" },
+  not_found: { text: t.cars.notFound, tone: "bg-attention-tint text-attention" },
+  unavailable: { text: t.cars.unavailable, tone: "bg-attention-tint text-attention" },
   manual: null,
 };
 
@@ -74,7 +74,7 @@ export function AddCarForm() {
         // Room for pasted spaces and hyphens; they're stripped as the dealer types.
         maxLength={20}
         autoFocus
-        className="[&_input]:text-lg [&_input]:font-semibold [&_input]:tracking-widest"
+        className="[&_input]:font-mono [&_input]:text-xl [&_input]:font-medium [&_input]:tracking-[0.08em] [&_input]:uppercase"
       />
       <Button type="submit" loading={looking === "rc"} disabled={looking !== null}>
         {looking === "rc" ? t.cars.lookingUp : t.cars.findDetails}
@@ -137,10 +137,10 @@ function CarDetailsForm({ lookup, onChangeReg }: { lookup: Lookup; onChangeReg: 
       className="mt-6 flex flex-col gap-5"
       noValidate
     >
-      <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+      <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface p-4">
         <div className="min-w-0">
-          <p className="text-sm text-slate-600">{t.cars.regNumber}</p>
-          <p className="truncate text-xl font-bold tracking-widest">{lookup.regNumber}</p>
+          <p className="text-sm text-text-muted">{t.cars.regNumber}</p>
+          <p className="truncate font-mono text-xl font-medium tracking-[0.08em]">{lookup.regNumber}</p>
         </div>
         <Button type="button" variant="secondary" onClick={onChangeReg} disabled={isPending} className="min-h-11 shrink-0 px-4 text-sm">
           {t.cars.change}
@@ -148,14 +148,14 @@ function CarDetailsForm({ lookup, onChangeReg }: { lookup: Lookup; onChangeReg: 
       </div>
 
       {lookup.existingCarId && (
-        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <p className="rounded-md bg-attention-tint px-4 py-3 text-sm text-attention">
           {t.cars.duplicate}{" "}
           <Link href={`/app/cars/${lookup.existingCarId}`} className="font-semibold underline underline-offset-2">
             {t.cars.openExisting}
           </Link>
         </p>
       )}
-      {notice && <p className={`rounded-xl px-4 py-3 text-sm ${notice.tone}`}>{notice.text}</p>}
+      {notice && <p className={`rounded-md px-4 py-3 text-sm ${notice.tone}`}>{notice.text}</p>}
 
       <Field
         ref={firstField}

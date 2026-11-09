@@ -55,43 +55,43 @@ export default async function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="rounded-2xl border border-slate-200 bg-white p-4">
+      <section className="rounded-lg border border-border bg-surface p-4">
         <div className="flex items-center gap-3">
           {logo ? (
             // eslint-disable-next-line @next/next/no-img-element -- small public logo, no need for the image optimiser
-            <img src={logo} alt="" className="size-14 shrink-0 rounded-xl border border-slate-200 object-contain" />
+            <img src={logo} alt="" className="size-14 shrink-0 rounded-md border border-border object-contain" />
           ) : (
-            <span className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-brand-700 text-xl font-bold text-white">
+            <span className="flex size-14 shrink-0 items-center justify-center rounded-md bg-surface-sunken type-heading-2 text-text">
               {name.charAt(0).toUpperCase()}
             </span>
           )}
           <div className="min-w-0">
             <h1 className="truncate text-xl font-bold">{name}</h1>
-            {profile.city && <p className="text-slate-600">{profile.city}</p>}
+            {profile.city && <p className="text-text-muted">{profile.city}</p>}
           </div>
         </div>
         <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
           {profile.user_type && (
             <>
-              <dt className="text-slate-500">{t.profile.userType}</dt>
+              <dt className="text-text-subtle">{t.profile.userType}</dt>
               <dd>{t.onboarding.userTypes[profile.user_type]}</dd>
             </>
           )}
           {profile.owner_name && profile.owner_name !== name && (
             <>
-              <dt className="text-slate-500">{t.profile.owner}</dt>
+              <dt className="text-text-subtle">{t.profile.owner}</dt>
               <dd>{profile.owner_name}</dd>
             </>
           )}
           {phone && (
             <>
-              <dt className="text-slate-500">{t.profile.phone}</dt>
+              <dt className="text-text-subtle">{t.profile.phone}</dt>
               <dd>{phone}</dd>
             </>
           )}
           {isDealer && profile.address && (
             <>
-              <dt className="text-slate-500">{t.profile.address}</dt>
+              <dt className="text-text-subtle">{t.profile.address}</dt>
               <dd className="whitespace-pre-line">{profile.address}</dd>
             </>
           )}
@@ -101,13 +101,13 @@ export default async function ProfilePage() {
         </LinkButton>
       </section>
 
-      <section className="rounded-2xl bg-brand-700 p-5 text-white">
-        <p className="text-sm text-brand-100">{t.profile.creditsTitle}</p>
-        <p className="text-3xl font-bold">{t.profile.balance(profile.credits)}</p>
-        <p className="mt-1 text-sm text-brand-100">
+      <section className="rounded-lg border border-border bg-surface p-5 shadow-card">
+        <p className="type-overline uppercase tracking-[0.06em] text-text-subtle">{t.profile.creditsTitle}</p>
+        <p className="font-mono text-3xl font-medium text-text">{t.profile.balance(profile.credits)}</p>
+        <p className="mt-1 type-caption text-text-muted">
           {t.profile.bought(totalBought(history))} · {t.profile.used(totalUsed(history))}
         </p>
-        <LinkButton href="/app/credits" variant="secondary" className="mt-4 w-full border-white">
+        <LinkButton href="/app/credits" variant="secondary" className="mt-4 w-full">
           {t.profile.buy}
         </LinkButton>
       </section>
@@ -115,24 +115,24 @@ export default async function ProfilePage() {
       <section id="history" className="scroll-mt-20">
         <h2 className="mb-3 text-lg font-bold">{t.profile.historyTitle}</h2>
         {history.length === 0 ? (
-          <p className="text-slate-600">{t.profile.historyEmpty}</p>
+          <p className="text-text-muted">{t.profile.historyEmpty}</p>
         ) : (
-          <ul className="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
+          <ul className="divide-y divide-border rounded-lg border border-border bg-surface">
             {history.map((entry, i) => (
               <li key={i} className="flex items-start justify-between gap-3 p-4">
                 <div className="min-w-0">
                   <p className="font-medium break-words">{entryLabel(entry)}</p>
-                  <p className="text-sm text-slate-500">{formatDateTime(entry.at)}</p>
-                  {entry.kind === "purchase" && entry.paymentId && <p className="text-xs break-all text-slate-400">{t.profile.paymentId(entry.paymentId)}</p>}
+                  <p className="text-sm text-text-subtle">{formatDateTime(entry.at)}</p>
+                  {entry.kind === "purchase" && entry.paymentId && <p className="text-xs break-all text-text-subtle">{t.profile.paymentId(entry.paymentId)}</p>}
                 </div>
-                <span className={`shrink-0 font-bold tabular-nums ${entry.change > 0 ? "text-emerald-700" : "text-slate-700"}`}>
+                <span className={`shrink-0 font-bold tabular-nums ${entry.change > 0 ? "text-pass" : "text-text-muted"}`}>
                   {entry.change > 0 ? `+${entry.change}` : entry.change}
                 </span>
               </li>
             ))}
           </ul>
         )}
-        <p className="mt-3 text-sm text-slate-500">{t.profile.help}</p>
+        <p className="mt-3 text-sm text-text-subtle">{t.profile.help}</p>
       </section>
     </div>
   );

@@ -97,8 +97,8 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
     return (
       <form onSubmit={onPhoneSubmit} className="mt-8 flex flex-col gap-5" noValidate>
         <div>
-          <h1 className="text-2xl font-bold">{t.login.title}</h1>
-          <p className="mt-1 text-slate-600">{t.login.subtitle}</p>
+          <h1 className="type-heading-1">{t.login.title}</h1>
+          <p className="mt-1 text-text-muted">{t.login.subtitle}</p>
         </div>
         <Field
           label={t.login.phoneLabel}
@@ -126,8 +126,8 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
   return (
     <form onSubmit={onOtpSubmit} className="mt-8 flex flex-col gap-5" noValidate>
       <div>
-        <h1 className="text-2xl font-bold">{t.login.otpTitle}</h1>
-        <p className="mt-1 text-slate-600">{t.login.otpSentTo(formatPhone(phone))}</p>
+        <h1 className="type-heading-1">{t.login.otpTitle}</h1>
+        <p className="mt-1 text-text-muted">{t.login.otpSentTo(formatPhone(phone))}</p>
       </div>
       <Field
         ref={otpRef}

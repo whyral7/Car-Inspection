@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { LogoutButton } from "@/components/logout-button";
 import { getCurrentProfile, isProfileComplete } from "@/lib/profile";
 import { logoUrl } from "@/lib/storage";
@@ -14,11 +15,14 @@ export default async function OnboardingPage() {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 pt-4 pb-10">
       <div className="flex items-center justify-between">
-        <p className="text-xl font-bold text-brand-700">{t.appName}</p>
+        <Link href="/" className="self-start" aria-label={t.appName}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- static brand SVG; small lockup suits a page header */}
+        <img src="/brand/treadmark-lockup-small-color.svg" alt={t.appName} width={136} height={28} className="h-7 w-auto" />
+      </Link>
         <LogoutButton />
       </div>
-      <h1 className="mt-6 text-2xl font-bold">{editing ? t.onboarding.editTitle : t.onboarding.title}</h1>
-      <p className="mt-1 text-slate-600">{t.onboarding.subtitle}</p>
+      <h1 className="mt-6 type-heading-1">{editing ? t.onboarding.editTitle : t.onboarding.title}</h1>
+      <p className="mt-1 text-text-muted">{t.onboarding.subtitle}</p>
       <OnboardingForm
         profileId={user.id}
         cancelHref={editing ? "/app/profile" : undefined}

@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Button, LinkButton } from "@/components/button";
 import { FormError } from "@/components/field";
-import { THEME_COLOR } from "@/lib/config";
+import { CheckIcon } from "@/components/icons";
+import { ACCENT_COLOR } from "@/lib/config";
 import { formatRupees } from "@/lib/format";
 import { loadCheckout } from "@/lib/razorpay/checkout";
 import { t } from "@/lib/strings";
@@ -87,7 +88,7 @@ export function BuyCredits({ packs, next }: { packs: Pack[]; next: string | null
       description: order.description,
       image: `${window.location.origin}/icons/icon-192.png`,
       prefill: order.prefill,
-      theme: { color: THEME_COLOR },
+      theme: { color: ACCENT_COLOR },
       retry: { enabled: true },
       // Checkout's own success callback. It proves nothing on its own: we wait for the webhook to credit.
       handler: () => void waitForCredits(order.orderId),
@@ -104,8 +105,8 @@ export function BuyCredits({ packs, next }: { packs: Pack[]; next: string | null
 
   if (phase.kind === "confirming") {
     return (
-      <div role="status" className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-5">
-        <span className="size-5 shrink-0 animate-spin rounded-full border-2 border-brand-700 border-t-transparent" />
+      <div role="status" className="flex items-center gap-3 rounded-lg border border-border bg-surface p-5">
+        <span className="size-5 shrink-0 animate-spin rounded-full border-2 border-accent border-t-transparent" />
         <p className="font-medium">{t.credits.confirming}</p>
       </div>
     );
@@ -114,14 +115,14 @@ export function BuyCredits({ packs, next }: { packs: Pack[]; next: string | null
   if (phase.kind === "success" || phase.kind === "slow") {
     const success = phase.kind === "success";
     return (
-      <div role="status" className={`flex flex-col gap-4 rounded-2xl p-5 ${success ? "bg-emerald-50" : "bg-amber-50"}`}>
+      <div role="status" className={`flex flex-col gap-4 rounded-lg p-5 ${success ? "bg-pass-tint" : "bg-attention-tint"}`}>
         <div className="flex items-start gap-3">
-          <span aria-hidden className={`flex size-10 shrink-0 items-center justify-center rounded-full text-xl text-white ${success ? "bg-emerald-600" : "bg-amber-500"}`}>
-            {success ? "✓" : "…"}
+          <span aria-hidden className={`flex size-10 shrink-0 items-center justify-center rounded-full ${success ? "bg-pass text-on-pass" : "bg-attention text-on-attention"}`}>
+            {success ? <CheckIcon size={20} /> : <span className="type-title-sm">…</span>}
           </span>
           <div>
             <h2 className="text-lg font-bold">{success ? t.credits.successTitle : t.credits.slowTitle}</h2>
-            <p className="text-slate-700">{success ? t.credits.successBody(phase.added, phase.total) : t.credits.slowBody}</p>
+            <p className="text-text-muted">{success ? t.credits.successBody(phase.added, phase.total) : t.credits.slowBody}</p>
           </div>
         </div>
         {phase.kind === "slow" && (
@@ -137,7 +138,7 @@ export function BuyCredits({ packs, next }: { packs: Pack[]; next: string | null
   return (
     <div className="flex flex-col gap-3">
       {phase.kind === "failed" && (
-        <div role="alert" className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+        <div role="alert" className="rounded-lg bg-fail-tint p-4 text-sm text-fail">
           <p className="font-semibold">{t.credits.failedTitle}</p>
           <p>{t.credits.failedBody(phase.reason)}</p>
         </div>
@@ -147,13 +148,13 @@ export function BuyCredits({ packs, next }: { packs: Pack[]; next: string | null
         {packs.map((pack) => {
           const opening = phase.kind === "opening" && phase.packKey === pack.key;
           return (
-            <li key={pack.key} className={`rounded-2xl border bg-white p-4 ${pack.best ? "border-brand-600 ring-1 ring-brand-600" : "border-slate-200"}`}>
+            <li key={pack.key} className={`rounded-lg border bg-surface p-4 ${pack.best ? "border-accent ring-1 ring-focus-ring" : "border-border"}`}>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-lg font-bold">{t.credits.pack(pack.credits)}</p>
-                  <p className="text-sm text-slate-500">{t.credits.perReport(formatRupees(pack.perReportPaise))}</p>
+                  <p className="text-sm text-text-subtle">{t.credits.perReport(formatRupees(pack.perReportPaise))}</p>
                 </div>
-                {pack.best && <span className="rounded-full bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-800">{t.credits.bestValue}</span>}
+                {pack.best && <span className="rounded-sm bg-accent-tint px-2.5 py-1 text-xs font-semibold text-accent">{t.credits.bestValue}</span>}
               </div>
               <Button className="mt-3 w-full" loading={opening} disabled={phase.kind === "opening"} onClick={() => buy(pack.key)}>
                 {opening ? t.credits.opening : t.credits.pay(formatRupees(pack.pricePaise))}
@@ -162,7 +163,7 @@ export function BuyCredits({ packs, next }: { packs: Pack[]; next: string | null
           );
         })}
       </ul>
-      <p className="text-center text-xs text-slate-500">{t.credits.secure}</p>
+      <p className="text-center text-xs text-text-subtle">{t.credits.secure}</p>
     </div>
   );
 }
