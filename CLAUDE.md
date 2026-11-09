@@ -52,7 +52,7 @@ Every new user gets 3 free credits. Publishing a report costs 1 credit, deducted
 - Compress images in the browser to max 1600px long edge, JPEG quality 0.8, before upload.
 - All secrets and AI/RC/Razorpay calls stay on the server (route handlers or server actions).
 - RC lookup goes through one interface in lib/rc/ with a mock provider; real providers plug in by env var.
-- Plain, friendly English in the UI; keep strings in one file so Hindi can be added later.
+- Plain, friendly English and Hindi in the UI: every string in `lib/strings.ts` with its Hindi in `lib/strings.hi.ts` (same shape; `lib/i18n.test.ts` fails on anything untranslated). Screens read the reader's language with `await getT()` (server) or `useT()` (client); the PDF, link previews and legal pages stay English.
 - After each phase: run lint, typecheck, tests and `npm run brand:check`, fix failures, then summarise what changed and how to test it on a phone.
 - Small, focused commits with clear messages.
 

@@ -9,6 +9,10 @@
 }
 html { background: var(--bg); color: var(--text); font: var(--type-body); -webkit-font-smoothing: antialiased; }
 :lang(hi) { line-height: 1.6; }                       /* Devanagari needs room for matras */
+/* The type styles set their own line height, so Hindi pages loosen them: headings to 1.35, text to 1.6.
+   Attribute selectors also catch responsive variants such as sm:type-display-xl. */
+:lang(hi) :is([class*="type-display"], [class*="type-heading"]) { line-height: 1.35; }
+:lang(hi) :is([class*="type-body"], [class*="type-title"], [class*="type-label"], [class*="type-caption"], [class*="type-overline"], [class*="type-micro"]) { line-height: 1.6; }
 :focus-visible { outline: var(--focus-ring-width) solid var(--focus-ring); outline-offset: var(--focus-ring-offset); }
 .tabular { font-variant-numeric: tabular-nums; }
 .caps { text-transform: uppercase; letter-spacing: var(--tracking-caps); } /* not .overline: Tailwind owns that name */
