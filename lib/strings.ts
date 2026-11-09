@@ -6,7 +6,7 @@ type LegalBusiness = { legalName: string; address: string; city: string; email: 
 
 export const en = {
   appName: "Treadmark",
-  tagline: "Trusted inspection reports for used cars, ready to share on WhatsApp.",
+  tagline: "Every car, properly checked. Inspection reports you can share on WhatsApp.",
   disclaimer: "Visual and documented inspection. Not a mechanical certification.",
 
   common: {
@@ -14,7 +14,7 @@ export const en = {
     save: "Save",
     logout: "Log out",
     back: "Back",
-    somethingWrong: "Something went wrong. Please try again.",
+    somethingWrong: "That didn't work. Check your internet and try again.",
     offline: "You seem to be offline. Check your internet and try again.",
   },
 
@@ -25,7 +25,7 @@ export const en = {
       "Shoot 20 guided photos, get AI damage notes and share a branded used-car inspection report on WhatsApp in about 10 minutes. Start free with 3 reports.",
     nav: { login: "Log in", pricing: "Pricing" },
     eyebrow: "For used-car dealers in India",
-    headline: "Sell used cars faster with reports buyers trust",
+    headline: "Sell used cars faster with reports buyers can verify",
     subhead: "Shoot 20 guided photos, get AI damage notes and send a branded inspection report on WhatsApp. About 10 minutes a car.",
     cta: "Start free, 3 reports",
     ctaNote: "No card needed. Log in with your mobile number.",
@@ -599,7 +599,7 @@ export const en = {
       errors: {
         needsDetails: "Add the make, model and year on the car page first, so we can find similar cars.",
         limit: (n: number) => `You've searched ${n} times today for this car. Try again tomorrow.`,
-        notEnoughData: "We couldn't find enough similar cars for sale to give an honest range. Try again later.",
+        notEnoughData: "We couldn't find enough similar cars for sale to give a fair range. Try again later.",
         failed: "Couldn't get a price estimate. Please try again in a minute.",
       },
     },
@@ -651,9 +651,11 @@ export const en = {
     score: "Condition score",
     outOf: "/10",
     bands: {
-      good: "Good condition",
-      fair: "Fair condition",
-      poor: "Needs work",
+      excellent: "Excellent",
+      very_good: "Very good",
+      good: "Good",
+      below_average: "Below average",
+      poor: "Poor",
     },
     details: "Car details",
     regNumber: "Number plate",

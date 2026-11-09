@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { conditionScore, formatScore, scoreBand } from "./score";
+import { conditionScore, formatScore, scoreBand, scoreBars } from "./score";
 import type { ChecklistResult, Severity } from "@/lib/supabase/database.types";
 
 const f = (severity: Severity, accepted = true) => ({ severity, accepted });
@@ -65,12 +65,27 @@ describe("formatScore", () => {
 });
 
 describe("scoreBand", () => {
-  it("is good from 8.0, fair from 6.0, poor below", () => {
-    expect(scoreBand(10)).toBe("good");
-    expect(scoreBand(8)).toBe("good");
-    expect(scoreBand(7.9)).toBe("fair");
-    expect(scoreBand(6)).toBe("fair");
-    expect(scoreBand(5.9)).toBe("poor");
+  it("uses the brand grade bands", () => {
+    expect(scoreBand(10)).toBe("excellent");
+    expect(scoreBand(9)).toBe("excellent");
+    expect(scoreBand(8.9)).toBe("very_good");
+    expect(scoreBand(7.5)).toBe("very_good");
+    expect(scoreBand(7.4)).toBe("good");
+    expect(scoreBand(6)).toBe("good");
+    expect(scoreBand(5.9)).toBe("below_average");
+    expect(scoreBand(4.5)).toBe("below_average");
+    expect(scoreBand(4.4)).toBe("poor");
     expect(scoreBand(1)).toBe("poor");
+  });
+});
+
+describe("scoreBars", () => {
+  it("fills bar n from 2n - 1", () => {
+    expect(scoreBars(10)).toBe(5);
+    expect(scoreBars(9)).toBe(5);
+    expect(scoreBars(8.4)).toBe(4);
+    expect(scoreBars(6.6)).toBe(3);
+    expect(scoreBars(4.7)).toBe(2);
+    expect(scoreBars(1)).toBe(1);
   });
 });
