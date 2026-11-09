@@ -33,11 +33,11 @@ export function PhotoGallery({ photos }: { photos: ReportPhoto[] }) {
       <ul className="grid grid-cols-3 gap-1.5 sm:grid-cols-4">
         {photos.map((p, i) => (
           <li key={p.key}>
-            <button type="button" onClick={() => open(i)} className="block w-full overflow-hidden rounded-lg bg-slate-100 focus-visible:outline-2 focus-visible:outline-brand-700">
+            <button type="button" onClick={() => open(i)} className="block w-full overflow-hidden rounded-sm bg-surface-sunken focus-visible:outline-2 focus-visible:outline-focus-ring">
               {/* eslint-disable-next-line @next/next/no-img-element -- signed storage URLs; the small copy is already sized for this grid */}
               <img src={p.thumbUrl} alt={p.label} width={640} height={480} loading="lazy" decoding="async" className="aspect-[4/3] w-full object-cover" />
             </button>
-            <p className="mt-0.5 truncate text-xs text-slate-600">{p.label}</p>
+            <p className="mt-0.5 truncate text-xs text-text-muted">{p.label}</p>
           </li>
         ))}
       </ul>
@@ -45,7 +45,7 @@ export function PhotoGallery({ photos }: { photos: ReportPhoto[] }) {
       <dialog
         ref={dialog}
         aria-label={t.publicReport.photoViewer}
-        className="m-0 h-dvh max-h-none w-screen max-w-none bg-black p-0 text-white backdrop:bg-black"
+        className="m-0 h-dvh max-h-none w-screen max-w-none bg-ink-1000 p-0 text-on-photo backdrop:bg-ink-1000"
         onClick={(e) => e.target === e.currentTarget && dialog.current?.close()}
         onKeyDown={(e) => {
           if (e.key === "ArrowRight") step(1);
@@ -57,9 +57,9 @@ export function PhotoGallery({ photos }: { photos: ReportPhoto[] }) {
             <div className="flex items-center justify-between gap-3 px-4 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-2">
               <p className="min-w-0 truncate text-sm">
                 <span className="font-semibold">{photo.label}</span>
-                <span className="text-white/60"> · {t.publicReport.photoPosition(index + 1, photos.length)}</span>
+                <span className="text-on-photo/70"> · {t.publicReport.photoPosition(index + 1, photos.length)}</span>
               </p>
-              <button type="button" onClick={() => dialog.current?.close()} className="min-h-11 shrink-0 rounded-lg px-3 text-sm font-semibold active:bg-white/10">
+              <button type="button" onClick={() => dialog.current?.close()} className="min-h-11 shrink-0 rounded-sm px-3 text-sm font-semibold active:bg-surface/10">
                 {t.publicReport.close}
               </button>
             </div>
@@ -69,10 +69,10 @@ export function PhotoGallery({ photos }: { photos: ReportPhoto[] }) {
             </div>
             {photos.length > 1 && (
               <div className="flex justify-between gap-3 px-4 pt-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
-                <button type="button" onClick={() => step(-1)} aria-label={t.publicReport.previous} className="min-h-12 flex-1 rounded-xl bg-white/10 text-xl active:bg-white/20">
+                <button type="button" onClick={() => step(-1)} aria-label={t.publicReport.previous} className="min-h-12 flex-1 rounded-md bg-surface/10 text-xl active:bg-surface/20">
                   ‹
                 </button>
-                <button type="button" onClick={() => step(1)} aria-label={t.publicReport.next} className="min-h-12 flex-1 rounded-xl bg-white/10 text-xl active:bg-white/20">
+                <button type="button" onClick={() => step(1)} aria-label={t.publicReport.next} className="min-h-12 flex-1 rounded-md bg-surface/10 text-xl active:bg-surface/20">
                   ›
                 </button>
               </div>

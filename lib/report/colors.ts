@@ -1,28 +1,40 @@
-// Hex colours for the PDF and the link preview image, which can't use Tailwind classes.
-// They match the Tailwind colours the web report uses.
-import type { ScoreBand } from "@/lib/score";
+// Hex colours for the PDF and the link preview images, which can't read CSS variables.
+// They are the Treadmark brand tokens resolved for the light theme (brand/tokens/treadmark-tokens.css).
+// Change a colour there first, then here; brand style guide section 3.
 import type { ChecklistResult, Severity } from "@/lib/supabase/database.types";
 
-export const BRAND = { 700: "#0f766e", 800: "#115e59", 50: "#f0fdfa" } as const;
-export const INK = { 900: "#0f172a", 700: "#334155", 500: "#64748b", 300: "#cbd5e1", 200: "#e2e8f0", 100: "#f1f5f9", 50: "#f8fafc" } as const;
+export const C = {
+  paper: "#F6F4EF",
+  white: "#FFFFFF",
+  ink: "#1D1B24",
+  muted: "#4A4753",
+  subtle: "#66626F",
+  border: "#E2DDD3",
+  sunken: "#ECE8E0",
+  olive: "#556B1F",
+  oliveTint: "#EEF1E2",
+  sandstone: "#D8C3A0",
+} as const;
 
-type Chip = { fg: string; bg: string };
+export type Verdict = "pass" | "attention" | "fail" | "na";
+type Chip = { fg: string; bg: string; glyph: Verdict };
 
-export const BAND_COLORS: Record<ScoreBand, Chip> = {
-  good: { fg: "#047857", bg: "#d1fae5" },
-  fair: { fg: "#b45309", bg: "#fef3c7" },
-  poor: { fg: "#b91c1c", bg: "#fee2e2" },
+export const VERDICT_COLORS: Record<Verdict, { fg: string; bg: string }> = {
+  pass: { fg: "#0F6E63", bg: "#E2F2EF" },
+  attention: { fg: "#B23A0A", bg: "#FCEDE4" },
+  fail: { fg: "#B42318", bg: "#FCE8E6" },
+  na: { fg: C.muted, bg: C.sunken },
 };
 
 export const SEVERITY_COLORS: Record<Severity, Chip> = {
-  minor: { fg: "#78350f", bg: "#fef3c7" },
-  moderate: { fg: "#7c2d12", bg: "#ffedd5" },
-  major: { fg: "#991b1b", bg: "#fee2e2" },
+  minor: { ...VERDICT_COLORS.attention, glyph: "attention" },
+  moderate: { ...VERDICT_COLORS.attention, glyph: "attention" },
+  major: { ...VERDICT_COLORS.fail, glyph: "fail" },
 };
 
 export const RESULT_COLORS: Record<ChecklistResult, Chip> = {
-  ok: { fg: "#065f46", bg: "#d1fae5" },
-  attention: { fg: "#78350f", bg: "#fef3c7" },
-  fail: { fg: "#991b1b", bg: "#fee2e2" },
-  na: { fg: "#334155", bg: "#f1f5f9" },
+  ok: { ...VERDICT_COLORS.pass, glyph: "pass" },
+  attention: { ...VERDICT_COLORS.attention, glyph: "attention" },
+  fail: { ...VERDICT_COLORS.fail, glyph: "fail" },
+  na: { ...VERDICT_COLORS.na, glyph: "na" },
 };

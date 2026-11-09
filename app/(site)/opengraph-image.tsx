@@ -1,45 +1,34 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { ImageResponse } from "next/og";
-import { BRAND, INK } from "@/lib/report/colors";
+import { ogArt, ogFonts } from "@/lib/report/brand-assets";
+import { C } from "@/lib/report/colors";
 import { t } from "@/lib/strings";
 
 // Link preview for the landing and other public pages (WhatsApp, Facebook, X). Built once at build time.
+// Treadmark brand: Paper ground, primary lockup, ink headline, one olive button, the seal.
 
 export const alt = t.home.metaTitle;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function Image() {
-  const [regular, bold] = await Promise.all([
-    readFile(join(process.cwd(), "assets/fonts/Geist-Regular.ttf")),
-    readFile(join(process.cwd(), "assets/fonts/Geist-Bold.ttf")),
-  ]);
+  const [fonts, art] = await Promise.all([ogFonts(), ogArt()]);
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: BRAND[50], padding: "64px 72px", fontFamily: "Geist", color: INK[900] }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <div style={{ width: 72, height: 72, borderRadius: 18, background: BRAND[700], color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, fontWeight: 700 }}>
-            T
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: C.paper, padding: "64px 72px", fontFamily: "Martel Sans", color: C.ink }}>
+        <img src={art.lockup} alt="" width={420} height={86} />
+        <div style={{ display: "flex", alignItems: "center", gap: 48 }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 20 }}>
+            <div style={{ fontSize: 62, fontWeight: 800, lineHeight: 1.08, letterSpacing: -0.6 }}>{t.home.headline}</div>
+            <div style={{ fontSize: 30, color: C.muted, lineHeight: 1.35 }}>{t.home.subhead}</div>
           </div>
-          <div style={{ fontSize: 40, fontWeight: 700, color: BRAND[700] }}>{t.appName}</div>
+          <img src={art.seal} alt="" width={200} height={200} />
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          <div style={{ fontSize: 64, fontWeight: 700, lineHeight: 1.1, maxWidth: 1000 }}>{t.home.headline}</div>
-          <div style={{ fontSize: 30, color: INK[700], maxWidth: 1000 }}>{t.home.subhead}</div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 28, fontWeight: 700 }}>
-          <div style={{ background: BRAND[700], color: "#fff", padding: "14px 28px", borderRadius: 16, display: "flex" }}>{t.home.cta}</div>
-          <div style={{ color: INK[500], fontWeight: 400, display: "flex" }}>{t.home.eyebrow}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 20, fontSize: 28, fontWeight: 700 }}>
+          <div style={{ background: C.olive, color: C.white, padding: "14px 28px", borderRadius: 12, display: "flex" }}>{t.home.cta}</div>
+          <div style={{ color: C.subtle, fontWeight: 400, display: "flex" }}>{t.home.eyebrow}</div>
         </div>
       </div>
     ),
-    {
-      ...size,
-      fonts: [
-        { name: "Geist", data: regular, weight: 400, style: "normal" },
-        { name: "Geist", data: bold, weight: 700, style: "normal" },
-      ],
-    },
+    { ...size, fonts },
   );
 }
