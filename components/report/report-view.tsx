@@ -9,7 +9,7 @@ import { Plate } from "@/components/plate";
 import { PhotoGallery, PhotoHero } from "@/components/report/photo-gallery";
 import { ShareButton } from "@/components/report/share-button";
 import { BAND_STYLE } from "@/components/score-chip";
-import { SEVERITY_EDGE, SEVERITY_TONE } from "@/components/severity";
+import { SeverityBadge } from "@/components/severity";
 import { Badge, buttonClass, cardClass, type BadgeTone } from "@/components/ui";
 import { formatPhone, telHref, whatsappChatUrl } from "@/lib/report/share";
 import { checkCounts, flaggedChecks, shownChecks, type DetailRow, type ReportCheckItem, type ReportView as View } from "@/lib/report/view";
@@ -64,7 +64,8 @@ function CheckList({ items }: { items: ReportCheckItem[] }) {
 export function ScoreBadge({ view, t, className = "" }: { view: Pick<View, "scoreText" | "band">; t: Strings; className?: string }) {
   const s = BAND_STYLE[view.band];
   return (
-    <div className={`flex shrink-0 flex-col items-center rounded-card px-4 py-2 ring-1 ring-inset ${s.tint} ${s.text} ${s.ring} ${className}`}>
+    // Flush in the summary card (no box of its own): the colour and the band word carry it.
+    <div className={`flex shrink-0 flex-col items-end text-right ${s.text} ${className}`}>
       <span className="text-caption font-semibold">{t.publicReport.score}</span>
       <span className="text-display tabular">
         {view.scoreText}
@@ -216,12 +217,10 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
               {view.findings.map((f, i) => (
                 <li
                   key={i}
-                  className={`relative overflow-hidden rounded-control p-4 pl-5 ring-1 ring-line ring-inset before:absolute before:inset-y-0 before:left-0 before:w-1 ${SEVERITY_EDGE[f.severity]}`}
+                  className="rounded-control p-4 ring-1 ring-line ring-inset"
                 >
                   <div className="flex flex-wrap items-start gap-2">
-                    <Badge tone={SEVERITY_TONE[f.severity]} className="mt-px">
-                      {f.severityLabel}
-                    </Badge>
+                    <SeverityBadge severity={f.severity} label={f.severityLabel} className="mt-px" />
                     <p className="min-w-0">
                       <span className="font-semibold">{f.typeLabel}</span>
                       {f.location && <span className="text-ink"> · {f.location}</span>}

@@ -12,13 +12,13 @@ export const legal = {
   privacy: {
     title: "Privacy policy",
     intro: (b: LegalBusiness) =>
-      `${b.legalName} ("we", "us") runs Treadmark, an app that helps used-car dealers create and share inspection reports. This policy explains what personal data we collect, why, and the choices you have. It is written to follow India's Digital Personal Data Protection Act, 2023.`,
+      `${b.legalName} ("we", "us") runs Treadmark, an app that helps car owners, people buying a car and used-car dealers create and share inspection reports. This policy explains what personal data we collect, why, and the choices you have. It is written to follow India's Digital Personal Data Protection Act, 2023.`,
     sections: (b: LegalBusiness) => [
       {
         heading: "What we collect",
         body: [
           "Account: your mobile number, used to log you in with a one-time code.",
-          "Dealer profile: your name, business name, city, address and logo.",
+          "Profile: your name and city, and whether you own, are buying or sell cars. Dealers can add a business name, address and logo.",
           "Car details: number plate, details from the vehicle registration (RC) record, odometer reading, insurance date, photos you take, damage notes and checklist answers.",
           "Payments: order and payment IDs, amount and status. Card, UPI and bank details are collected by Razorpay, not by us.",
           "Technical data: basic server logs and the cookies needed to keep you logged in. We do not use advertising cookies.",
@@ -83,7 +83,7 @@ export const legal = {
       {
         heading: "The service",
         body: [
-          "Treadmark gives used-car dealers tools to photograph a car, record its visible condition, and share an inspection report with buyers. It is meant for business use by dealers aged 18 or over.",
+          "Treadmark gives car owners, people buying a car and used-car dealers tools to photograph a car, record its visible condition, and share an inspection report. You must be 18 or over to use it.",
         ],
       },
       {
@@ -117,7 +117,7 @@ export const legal = {
       {
         heading: "Acceptable use",
         body: [
-          "Do not use the app for anything unlawful, upload content you have no right to, try to access other dealers' data, overload or reverse-engineer the service, or resell it without our permission.",
+          "Do not use the app for anything unlawful, upload content you have no right to, try to access other people's data, overload or reverse-engineer the service, or resell it without our permission.",
         ],
       },
       {

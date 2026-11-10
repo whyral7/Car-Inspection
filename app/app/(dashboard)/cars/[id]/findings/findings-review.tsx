@@ -7,7 +7,7 @@ import type { AnalyseResponse } from "@/app/api/photos/[photoId]/analyse/route";
 import { useT } from "@/components/i18n-provider";
 import { ArrowRightIcon, CameraIcon, CheckIcon, ChevronDownIcon, PencilIcon, PlusIcon, RefreshIcon, SparklesIcon, Spinner, TrashIcon, UndoIcon, ZoomInIcon } from "@/components/icons";
 import { RememberStep } from "@/components/remember-step";
-import { SEVERITY_EDGE, SEVERITY_TONE } from "@/components/severity";
+import { SeverityBadge } from "@/components/severity";
 import {
   Badge,
   cardClass,
@@ -659,13 +659,13 @@ function FindingCard({ finding, onAccept, onEdit, onDelete }: { finding: Finding
 
   return (
     <article
-      className={`relative overflow-hidden rounded-control p-4 pl-5 ring-1 ring-inset before:absolute before:inset-y-0 before:left-0 before:w-1 ${SEVERITY_EDGE[finding.severity]} ${
-        finding.accepted ? "bg-surface ring-line" : "bg-surface ring-2 ring-warning-200"
+      className={`rounded-control p-4 ring-inset ${
+        finding.accepted ? "bg-surface ring-1 ring-line" : "bg-surface ring-2 ring-warning-200"
       }`}
     >
       <div className="flex flex-wrap items-center gap-2">
         <span className="font-semibold">{t.findings.types[finding.type]}</span>
-        <Badge tone={SEVERITY_TONE[finding.severity]}>{t.findings.severities[finding.severity]}</Badge>
+        <SeverityBadge severity={finding.severity} label={t.findings.severities[finding.severity]} />
         {finding.source === "ai" && (
           <Badge icon={<SparklesIcon size={12} />} className="!bg-surface ring-1 ring-line ring-inset">
             {t.findings.aiSuggestion}

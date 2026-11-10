@@ -284,7 +284,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
 
       <section aria-label={t.report.previewLabel} className="flex flex-col gap-4 rounded-sheet bg-sunken p-2 sm:p-4">
         <p className="pt-2 text-center text-caption font-semibold tracking-wide text-ink-muted uppercase">{t.report.previewLabel}</p>
-        <div className="overflow-hidden rounded-card bg-canvas px-4 py-4 shadow-card">
+        <div className="px-2 pb-2">
           <ReportView view={preview} t={t} pdfHref={null} />
           <div className="mt-4">
             <ContactButtons view={preview} t={t} preview />
