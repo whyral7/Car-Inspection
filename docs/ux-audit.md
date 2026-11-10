@@ -669,3 +669,53 @@ Run with [impeccable](https://impeccable.style)'s `critique` and `audit` playboo
 - **Dated report changes.** Showing buyers "updated on" after a published report changes needs a timestamp column, which is a schema change.
 - **Product decisions.** Whether to show buyers how many AI notes the seller left out, or which photos came from the gallery.
 - **Dark mode.**
+
+## 7. Hands-on audit (round 4)
+
+This round drove every flow end to end in a real browser at 360px, as four test accounts (new, empty, mid-inspection, published). The flows covered were:
+- sign-up and onboarding with a logo;
+- adding a car through the RC lookup and by hand;
+- all 20 photos, including the blurry-photo check and an offline retake;
+- damage notes and the checklist;
+- publishing, copying the link and the PDF;
+- the buyer's report with the photo viewer, zoom and Esc;
+- toggling report sections after publishing;
+- the credits screen;
+- the profile and editing it;
+- English ↔ Hindi;
+- logout (cancel and confirm);
+- deleting a car with its toast, and editing a car;
+- the in-app, report and site 404s;
+- the landing, sample, legal and contact pages, with every internal link;
+- login with the phone and OTP (the SMS calls mocked).
+
+The photo AI was mocked so no paid calls were made. Afterwards the axe, sideways-scroll and tap-target checks ran again on every screen, in English and Hindi, at 360px, 1280px and 200% text, and found 0 issues.
+
+**Broken, now fixed:**
+- ✅ **[High] Endless redirect after logging out on another device.**
+  - Logging out ended the session on every device, not just "this phone" as the confirm says.
+  - The other devices then hit `ERR_TOO_MANY_REDIRECTS`: the proxy trusted the still-signed token and sent `/login` to `/app`, and the app checked with the auth server and sent `/app` back to `/login`.
+  - The fix has two parts. Logout now only ends this device's session. `/login` double-checks with the auth server and clears dead cookies; a network blip doesn't log anyone out.
+- ✅ **[High] Easy to add the same car twice.**
+  - After "You've already added this car", the main button still said "Looks right, save car" and quietly made a duplicate.
+  - Now the main button opens the existing car. "Add it again for a new inspection" is the second choice, so re-inspection still works.
+- ✅ **[Medium] Retaking a photo walked through photos that were fine.**
+  - After a retake from the grid, it moved on to the next angle even when that angle already had a photo.
+  - It now goes to the next angle still missing a photo, or back to the grid when there are none.
+- ✅ **[Medium] The photo count dropped during a retake** ("All photos (19/20)"). Photos uploading or waiting to upload now count, as they already did for the Next button.
+- ✅ **[Medium] Errors weren't announced on two forms.**
+  - In onboarding, an empty submit focused the name field and skipped the unanswered "I am a" choice, which had no error state.
+  - On login, a wrong or empty number left focus on the button, so screen readers didn't hear the error.
+  - Both now outline and focus the first problem. Choice groups take `invalid` and read their error out.
+
+**Checked and working:**
+- Validation and keyboards (`tel`, `numeric`, `one-time-code`); the OTP autofocus; the wrong-OTP message clears the code; "Change number" keeps the number.
+- Publishing takes exactly 1 credit.
+- Share link, clipboard toast, PDF download, and "Saved. Buyers see this now." after a section toggle.
+- Esc and backdrop close every sheet; the photo viewer's next and zoom work.
+- Profile save toast, delete toast, and the Hindi home screen.
+- The credits screen shows a clear "No money was taken" error when Razorpay can't be reached.
+
+**Not bugs:**
+- The header's credit count updates about 4 seconds after "Report published" in dev mode. That's one extra round trip to the remote database, and it's near-instant in production.
+- An in-app "not found" page returns HTTP 200 because the page streams. People see the right screen, and these pages aren't indexed.
