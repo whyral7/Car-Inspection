@@ -199,12 +199,14 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
             options={userTypeOptions(t)}
             value={userType}
             columns="grid-cols-1 min-[380px]:grid-cols-3"
+            invalid={Boolean(errors.user_type)}
+            describedBy={errors.user_type ? "user_type-error" : undefined}
             onChange={(value) => {
               setUserType(value);
               clearFieldError("user_type");
             }}
           />
-          <FieldMessage error={errors.user_type} hint={userType ? t.onboarding.userTypeHints[userType] : t.onboarding.userTypeChoose} />
+          <FieldMessage id="user_type-error" error={errors.user_type} hint={userType ? t.onboarding.userTypeHints[userType] : t.onboarding.userTypeChoose} />
         </div>
         <Field
           label={t.onboarding.ownerName}

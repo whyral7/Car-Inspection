@@ -127,5 +127,6 @@ export function FormError({ message }: { message?: string | null }) {
 
 /** After a failed submit, move focus (and the screen) to the first field with an error. */
 export function focusFirstError(form: HTMLElement | null) {
-  requestAnimationFrame(() => form?.querySelector<HTMLElement>("[aria-invalid=true]")?.focus());
+  // Only controls: a radio group marks itself invalid too, but focus goes to its option.
+  requestAnimationFrame(() => form?.querySelector<HTMLElement>(":is(input, select, textarea, button)[aria-invalid=true]")?.focus());
 }

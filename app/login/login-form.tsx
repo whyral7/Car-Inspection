@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Button, Card, Field, FormError, TextButton } from "@/components/ui";
+import { Button, Card, Field, FormError, TextButton, focusFirstError } from "@/components/ui";
 import { OTP_RESEND_SECONDS } from "@/lib/config";
 import { useT } from "@/components/i18n-provider";
 import { errorText } from "@/lib/i18n";
@@ -81,6 +81,7 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
     const parsed = indianMobileSchema.safeParse(phoneInput);
     if (!parsed.success) {
       setFieldError(errorText(t, parsed.error.issues[0]?.message));
+      focusFirstError(e.currentTarget as HTMLFormElement);
       return;
     }
     setFieldError(undefined);
@@ -102,6 +103,7 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
     const parsed = otpSchema.safeParse(code);
     if (!parsed.success) {
       setFieldError(errorText(t, parsed.error.issues[0]?.message));
+      otpRef.current?.focus();
       return;
     }
     setFieldError(undefined);
