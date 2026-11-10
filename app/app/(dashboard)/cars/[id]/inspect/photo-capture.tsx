@@ -66,6 +66,11 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
   // null shows the overview grid; a number shows the guided screen for that angle.
   const [view, setView] = useState<number | null>(startAt ?? (initialPhotos.length === 0 ? 0 : null));
   const viewRef = useRef(view);
+  // The auto-advance timer reads the latest slots, not the ones from when the photo was taken.
+  const slotsRef = useRef(slots);
+  useEffect(() => {
+    slotsRef.current = slots;
+  }, [slots]);
   const [pickError, setPickError] = useState<string | null>(null);
   const toast = useToast();
 
@@ -177,7 +182,13 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
     advanceTimer.current = setTimeout(() => {
       if (viewRef.current !== index) return;
       setPickError(null);
-      setView(index < ANGLES.length - 1 ? index + 1 : null);
+      // On to the next angle still missing a photo, skipping ones already taken (a retake doesn't
+      // walk through photos that are fine); when every angle has one, back to the grid.
+      const covered = coveredKeys(slotsRef.current);
+      covered.add(key);
+      const after = ANGLES.findIndex((a, i) => i > index && !covered.has(a.key));
+      const before = firstMissingIndex(covered);
+      setView(after >= 0 ? after : before >= 0 ? before : null);
       // "Front saved · Retake", in case the auto-advance was too quick.
       toast.show({ tone: "success", message: t.photos.justSaved(t.photos.angles[key].label), action: { label: t.photos.retake, onClick: () => go(index) } });
     }, ADVANCE_MS);
@@ -237,8 +248,10 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
     void accept(angle);
   }
 
-  const savedKeys = ANGLES.filter((a) => slots[a.key]?.status === "saved").map((a) => a.key);
-  const progress = photoProgress(savedKeys);
+  // Photos on their way count as covered, so "Next" moves on while they upload and a retake doesn't
+  // drop the count; failed ones stay on the list. The waiting note says how many haven't uploaded yet.
+  const covered = coveredKeys(slots);
+  const progress = photoProgress(covered);
   const waiting = ANGLES.filter((a) => slots[a.key]?.status === "waiting").length;
 
   if (view !== null) {
@@ -261,12 +274,10 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
     );
   }
 
-  // Photos on their way count as covered, so "Next" moves on while they upload; failed ones stay on the list.
-  const covered = ANGLES.filter((a) => ["saved", "uploading", "processing", "waiting"].includes(slots[a.key]?.status ?? "")).map((a) => a.key);
   const nextIndex = firstMissingIndex(covered);
   const nextAngle = nextIndex >= 0 ? ANGLES[nextIndex] : null;
-  const requiredCovered = ANGLES.filter((a) => a.required && covered.includes(a.key)).length;
-  const requiredDone = requiredCovered === progress.requiredTotal;
+  const requiredCovered = progress.requiredDone;
+  const requiredDone = progress.allRequiredDone;
 
   const stepLabels = [t.car.stepPhotos, t.car.stepFindings, t.car.stepChecklist, t.car.stepReport];
   return (
@@ -608,4 +619,11 @@ function PickButton({
       {children}
     </label>
   );
+}
+
+const COVERED_STATUSES = new Set(["saved", "uploading", "processing", "waiting"]);
+
+/** Angles with a photo saved or on its way up. */
+function coveredKeys(slots: Slots) {
+  return new Set<string>(ANGLES.filter((a) => COVERED_STATUSES.has(slots[a.key]?.status ?? "")).map((a) => a.key));
 }
