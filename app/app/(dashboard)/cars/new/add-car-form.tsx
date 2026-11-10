@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState, useTransition, type FormEvent, type ReactNode } from "react";
 import { CarFields, carFormValues } from "@/components/car-fields";
 import { useT } from "@/components/i18n-provider";
 import { CheckIcon, InfoIcon, PencilIcon, SearchIcon } from "@/components/icons";
 import { Plate } from "@/components/plate";
-import { Button, Card, FieldMessage, FormError, StickyBar, TextButton, focusFirstError, useToast } from "@/components/ui";
+import { Button, Card, FieldMessage, FormError, LinkButton, StickyBar, TextButton, focusFirstError, useToast } from "@/components/ui";
 import { clearDraft, useFormDraft } from "@/lib/draft";
 import { isFuel, isTransmission } from "@/lib/cars";
 import { formatDate } from "@/lib/format";
@@ -173,18 +172,18 @@ function CarDetailsStep({ lookup, onChangeReg }: { lookup: Lookup; onChangeReg: 
         </Button>
       </Card>
 
-      {lookup.existingCarId && (
-        <Notice>
-          {t.cars.duplicate}{" "}
-          <Link href={`/app/cars/${lookup.existingCarId}`} className="font-semibold underline underline-offset-2">
-            {t.cars.openExisting}
-          </Link>
-        </Notice>
-      )}
+      {lookup.existingCarId && <Notice>{t.cars.duplicate}</Notice>}
       {notice && <Notice>{notice}</Notice>}
 
       {!editing ? (
-        <RcSummary values={lookup.values} pending={isPending} onConfirm={() => save(lookup.values)} onEdit={() => setEditing(true)} error={state.formError} />
+        <RcSummary
+          values={lookup.values}
+          existingCarId={lookup.existingCarId}
+          pending={isPending}
+          onConfirm={() => save(lookup.values)}
+          onEdit={() => setEditing(true)}
+          error={state.formError}
+        />
       ) : (
         <form
           ref={formRef}
@@ -209,7 +208,22 @@ function CarDetailsStep({ lookup, onChangeReg }: { lookup: Lookup; onChangeReg: 
 }
 
 /** What the RC says, in one card: most people only need to confirm it. */
-function RcSummary({ values, pending, onConfirm, onEdit, error }: { values: CarFormValues; pending: boolean; onConfirm: () => void; onEdit: () => void; error?: string }) {
+function RcSummary({
+  values,
+  existingCarId,
+  pending,
+  onConfirm,
+  onEdit,
+  error,
+}: {
+  values: CarFormValues;
+  /** Set when this number is already in the account: opening that car becomes the main action. */
+  existingCarId: string | null;
+  pending: boolean;
+  onConfirm: () => void;
+  onEdit: () => void;
+  error?: string;
+}) {
   const t = useT();
   const title = [values.year, values.make, values.model, values.variant].filter(Boolean).join(" ");
   const facts = [
@@ -239,12 +253,23 @@ function RcSummary({ values, pending, onConfirm, onEdit, error }: { values: CarF
       </Card>
       <FormError message={error} />
       <StickyBar>
-        <Button onClick={onConfirm} loading={pending} icon={<CheckIcon size={20} />}>
-          {pending ? t.cars.saving : t.cars.looksRight}
-        </Button>
-        <Button variant="ghost" onClick={onEdit} disabled={pending} icon={<PencilIcon size={18} />}>
-          {t.cars.editFound}
-        </Button>
+        {existingCarId ? (
+          <>
+            <LinkButton href={`/app/cars/${existingCarId}`}>{t.cars.openExisting}</LinkButton>
+            <Button variant="ghost" onClick={onConfirm} loading={pending}>
+              {pending ? t.cars.saving : t.cars.addAgain}
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button onClick={onConfirm} loading={pending} icon={<CheckIcon size={20} />}>
+              {pending ? t.cars.saving : t.cars.looksRight}
+            </Button>
+            <Button variant="ghost" onClick={onEdit} disabled={pending} icon={<PencilIcon size={18} />}>
+              {t.cars.editFound}
+            </Button>
+          </>
+        )}
       </StickyBar>
     </>
   );
