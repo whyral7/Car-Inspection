@@ -29,7 +29,22 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const isSignedIn = Boolean(data?.claims?.sub);
 
-  return { response, isSignedIn };
+  /**
+   * getClaims only checks the token's signature, so a session revoked elsewhere (logged out on the
+   * server, user removed) still looks signed in until the token expires. Pages check with the auth
+   * server and send people to /login, so /login must too, or the two bounce each other forever.
+   * This asks the auth server and clears dead cookies; only /login calls it, so it costs one request there.
+   */
+  async function confirmSignedIn() {
+    if (!isSignedIn) return false;
+    const { data: user, error } = await supabase.auth.getUser();
+    if (user.user) return true;
+    // Only a definite "no" from the auth server clears cookies; a network blip just shows the login page.
+    if (error?.status === 401 || error?.status === 403) await supabase.auth.signOut({ scope: "local" });
+    return false;
+  }
+
+  return { get response() { return response; }, isSignedIn, confirmSignedIn };
 }
 
 /** Copies refreshed auth cookies onto a redirect so the session isn't lost. */

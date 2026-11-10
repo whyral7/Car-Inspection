@@ -2,7 +2,8 @@ import type { NextRequest } from "next/server";
 import { redirectWithCookies, updateSession } from "@/lib/supabase/proxy";
 
 export async function proxy(request: NextRequest) {
-  const { response, isSignedIn } = await updateSession(request);
+  const session = await updateSession(request);
+  const { isSignedIn } = session;
   const { pathname, search } = request.nextUrl;
 
   const isAppRoute = pathname === "/app" || pathname.startsWith("/app/");
@@ -10,14 +11,14 @@ export async function proxy(request: NextRequest) {
   if (isAppRoute && !isSignedIn) {
     const url = new URL("/login", request.url);
     url.searchParams.set("next", pathname + search);
-    return redirectWithCookies(url, response);
+    return redirectWithCookies(url, session.response);
   }
 
-  if (pathname === "/login" && isSignedIn) {
-    return redirectWithCookies(new URL("/app", request.url), response);
+  if (pathname === "/login" && (await session.confirmSignedIn())) {
+    return redirectWithCookies(new URL("/app", request.url), session.response);
   }
 
-  return response;
+  return session.response;
 }
 
 export const config = {
