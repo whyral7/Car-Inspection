@@ -1,5 +1,6 @@
 import { CHECKLIST_KEYS, type ChecklistKey } from "@/lib/checklist";
 import { ANGLE_KEYS } from "@/lib/photos/angles";
+import { en, type Strings } from "@/lib/strings";
 import { buildReportView, type ReportInput } from "./view";
 
 // Made-up report for the landing page's "See a sample report". Built through the same buildReportView
@@ -51,6 +52,6 @@ const sampleInput: ReportInput = {
   checklist: CHECKLIST_KEYS.map((key) => ({ item_key: key, result: notOk[key]?.result ?? "ok", note: notOk[key]?.note ?? null })),
 };
 
-export function sampleReportView() {
-  return buildReportView(sampleInput);
+export function sampleReportView(t: Strings = en) {
+  return buildReportView(sampleInput, [], undefined, t);
 }

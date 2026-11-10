@@ -202,7 +202,7 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
           {nextLabel[state.next]}
           <ArrowRightIcon size={20} />
         </LinkButton>
-        <p className="text-center text-caption text-ink-muted">{t.car.nextHint[state.next]}</p>
+        <p className="text-center text-small text-ink-muted">{t.car.nextHint[state.next]}</p>
       </StickyBar>
     </div>
   );

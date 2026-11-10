@@ -29,7 +29,8 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>({ kind: "idle" });
   const [error, setError] = useState<string | null>(null);
-  const [selected, setSelected] = useState(() => (packs.find((p) => p.best) ?? packs[0])?.key ?? "");
+  // Starts on the smallest pack: the bigger one is marked "Best value", not pushed.
+  const [selected, setSelected] = useState(() => [...packs].sort((a, b) => a.pricePaise - b.pricePaise)[0]?.key ?? "");
   const alive = useRef(true);
   useEffect(
     () => () => {

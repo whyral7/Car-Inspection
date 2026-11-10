@@ -3,8 +3,8 @@ import { en, type Strings } from "@/lib/strings";
 // Hindi (हिन्दी). Same shape as lib/strings.ts. Plain, spoken Hindi: common English words people use
 // every day (OTP, RC, PUC, AI, PDF, WhatsApp, km, OK) stay in English.
 //
-// The public marketing site (home, site footer, sample report banner) is English-only and static, so
-// those sections reuse the English text. Please have a native speaker review before a wide launch.
+// The legal pages, the PDF and link previews stay English. Please have a native speaker review
+// before a wide launch.
 
 export const hi: Strings = {
   appName: "Treadmark",
@@ -46,10 +46,72 @@ export const hi: Strings = {
     pageNotFoundBody: "हो सकता है लिंक गलत लिखा हो या पेज हटा दिया गया हो।",
   },
 
-  // English-only static site.
-  home: en.home,
-  site: en.site,
-  sampleReport: en.sampleReport,
+  home: {
+    login: "फ़ोन से लॉग इन करें",
+    // Search engines and link previews keep the English title and description.
+    metaTitle: en.home.metaTitle,
+    metaDescription: en.home.metaDescription,
+    nav: { login: "लॉग इन", pricing: "कीमत" },
+    eyebrow: "भारत के कार मालिकों, खरीदारों और डीलरों के लिए",
+    headline: "पुरानी कार की जाँच रिपोर्ट, जिस पर लोग भरोसा करें",
+    subhead: "बताए गए 20 फ़ोटो लें, AI से नुकसान के नोट और कंडीशन स्कोर पाएँ, और हर फ़ोटो के साथ रिपोर्ट WhatsApp पर भेजें। एक कार में लगभग 15 मिनट।",
+    cta: "मुफ़्त शुरू करें, 3 रिपोर्ट",
+    ctaNote: "कार्ड की ज़रूरत नहीं। अपने मोबाइल नंबर से लॉग इन करें।",
+    sample: "नमूना रिपोर्ट देखें",
+    preview: {
+      dealer: en.home.preview.dealer,
+      city: en.home.preview.city,
+      reg: en.home.preview.reg,
+      car: en.home.preview.car,
+      score: en.home.preview.score,
+      outOf: en.home.preview.outOf,
+      lines: ["2 हल्की खरोंच", "19 चीज़ों की चेकलिस्ट", "RC की जानकारी मिलाई गई"],
+    },
+    stepsTitle: "यह कैसे काम करता है",
+    steps: [
+      { title: "कार जोड़ें", body: "नंबर प्लेट लिखें। हम RC से जानकारी भर देते हैं: कंपनी, मॉडल, साल, मालिक और इंश्योरेंस।" },
+      { title: "बताए गए 20 फ़ोटो लें", body: "ऐप हर एंगल दिखाता है। AI दिखने वाले डेंट, खरोंच और जंग बताता है, और हर नोट आप पक्का करते हैं।" },
+      { title: "WhatsApp पर भेजें", body: "कंडीशन स्कोर, सारे फ़ोटो और PDF के साथ रिपोर्ट भेजें। एक टैप में खुलती है, कोई ऐप नहीं चाहिए।" },
+    ],
+    whyTitle: "यह किसके लिए है",
+    why: [
+      { title: "अपनी कार बेच रहे हैं", body: "हर खरोंच पहले ही दिखा दें। गंभीर खरीदार कम शक के साथ फ़ोन करते हैं, और बेकार चक्कर कम होते हैं।" },
+      { title: "कार खरीद रहे हैं", body: "पैसे देने से पहले कार ठीक से जाँचें, और रिपोर्ट परिवार या अपने मैकेनिक को भेजें।" },
+      { title: "पुरानी कारों के डीलर", body: "हर रिपोर्ट और PDF पर आपकी दुकान का नाम, लोगो और फ़ोन। अपना पूरा स्टॉक जाँचें।" },
+    ],
+    faqTitle: "सवाल",
+    faq: [
+      { q: "क्या यह मैकेनिकल जाँच है?", a: "नहीं। यह दिखने वाली और कागज़ों की जाँच है: फ़ोटो, दिखने वाला नुकसान और आपकी भरी चेकलिस्ट। इंजन या गियरबॉक्स की हालत के लिए कार किसी मैकेनिक को दिखाएँ।" },
+      { q: "खरीदार रिपोर्ट कैसे खोलते हैं?", a: "WhatsApp पर भेजे लिंक पर एक टैप से। कोई ऐप या लॉग इन नहीं चाहिए। वे PDF भी डाउनलोड कर सकते हैं।" },
+      { q: "इसकी कीमत क्या है?", a: "पहली 3 रिपोर्ट मुफ़्त हैं। उसके बाद पैक लगभग ₹83 प्रति रिपोर्ट से शुरू होते हैं। जाँच करना मुफ़्त है: क्रेडिट तभी लगता है जब आप रिपोर्ट पब्लिश करते हैं।" },
+      { q: "क्या कमज़ोर नेटवर्क में चलता है?", a: "हाँ। फ़ोटो और चेकलिस्ट के जवाब आपके फ़ोन पर सेव रहते हैं और इंटरनेट आने पर भेज दिए जाते हैं।" },
+      { q: "क्या मैं इसे हिन्दी में चला सकता हूँ?", a: "हाँ। लॉग इन स्क्रीन पर या अपनी प्रोफ़ाइल में हिन्दी चुनें।" },
+    ],
+    pricingTitle: "सीधी, पहले से भुगतान वाली कीमत",
+    pricingSubtitle: "1 क्रेडिट से 1 रिपोर्ट पब्लिश होती है। क्रेडिट कभी खत्म नहीं होते। UPI, कार्ड या नेट बैंकिंग से भुगतान करें।",
+    free: { title: "मुफ़्त", price: "₹0", body: (n: number) => `साइन अप पर ${n} रिपोर्ट` },
+    packTitle: (n: number) => `${n} रिपोर्ट`,
+    perReport: (rupees: string) => `₹${rupees} प्रति रिपोर्ट`,
+    bestValue: "सबसे फ़ायदेमंद",
+    contactBody: "कोई सवाल? पहली रिपोर्ट बनाने में हम ख़ुशी से मदद करेंगे।",
+    whatsapp: "WhatsApp पर बात करें",
+    whatsappMessage: "नमस्ते, मैं Treadmark के बारे में और जानना चाहता/चाहती हूँ।",
+    finalTitle: "आपकी अगली कार की रिपोर्ट 15 मिनट में",
+  },
+  site: {
+    footer: {
+      privacy: "प्राइवेसी पॉलिसी",
+      terms: "शर्तें",
+      refunds: "रिफ़ंड",
+      contact: "संपर्क",
+      rights: en.site.footer.rights,
+    },
+  },
+  sampleReport: {
+    metaTitle: en.sampleReport.metaTitle,
+    banner: "यह नमूना रिपोर्ट है, जानकारी काल्पनिक है। असली रिपोर्ट में 20 असली फ़ोटो होते हैं, जिन्हें खरीदार बड़ा करके देख सकते हैं; यहाँ उनकी जगह चित्र हैं।",
+    cta: "अपनी रिपोर्ट बनाएँ: मुफ़्त शुरू करें",
+  },
 
   login: {
     title: "लॉग इन या साइन अप करें",

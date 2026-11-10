@@ -323,7 +323,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
               <Button onClick={() => setConfirmPublish(true)} loading={publishing}>
                 {publishing ? t.report.publishing : t.report.publish}
               </Button>
-              <p className="text-center text-caption text-ink-muted">{t.report.publishCost(credits)}</p>
+              <p className="text-center text-small text-ink-muted">{t.report.publishCost(credits)}</p>
             </>
           )
         ) : published ? (

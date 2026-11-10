@@ -6,7 +6,8 @@ type Section = { heading: string; body: readonly string[] };
 
 export function LegalPage({ title, intro, sections }: { title: string; intro: string; sections: readonly Section[] }) {
   return (
-    <article className="mx-auto w-full max-w-2xl px-4 py-8">
+    // Legal text is English only, so say so for screen readers even when the site is in Hindi.
+    <article lang="en" className="mx-auto w-full max-w-2xl px-4 py-8">
       <BackLink href="/">{legal.back}</BackLink>
       <h1 className="mt-2 text-title">{title}</h1>
       <p className="mt-1 text-small text-ink-muted">{legal.updated(BUSINESS.legalUpdated)}</p>

@@ -21,7 +21,8 @@ export default function ContactPage() {
   ];
 
   return (
-    <article className="mx-auto w-full max-w-2xl px-4 py-8">
+    // Legal text is English only, so say so for screen readers even when the site is in Hindi.
+    <article lang="en" className="mx-auto w-full max-w-2xl px-4 py-8">
       <BackLink href="/">{legal.back}</BackLink>
       <h1 className="mt-2 text-title">{copy.title}</h1>
       <p className="mt-2 text-ink-muted">{copy.intro}</p>

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { buttonClass } from "@/components/ui";
-import { en as t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const t = await getT();
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-surface pt-[env(safe-area-inset-top)]">
       <nav className="mx-auto flex w-full max-w-5xl items-center gap-2 px-4 py-2">

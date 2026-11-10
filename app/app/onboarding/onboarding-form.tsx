@@ -214,7 +214,6 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
           enterKeyHint="next"
           defaultValue={initial.owner_name}
           error={errors.owner_name}
-          autoFocus={!initial.owner_name}
           required
         />
         <Field

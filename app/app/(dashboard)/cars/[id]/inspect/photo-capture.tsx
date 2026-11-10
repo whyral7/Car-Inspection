@@ -363,7 +363,7 @@ function Tile({ angle, slot, onOpen }: { angle: Angle; slot: Slot | undefined; o
       : status
         ? "ring-1 ring-line"
         : angle.required
-          ? "ring-2 ring-warning-500/70"
+          ? "ring-1 ring-line-strong/60"
           : "ring-1 ring-line";
   const statusText = status ? t.photos.status[status] : angle.required ? t.photos.required : t.photos.optional;
   const src = (!thumbBroken && slot?.thumbUrl) || slot?.url;
@@ -381,6 +381,10 @@ function Tile({ angle, slot, onOpen }: { angle: Angle; slot: Slot | undefined; o
           <img src={src} alt="" loading="lazy" decoding="async" onError={() => setThumbBroken(true)} className="size-full object-cover" />
         ) : (
           <AngleHint angle={angle} className="size-full p-2 text-ink-subtle" />
+        )}
+        {!status && angle.required && (
+          // Said in words, not just colour: which photos still have to be taken.
+          <span className="absolute bottom-2 left-2 rounded-full bg-warning-50 px-2 py-0.5 text-caption font-semibold text-warning-800">{t.photos.required}</span>
         )}
         <span className="absolute top-2 left-2 flex size-6 items-center justify-center rounded-full bg-ink/70 text-caption font-semibold text-white tabular">{angle.number}</span>
         <TileBadge status={status} />

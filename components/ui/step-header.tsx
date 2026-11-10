@@ -57,8 +57,7 @@ export function StepHeader({ step, labels, stepLabel, ...props }: HeaderProps & 
         {labels.map((l, i) => (
           <li key={l} aria-current={i + 1 === step ? "step" : undefined} className="flex flex-col gap-1.5">
             <span className={`h-1 rounded-full transition-colors duration-200 ${i + 1 <= step ? "bg-brand-700" : "bg-sunken"}`} />
-            <span className={`hidden text-caption sm:block ${i + 1 === step ? "font-semibold text-ink" : "text-ink-subtle"}`}>{l}</span>
-            <span className="sr-only sm:hidden">{l}</span>
+            <span className={`line-clamp-2 text-caption ${i + 1 === step ? "font-semibold text-ink" : "text-ink-subtle"}`}>{l}</span>
           </li>
         ))}
       </ol>

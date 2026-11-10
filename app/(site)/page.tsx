@@ -8,20 +8,22 @@ import { ANGLE_KEYS } from "@/lib/photos/angles";
 import { pricePerReportPaise } from "@/lib/credits/packs";
 import { formatRupees } from "@/lib/format";
 import { supportWhatsappHref } from "@/lib/site";
-import { en as t } from "@/lib/strings";
+import { getT } from "@/lib/i18n.server";
+import { en, type Strings } from "@/lib/strings";
 
-const h = t.home;
+type Home = Strings["home"];
 
+// Search engines and link previews get the English title and description.
 export const metadata: Metadata = {
-  title: { absolute: h.metaTitle },
-  description: h.metaDescription,
+  title: { absolute: en.home.metaTitle },
+  description: en.home.metaDescription,
   alternates: { canonical: "/" },
-  openGraph: { title: h.metaTitle, description: h.metaDescription, url: "/" },
-  twitter: { title: h.metaTitle, description: h.metaDescription },
+  openGraph: { title: en.home.metaTitle, description: en.home.metaDescription, url: "/" },
+  twitter: { title: en.home.metaTitle, description: en.home.metaDescription },
 };
 
 /** "Chat on WhatsApp". Only shown once BUSINESS.whatsapp is set, so it never leads to a placeholder page. */
-function WhatsappLink({ className }: { className: string }) {
+function WhatsappLink({ h, className }: { h: Home; className: string }) {
   if (!BUSINESS.whatsapp) return null;
   return (
     <a href={supportWhatsappHref()} className={className} target="_blank" rel="noopener">
@@ -32,7 +34,7 @@ function WhatsappLink({ className }: { className: string }) {
 }
 
 /** A small static picture of a report, so visitors see what buyers get before tapping the sample. */
-function ReportPreview() {
+function ReportPreview({ h }: { h: Home }) {
   const p = h.preview;
   return (
     <div aria-hidden className="mx-auto w-full max-w-xs rotate-1 rounded-card bg-surface p-4 shadow-raised ring-1 ring-line/60">
@@ -71,7 +73,10 @@ function ReportPreview() {
   );
 }
 
-export default function Home() {
+export default async function HomePage() {
+  // In the visitor's language (the lang cookie, else the phone's language), like the app.
+  const t = await getT();
+  const h = t.home;
   const cheapest = Math.min(...CREDIT_PACKS.map(pricePerReportPaise));
   const jsonLd = {
     "@context": "https://schema.org",
@@ -103,7 +108,7 @@ export default function Home() {
             </div>
             <p className="text-small text-ink-muted">{h.ctaNote}</p>
           </div>
-          <ReportPreview />
+          <ReportPreview h={h} />
         </div>
       </section>
 
@@ -193,13 +198,13 @@ export default function Home() {
             <LinkButton href="/login" variant="secondary" size="lg" className="!ring-0">
               {h.cta}
             </LinkButton>
-            <WhatsappLink className={buttonClass("ghost", "!text-white ring-1 ring-white/40 ring-inset hover:!bg-white/10", false, "lg")} />
+            <WhatsappLink h={h} className={buttonClass("ghost", "!text-white ring-1 ring-white/40 ring-inset hover:!bg-white/10", false, "lg")} />
           </div>
         </div>
       </section>
 
       {/* Always-visible WhatsApp button, the way Indian dealers expect to ask a question. */}
-      <WhatsappLink className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-30 flex min-h-12 items-center gap-2 rounded-full bg-brand-700 px-4 font-semibold text-white shadow-raised transition-colors hover:bg-brand-800" />
+      <WhatsappLink h={h} className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-30 flex min-h-12 items-center gap-2 rounded-full bg-brand-700 px-4 font-semibold text-white shadow-raised transition-colors hover:bg-brand-800" />
     </>
   );
 }
