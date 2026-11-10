@@ -228,13 +228,34 @@ export function applyHidden(view: ReportView, hidden: readonly ReportSection[]):
   };
 }
 
+/** Every checklist answer the report shows, the document checks included. */
+export function shownChecks(view: ReportView): ReportCheckItem[] {
+  return [...(view.checklist?.groups.flatMap((g) => g.items) ?? []), ...(view.documents?.items ?? [])];
+}
+
+/** Counts across every shown answer, so a summary can never leave out a document "Problem". */
+export function checkCounts(view: ReportView): Record<ChecklistResult, number> {
+  const counts: Record<ChecklistResult, number> = { ok: 0, attention: 0, fail: 0, na: 0 };
+  for (const item of shownChecks(view)) counts[item.result]++;
+  return counts;
+}
+
+/** The answers a buyer most needs to see, named: what needs attention and what failed. */
+export function flaggedChecks(view: ReportView): { attention: string[]; fail: string[] } {
+  const items = shownChecks(view);
+  return { attention: items.filter((i) => i.result === "attention").map((i) => i.label), fail: items.filter((i) => i.result === "fail").map((i) => i.label) };
+}
+
 /** The short summary used in the link preview and page description, e.g. ["20 photos.", "3 damage notes."]. */
 export function summaryParts(view: ReportView, t: Strings = en): string[] {
   const s = t.publicReport.summary;
   const parts: string[] = [];
   if (view.photos?.length) parts.push(s.photos(view.photos.length));
   if (view.findings) parts.push(s.findings(view.findings.length));
-  if (view.checklist) parts.push(s.checklist(t.publicReport.checklistSummary(view.checklist.counts.ok, view.checklist.counts.attention, view.checklist.counts.fail)));
+  if (shownChecks(view).length > 0) {
+    const c = checkCounts(view);
+    parts.push(s.checklist(t.publicReport.checklistSummary(c.ok, c.attention, c.fail)));
+  }
   return parts;
 }
 

@@ -360,7 +360,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
               {t.findings.acceptAllContinue(toReview.length)}
             </Button>
             <LinkButton href={checklistHref} variant="ghost" size="sm">
-              {t.findings.continueWithout}
+              {t.findings.continueWithout(toReview.length)}
             </LinkButton>
           </>
         ) : photos.length === 0 ? (

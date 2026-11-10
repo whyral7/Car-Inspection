@@ -315,6 +315,8 @@ export const en = {
     findingsToReview: (n: number) => (n === 1 ? "1 note to review" : `${n} notes to review`),
     findingsAccepted: (n: number) => (n === 1 ? "1 note accepted" : `${n} notes accepted`),
     findingsNone: "No damage notes yet",
+    findingsWaiting: "Waiting for the required photos",
+    scoreWaiting: (n: number) => (n === 1 ? "The condition score appears once you review the 1 damage note waiting for you." : `The condition score appears once you review the ${n} damage notes waiting for you.`),
     checklistProgress: (done: number, total: number) => `${done} of ${total} checked`,
     score: "Condition score",
     scoreOutOf: "/10",
@@ -352,7 +354,7 @@ export const en = {
     undo: "Undo",
     continueWithoutWaiting: "Continue without waiting",
     acceptAllContinue: (n: number) => (n === 1 ? "Accept 1 note and continue" : `Accept all ${n} and continue`),
-    continueWithout: "Continue without accepting them",
+    continueWithout: (n: number) => (n === 1 ? "Leave this note off the report" : `Leave these ${n} notes off the report`),
     someFailed: (n: number) => (n === 1 ? "1 photo couldn't be checked." : `${n} photos couldn't be checked.`),
     retryFailed: "Try again",
     noPhotos: "No photos yet. Take the photos first, then come back here.",
@@ -584,6 +586,7 @@ export const en = {
     checklist: "Checklist",
     checklistSummary: (ok: number, attention: number, fail: number) =>
       [`${ok} OK`, attention ? `${attention} need${attention === 1 ? "s" : ""} attention` : "", fail ? `${fail} problem${fail === 1 ? "" : "s"}` : ""].filter(Boolean).join(" · "),
+    flagged: { attention: (items: string) => `Needs attention: ${items}`, fail: (items: string) => `Problem: ${items}` },
     documents: "Documents",
     price: "Estimated market price",
     priceAdjusted: (market: string, adjustment: string | null, score: string) =>

@@ -10,8 +10,8 @@ import type { ReportView } from "./view";
 // stays small (well under WhatsApp's ~300 KB limit).
 
 const fonts = Promise.all([
-  readFile(join(process.cwd(), "assets/fonts/Geist-Regular.ttf")),
-  readFile(join(process.cwd(), "assets/fonts/Geist-Bold.ttf")),
+  readFile(join(process.cwd(), "assets/fonts/Anek-Regular.ttf")),
+  readFile(join(process.cwd(), "assets/fonts/Anek-Bold.ttf")),
 ]);
 
 const clip = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text);
@@ -36,7 +36,7 @@ export async function reportOgImage(view: ReportView, logo: string | null, photo
 
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", background: "#ffffff", fontFamily: "Geist", color: INK[900] }}>
+      <div style={{ width: "100%", height: "100%", display: "flex", background: "#ffffff", fontFamily: "Anek", color: INK[900] }}>
         {photo && (
           // eslint-disable-next-line @next/next/no-img-element -- rendered to PNG by Satori, not a page
           <img src={photo} alt="" width={456} height={630} style={{ objectFit: "cover" }} />
@@ -95,8 +95,8 @@ export async function reportOgImage(view: ReportView, logo: string | null, photo
       width: 1200,
       height: 630,
       fonts: [
-        { name: "Geist", data: regular, weight: 400, style: "normal" },
-        { name: "Geist", data: bold, weight: 700, style: "normal" },
+        { name: "Anek", data: regular, weight: 400, style: "normal" },
+        { name: "Anek", data: bold, weight: 700, style: "normal" },
       ],
       headers,
     },

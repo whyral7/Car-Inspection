@@ -252,6 +252,8 @@ export const hi: Strings = {
     findingsToReview: (n: number) => `${n} नोट देखने बाकी`,
     findingsAccepted: (n: number) => `${n} नोट माने गए`,
     findingsNone: "अभी कोई नोट नहीं",
+    findingsWaiting: "ज़रूरी फ़ोटो का इंतज़ार",
+    scoreWaiting: (n: number) => `आपके देखने के लिए ${n} नुकसान नोट बाकी हैं। इन्हें देखने के बाद कंडीशन स्कोर दिखेगा।`,
     checklistProgress: (done: number, total: number) => `${total} में से ${done} जाँचे`,
     score: "कंडीशन स्कोर",
     scoreOutOf: "/10",
@@ -289,7 +291,7 @@ export const hi: Strings = {
     undo: "वापस लाएँ",
     continueWithoutWaiting: "इंतज़ार किए बिना आगे बढ़ें",
     acceptAllContinue: (n: number) => (n === 1 ? "1 नोट मानें और आगे बढ़ें" : `सभी ${n} मानें और आगे बढ़ें`),
-    continueWithout: "बिना माने आगे बढ़ें",
+    continueWithout: (n: number) => (n === 1 ? "यह नोट रिपोर्ट से बाहर रखें" : `ये ${n} नोट रिपोर्ट से बाहर रखें`),
     someFailed: (n: number) => `${n} फ़ोटो जाँचे नहीं जा सके।`,
     retryFailed: "फिर से कोशिश करें",
     noPhotos: "अभी कोई फ़ोटो नहीं। पहले फ़ोटो लें, फिर यहाँ आएँ।",
@@ -582,6 +584,7 @@ export const hi: Strings = {
     checklist: "चेकलिस्ट",
     checklistSummary: (ok: number, attention: number, fail: number) =>
       [`${ok} OK`, attention ? `${attention} पर ध्यान दें` : "", fail ? `${fail} खराबी` : ""].filter(Boolean).join(" · "),
+    flagged: { attention: (items: string) => `ध्यान दें: ${items}`, fail: (items: string) => `खराबी: ${items}` },
     documents: "कागज़",
     price: "बाज़ार कीमत का अंदाज़ा",
     priceAdjusted: (market: string, adjustment: string | null, score: string) =>

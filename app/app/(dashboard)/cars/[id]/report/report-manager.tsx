@@ -92,7 +92,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
         setPublishError(res.error);
         return;
       }
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
       toast.show({ tone: "success", message: t.report.published });
       router.refresh();
     } catch {

@@ -6,15 +6,15 @@ import { APP_NAME } from "@/lib/config";
 import { formatPhone } from "@/lib/report/share";
 import { en as t } from "@/lib/strings";
 import { BAND_COLORS, BRAND, INK, RESULT_COLORS, SEVERITY_COLORS } from "./colors";
-import type { DetailRow, ReportCheckItem, ReportView } from "./view";
+import { flaggedChecks, type DetailRow, type ReportCheckItem, type ReportView } from "./view";
 
 // The same layout as the public page, on A4: header, car and score, photos, damage notes, checklist,
-// documents, disclaimer. Geist is bundled in assets/fonts (OFL) so the PDF looks the same everywhere.
+// documents, disclaimer. Anek is bundled in assets/fonts (OFL) so the PDF looks the same everywhere.
 Font.register({
-  family: "Geist",
+  family: "Anek",
   fonts: [
-    { src: join(process.cwd(), "assets/fonts/Geist-Regular.ttf"), fontWeight: 400 },
-    { src: join(process.cwd(), "assets/fonts/Geist-Bold.ttf"), fontWeight: 700 },
+    { src: join(process.cwd(), "assets/fonts/Anek-Regular.ttf"), fontWeight: 400 },
+    { src: join(process.cwd(), "assets/fonts/Anek-Bold.ttf"), fontWeight: 700 },
   ],
 });
 // Don't split words like "Odometer" across lines.
@@ -32,7 +32,7 @@ type Props = {
 
 const s = StyleSheet.create({
   // Don't set lineHeight on the page (or a wrapper): react-pdf then drops the fixed footer or spaces rows out.
-  page: { paddingTop: 32, paddingBottom: 52, paddingHorizontal: 32, fontFamily: "Geist", fontSize: 9.5, color: INK[900] },
+  page: { paddingTop: 32, paddingBottom: 52, paddingHorizontal: 32, fontFamily: "Anek", fontSize: 9.5, color: INK[900] },
   footer: { position: "absolute", bottom: 20, left: 32, right: 32, flexDirection: "row", justifyContent: "space-between", fontSize: 7.5, color: INK[500] },
   header: { flexDirection: "row", alignItems: "center", gap: 10, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: INK[200] },
   logo: { width: 40, height: 40, objectFit: "contain", borderRadius: 6 },
@@ -101,6 +101,7 @@ function CheckRow({ item }: { item: ReportCheckItem }) {
 
 export function ReportPdf({ view, reportUrl, logo, images }: Props) {
   const band = BAND_COLORS[view.band];
+  const flagged = flaggedChecks(view);
   const phone = formatPhone(view.dealer.phone);
   const place = [view.dealer.address, view.dealer.city].filter(Boolean).join(", ");
   const photos = view.photos?.filter((p) => images.has(p.key)) ?? null;
@@ -148,6 +149,14 @@ export function ReportPdf({ view, reportUrl, logo, images }: Props) {
             <Text style={{ color: band.fg, fontWeight: 700, marginTop: 4 }}>{t.publicReport.bands[view.band]}</Text>
           </View>
         </View>
+        {flagged.fail.length > 0 ? (
+          <Text style={{ marginTop: 10, color: RESULT_COLORS.fail.fg, fontWeight: 700 }}>{t.publicReport.flagged.fail(flagged.fail.join(", "))}</Text>
+        ) : null}
+        {flagged.attention.length > 0 ? (
+          <Text style={{ marginTop: flagged.fail.length > 0 ? 3 : 10, color: RESULT_COLORS.attention.fg, fontWeight: 700 }}>
+            {t.publicReport.flagged.attention(flagged.attention.join(", "))}
+          </Text>
+        ) : null}
 
         {view.price ? (
           <View style={s.section} wrap={false}>

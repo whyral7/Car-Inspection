@@ -56,7 +56,14 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
       key: "findings",
       href: `${base}/findings`,
       title: t.car.stepFindings,
-      status: state.toReview > 0 ? t.car.findingsToReview(state.toReview) : findingsCount > 0 ? t.car.findingsAccepted(findingsCount) : t.car.findingsNone,
+      status:
+        state.toReview > 0
+          ? t.car.findingsToReview(state.toReview)
+          : findingsCount > 0
+            ? t.car.findingsAccepted(findingsCount)
+            : state.photos.allRequiredDone
+              ? t.car.findingsNone
+              : t.car.findingsWaiting,
       done: state.findingsDone,
       warn: state.toReview > 0,
     },
@@ -108,6 +115,12 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
           <p className="text-small text-ink-muted">{car.rc_raw ? t.car.fromRc : t.car.enteredManually}</p>
         </div>
       </header>
+
+      {!state.score && state.toReview > 0 && state.checklist.done > 0 && (
+        <Card tone="muted" className="text-small text-ink-muted">
+          {t.car.scoreWaiting(state.toReview)}
+        </Card>
+      )}
 
       {state.score && (
         <Card

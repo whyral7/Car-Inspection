@@ -12,12 +12,12 @@ export const contentType = "image/png";
 
 export default async function Image() {
   const [regular, bold] = await Promise.all([
-    readFile(join(process.cwd(), "assets/fonts/Geist-Regular.ttf")),
-    readFile(join(process.cwd(), "assets/fonts/Geist-Bold.ttf")),
+    readFile(join(process.cwd(), "assets/fonts/Anek-Regular.ttf")),
+    readFile(join(process.cwd(), "assets/fonts/Anek-Bold.ttf")),
   ]);
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: BRAND[50], padding: "64px 72px", fontFamily: "Geist", color: INK[900] }}>
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: BRAND[50], padding: "64px 72px", fontFamily: "Anek", color: INK[900] }}>
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
           <div style={{ width: 72, height: 72, borderRadius: 18, background: BRAND[700], color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, fontWeight: 700 }}>
             T
@@ -37,8 +37,8 @@ export default async function Image() {
     {
       ...size,
       fonts: [
-        { name: "Geist", data: regular, weight: 400, style: "normal" },
-        { name: "Geist", data: bold, weight: 700, style: "normal" },
+        { name: "Anek", data: regular, weight: 400, style: "normal" },
+        { name: "Anek", data: bold, weight: 700, style: "normal" },
       ],
     },
   );

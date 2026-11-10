@@ -22,7 +22,7 @@ Before and after screenshots, phone and desktop, are in [`design-system/`](desig
 | Motion | `ease-standard`; 150ms by default; `animate-fade-in`, `animate-rise-in` (200ms), `animate-sheet-in` (250ms), `animate-pop` | Reduced motion is respected. |
 | Spacing | Tailwind 4px steps, used as 8px rhythm: 2, 4, 6, 8, 12 | Odd steps only to nudge an icon against its label. |
 
-Font: Geist, self-hosted (`public/fonts`, 28 KB for Latin, plus a ₹ subset). Hindi falls back to the phone's Devanagari font.
+Font: **Anek** (Ek Type, OFL), made for Indian scripts, self-hosted in `public/fonts`: Latin 400/600/700 (about 60 KB), a ₹ subset, and Devanagari that only downloads when Hindi text is on screen. The PDF and link preview use merged Latin + ₹ TTFs in `assets/fonts`.
 
 ## Components
 

@@ -4,7 +4,7 @@
 // Order follows what a buyer wants first: the car's photos, then one summary card (plate, score,
 // what was found, when), then price and the details.
 import type { ReactNode } from "react";
-import { ChatIcon, ChevronDownIcon, DownloadIcon, InfoIcon, PhoneIcon, ShieldCheckIcon } from "@/components/icons";
+import { AlertIcon, ChatIcon, ChevronDownIcon, DownloadIcon, InfoIcon, PhoneIcon, ShieldCheckIcon, XIcon } from "@/components/icons";
 import { Plate } from "@/components/plate";
 import { PhotoGallery, PhotoHero } from "@/components/report/photo-gallery";
 import { ShareButton } from "@/components/report/share-button";
@@ -12,7 +12,7 @@ import { BAND_STYLE } from "@/components/score-chip";
 import { SEVERITY_EDGE, SEVERITY_TONE } from "@/components/severity";
 import { Badge, buttonClass, cardClass, type BadgeTone } from "@/components/ui";
 import { formatPhone, telHref, whatsappChatUrl } from "@/lib/report/share";
-import type { DetailRow, ReportCheckItem, ReportView as View } from "@/lib/report/view";
+import { checkCounts, flaggedChecks, shownChecks, type DetailRow, type ReportCheckItem, type ReportView as View } from "@/lib/report/view";
 import type { Strings } from "@/lib/strings";
 import type { ChecklistResult } from "@/lib/supabase/database.types";
 
@@ -106,11 +106,36 @@ export function ContactButtons({ view, t, preview = false }: { view: View; t: St
   );
 }
 
+/** Names the answers that need attention or failed, right under the score, so nothing bad hides further down. */
+function Flagged({ view, t }: { view: View; t: Strings }) {
+  const { attention, fail } = flaggedChecks(view);
+  if (attention.length + fail.length === 0) return null;
+  return (
+    <ul className="mt-2 flex flex-col gap-1 text-small">
+      {fail.length > 0 && (
+        <li className="flex items-start gap-2 text-danger-700">
+          <XIcon size={16} className="mt-0.5" />
+          <span>{t.publicReport.flagged.fail(fail.join(", "))}</span>
+        </li>
+      )}
+      {attention.length > 0 && (
+        <li className="flex items-start gap-2 text-warning-700">
+          <AlertIcon size={16} className="mt-0.5" />
+          <span>{t.publicReport.flagged.attention(attention.join(", "))}</span>
+        </li>
+      )}
+    </ul>
+  );
+}
+
 /** One line on what was found, for the summary card: "3 damage notes · 15 OK, 2 need attention, 1 problem". */
 function summaryLine(view: View, t: Strings) {
   const parts: string[] = [];
   if (view.findings) parts.push(t.publicReport.summary.findings(view.findings.length).replace(/[.।]$/, ""));
-  if (view.checklist) parts.push(t.publicReport.checklistSummary(view.checklist.counts.ok, view.checklist.counts.attention, view.checklist.counts.fail));
+  if (shownChecks(view).length > 0) {
+    const c = checkCounts(view);
+    parts.push(t.publicReport.checklistSummary(c.ok, c.attention, c.fail));
+  }
   return parts.join(" · ");
 }
 
@@ -157,6 +182,7 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
           <ScoreBadge view={view} t={t} />
         </div>
         {summary && <p className="mt-4 font-medium">{summary}</p>}
+        <Flagged view={view} t={t} />
         {inspectedOn && (
           <p className="mt-1 flex items-center gap-2 text-small text-ink-muted">
             <ShieldCheckIcon size={16} className="text-brand-700" />

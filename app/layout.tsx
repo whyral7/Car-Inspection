@@ -36,8 +36,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className="h-full">
       <head>
-        {/* Self-hosted Geist (28 KB, cached by the service worker). Other scripts fall back to the system font. */}
-        <link rel="preload" href="/fonts/Geist-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        {/* Self-hosted Anek (Ek Type, made for Indian scripts). Latin regular is preloaded; other weights, ₹ and Devanagari load when used. */}
+        <link rel="preload" href="/fonts/Anek-latin-400.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
       </head>
       <body className="flex min-h-full flex-col">
         {children}

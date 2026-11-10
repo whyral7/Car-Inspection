@@ -67,7 +67,7 @@ lib/
   razorpay/             orders API (api.ts), Checkout loader (checkout.ts), webhook signature + parsing (+ tests)
   credits/              packs and credit history (+ tests)
   site.ts               site URL and WhatsApp contact link
-assets/fonts/           Geist (OFL) for the PDF and preview image
+assets/fonts/           Anek (OFL, Ek Type) for the PDF and preview image
 proxy.ts                session refresh + /app protection
 public/                 icons, service worker
 supabase/migrations/    SQL schema, RLS, storage buckets

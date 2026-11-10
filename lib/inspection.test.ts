@@ -37,6 +37,20 @@ describe("inspectionState", () => {
     expect(started.score).toEqual({ value: 10, band: "good", provisional: true });
   });
 
+  it("hides the score while AI notes are waiting to be reviewed", () => {
+    const pending = inspectionState({ ...base, photos: photos(20), findings: [{ severity: "moderate", accepted: false }], checklist: checklist(5) });
+    expect(pending.score).toBeNull();
+    const reviewed = inspectionState({ ...base, photos: photos(20), findings: [{ severity: "moderate", accepted: true }], checklist: checklist(5) });
+    expect(reviewed.score?.value).toBeLessThan(10);
+  });
+
+  it("doesn't count damage notes as done before the required photos are in", () => {
+    const early = inspectionState({ ...base, photos: photos(7) });
+    expect(early.analysed).toBe(true);
+    expect(early.findingsDone).toBe(false);
+    expect(early.stepsDone).toBe(0);
+  });
+
   it("goes to the report once finished, even with a photo the AI couldn't check", () => {
     const failedPhoto = [...photos(11), { angle_key: "dashboard", ai_status: "failed" as const }];
     expect(inspectionState({ ...base, status: "inspected", photos: failedPhoto, checklist: checklist(19) }).next).toBe("report");

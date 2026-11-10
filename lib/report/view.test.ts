@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyHidden, buildReportView, hiddenSectionsSchema, parseHiddenSections, summaryParts, type ReportInput } from "./view";
+import { applyHidden, buildReportView, checkCounts, flaggedChecks, hiddenSectionsSchema, parseHiddenSections, summaryParts, type ReportInput } from "./view";
 
 const input = (patch: Partial<ReportInput> = {}): ReportInput => ({
   slug: "k7m2p9xa4c",
@@ -163,8 +163,22 @@ describe("hidden sections", () => {
 
 describe("summaryParts", () => {
   it("only mentions shown sections", () => {
-    const view = buildReportView(input(), ["checklist"], now);
+    const view = buildReportView(input(), ["checklist", "documents"], now);
     expect(summaryParts(view)).toEqual(["2 photos.", "3 damage notes."]);
+  });
+
+  it("counts the document checks too, so a document problem is never left out", () => {
+    const base = input();
+    const withDocProblem = { ...base, checklist: [...base.checklist.filter((c) => c.item_key !== "rc_original"), { item_key: "rc_original", result: "fail" as const, note: null }] };
+    const view = buildReportView(withDocProblem, [], now);
+    expect(checkCounts(view)).toEqual({ ok: 1, attention: 1, fail: 2, na: 1 });
+    expect(flaggedChecks(view).fail).toHaveLength(2);
+    expect(summaryParts(view).at(-1)).toContain("2 problems");
+  });
+
+  it("names flagged items only from shown sections", () => {
+    const view = buildReportView(input(), ["checklist"], now);
+    expect(flaggedChecks(view)).toEqual({ attention: [], fail: [] });
   });
 });
 
