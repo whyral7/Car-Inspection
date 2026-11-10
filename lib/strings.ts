@@ -435,6 +435,7 @@ export const en = {
   checklist: {
     title: "Checklist",
     subtitle: "Check each item on the car. Choose \"Doesn't apply\" if it isn't relevant.",
+    legend: "Needs attention: works, but needs a look or a repair soon. Problem: doesn't work, or isn't safe.",
     backToCar: "Back to car",
     progress: (done: number, total: number) => `${done}/${total} checked`,
     results: {
@@ -460,6 +461,9 @@ export const en = {
     finish: "Finish and see the report",
     allDone: "All items checked.",
     finishHint: (n: number) => (n === 1 ? "1 item left to check." : `${n} items left to check.`),
+    next: (label: string) => `Next: ${label}`,
+    change: "Change",
+    markRestHint: "Brakes, steering, flood and accident signs, RC and insurance always need a real answer.",
     finished: "Inspection finished. Your report is next.",
     backToCarDone: "Go to the report",
     errors: {
@@ -485,9 +489,9 @@ export const en = {
       lights: { label: "Lights", hint: "Headlights (high and low), indicators, brake, reverse and fog lights.", how: "Ask someone to stand outside while you switch on headlights (low and high), indicators, hazards, brake lights, reverse light and fog lights." },
       horn: { label: "Horn", hint: "Works and sounds normal.", how: "Press the horn. It should sound straight away and clearly." },
       battery: { label: "Battery", hint: "No corrosion on terminals, starts without hesitation.", how: "Look at the battery terminals for white or green crust. Check the date sticker: batteries older than about 3 years may need replacing soon. A slow start is a warning sign." },
-      rc_original: { label: "Original RC", hint: "Original RC seen and matches the number plate and chassis number.", how: "Ask for the original RC (smart card or book). Check the number plate, chassis number and engine number match the car. A photocopy only, or numbers that don't match, is a Problem." },
+      rc_original: { label: "Original RC", hint: "The original registration certificate (RC) is seen and matches the number plate and chassis number.", how: "Ask for the original RC (smart card or book). Check the number plate, chassis number and engine number match the car. A photocopy only, or numbers that don't match, is a Problem." },
       insurance_valid: { label: "Insurance valid", hint: "Policy is current and in the owner's name.", how: "Check the policy document or the insurer's app: the end date should be in the future and the owner's name should match the RC." },
-      puc_valid: { label: "PUC valid", hint: "Pollution certificate is current.", how: "Look at the Pollution Under Control certificate: the validity date should be in the future." },
+      puc_valid: { label: "PUC valid", hint: "The Pollution Under Control (PUC) certificate is current.", how: "Look at the Pollution Under Control certificate: the validity date should be in the future." },
       service_history: { label: "Service history", hint: "Service book or records available.", how: "Ask for the service book or invoices. Regular service at the right kilometres is OK. No records at all needs attention." },
       spare_key: { label: "Spare key", hint: "A second key is available and works.", how: "Ask for the second key and try it: it should open the car and start the engine." },
       flood_signs: { label: "No flood signs", hint: "No silt, water lines, rust under seats or damp smell.", how: "Lift the floor mats and look under the seats for silt, rust or water lines. A damp or musty smell inside is a warning sign." },

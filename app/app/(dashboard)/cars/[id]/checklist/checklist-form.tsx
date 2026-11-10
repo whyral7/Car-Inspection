@@ -4,10 +4,10 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useOnline } from "@/components/connection-banner";
 import { useT } from "@/components/i18n-provider";
-import { AlertIcon, ArrowRightIcon, CheckIcon, CloudUploadIcon, HelpIcon, PlusIcon, XIcon } from "@/components/icons";
+import { AlertIcon, ArrowRightIcon, CheckIcon, ChevronDownIcon, CloudUploadIcon, HelpIcon, PlusIcon, XIcon } from "@/components/icons";
 import { RememberStep } from "@/components/remember-step";
-import { Button, Card, ConfirmSheet, FormError, ProgressBar, Segmented, StepHeader, StickyBar, TextAreaField, TextButton, useToast, type SegmentOption } from "@/components/ui";
-import { CHECKLIST_GROUPS, CHECKLIST_KEYS, checklistProgress, type ChecklistKey } from "@/lib/checklist";
+import { Badge, Button, Card, ConfirmSheet, FormError, ProgressBar, Segmented, StepHeader, StickyBar, TextAreaField, TextButton, useToast, type BadgeTone, type SegmentOption } from "@/components/ui";
+import { CHECKLIST_GROUPS, CHECKLIST_KEYS, checklistProgress, isMustAnswer, type ChecklistKey } from "@/lib/checklist";
 import { FINDING_LIMITS } from "@/lib/findings";
 import { checklistOutbox } from "@/lib/outbox";
 import type { Strings } from "@/lib/strings";
@@ -32,12 +32,15 @@ const RETRY_MS = 15_000;
 /** A note is saved this long after the last keystroke (and on leaving the box). */
 const NOTE_SAVE_MS = 1_200;
 
+// Answers are tinted, not filled, so the one solid colour on screen stays the teal next action.
 const resultOptions = (t: Strings): readonly SegmentOption<ChecklistResult>[] => [
-  { value: "ok", label: t.checklist.results.ok, icon: <CheckIcon size={16} />, selectedClass: "bg-success-700 text-white ring-success-700" },
-  { value: "attention", label: t.checklist.results.attention, icon: <AlertIcon size={16} />, selectedClass: "bg-warning-500 text-ink ring-warning-500" },
-  { value: "fail", label: t.checklist.results.fail, icon: <XIcon size={16} />, selectedClass: "bg-danger-700 text-white ring-danger-700" },
-  { value: "na", label: t.checklist.results.na, selectedClass: "bg-ink-muted text-white ring-ink-muted" },
+  { value: "ok", label: t.checklist.results.ok, icon: <CheckIcon size={16} />, selectedClass: "bg-success-50 text-success-800 ring-2 ring-success-600" },
+  { value: "attention", label: t.checklist.results.attention, icon: <AlertIcon size={16} />, selectedClass: "bg-warning-50 text-warning-800 ring-2 ring-warning-500" },
+  { value: "fail", label: t.checklist.results.fail, icon: <XIcon size={16} />, selectedClass: "bg-danger-50 text-danger-800 ring-2 ring-danger-600" },
+  { value: "na", label: t.checklist.results.na, selectedClass: "bg-sunken text-ink ring-2 ring-ink-muted" },
 ];
+
+const resultTone: Record<ChecklistResult, BadgeTone> = { ok: "success", attention: "warning", fail: "danger", na: "neutral" };
 
 type Props = {
   carId: string;
@@ -65,6 +68,8 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
   const [finishing, setFinishing] = useState(false);
   const [finishError, setFinishError] = useState<string | null>(null);
   const [confirmRest, setConfirmRest] = useState(false);
+  // The item being worked on stays open; other answered items fold to one line.
+  const [active, setActive] = useState<ChecklistKey | null>(() => CHECKLIST_KEYS.find((k) => !initial[k]) ?? null);
 
   const update = useCallback((key: ChecklistKey, patch: Partial<Item>) => {
     itemsRef.current = { ...itemsRef.current, [key]: { ...itemsRef.current[key], ...patch } };
@@ -154,7 +159,18 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
     noteTimers.current.set(key, setTimeout(() => void persist(key), NOTE_SAVE_MS));
   }
 
+  /** Jumps to an item and opens it, focusing its first answer so keyboard users land there too. */
+  function goTo(key: ChecklistKey) {
+    setActive(key);
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`item-${key}`);
+      el?.scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      el?.querySelector<HTMLElement>("[role=radio]")?.focus({ preventScroll: true });
+    });
+  }
+
   function choose(key: ChecklistKey, result: ChecklistResult) {
+    setActive(key);
     // Open the note box for anything worth explaining to a buyer.
     const openNote = result === "attention" || result === "fail" ? { noteOpen: true } : {};
     update(key, { result, ...openNote });
@@ -163,7 +179,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
 
   async function markRestOk() {
     setConfirmRest(false);
-    const rest = CHECKLIST_KEYS.filter((k) => !itemsRef.current[k].result);
+    const rest = CHECKLIST_KEYS.filter((k) => !itemsRef.current[k].result && !isMustAnswer(k));
     if (rest.length === 0) return;
     for (const key of rest) {
       update(key, { result: "ok", save: "saving" });
@@ -215,6 +231,9 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
   const remaining = progress.total - progress.done;
   const waiting = CHECKLIST_KEYS.filter((k) => items[k].save === "waiting").length;
   const label = t.checklist.progress(progress.done, progress.total);
+  const nextKey = CHECKLIST_KEYS.find((k) => !items[k].result) ?? null;
+  // What "Mark the rest OK" would answer: never the safety and legal checks.
+  const restEligible = CHECKLIST_KEYS.filter((k) => !items[k].result && !isMustAnswer(k));
 
   const stepLabels = [t.car.stepPhotos, t.car.stepFindings, t.car.stepChecklist, t.car.stepReport];
   return (
@@ -232,7 +251,11 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
             {carTitle && ` · ${carTitle}`}
           </>
         }
-        description={t.checklist.subtitle}
+        description={
+          <>
+            {t.checklist.subtitle} <span className="block pt-1">{t.checklist.legend}</span>
+          </>
+        }
       />
 
       <Card className="flex flex-col gap-4" aria-label={label}>
@@ -247,38 +270,69 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
         </p>
       )}
 
-      {CHECKLIST_GROUPS.map((group) => (
-        <section key={group.key} aria-labelledby={`group-${group.key}`} className="flex flex-col gap-2">
-          <h2 id={`group-${group.key}`} className="px-1 text-heading">
-            {t.checklist.groups[group.key]}
-          </h2>
-          <ul className="divide-y divide-line overflow-hidden rounded-card bg-surface shadow-card">
-            {group.items.map((key) => (
-              <li key={key} id={`item-${key}`} className="scroll-mt-24 px-4 py-4 sm:px-6">
-                <ChecklistRow
-                  itemKey={key}
-                  item={items[key]}
-                  onChoose={(r) => choose(key, r)}
-                  onNoteChange={(note) => changeNote(key, note)}
-                  onNoteBlur={() => {
-                    clearTimeout(noteTimers.current.get(key));
-                    void persist(key);
-                  }}
-                  onOpenNote={() => update(key, { noteOpen: true })}
-                  onToggleHelp={() => update(key, { helpOpen: !items[key].helpOpen })}
-                  onRetry={() => void persist(key)}
-                />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+      {CHECKLIST_GROUPS.map((group) => {
+        const groupDone = group.items.filter((k) => items[k].result).length;
+        return (
+          <section key={group.key} aria-labelledby={`group-${group.key}`} className="flex flex-col gap-2">
+            <div className="flex items-baseline justify-between gap-4 px-1">
+              <h2 id={`group-${group.key}`} className="text-heading">
+                {t.checklist.groups[group.key]}
+              </h2>
+              <span className={`text-small tabular ${groupDone === group.items.length ? "font-medium text-success-700" : "text-ink-muted"}`}>
+                {groupDone}/{group.items.length}
+              </span>
+            </div>
+            <ul className="divide-y divide-line overflow-hidden rounded-card bg-surface shadow-card">
+              {group.items.map((key) => {
+                const item = items[key];
+                const folded = Boolean(item.result) && active !== key;
+                return (
+                  <li key={key} id={`item-${key}`} className={`scroll-mt-24 ${folded ? "" : "px-4 py-4 sm:px-6"}`}>
+                    {folded ? (
+                      <FoldedRow itemKey={key} item={item} onOpen={() => setActive(key)} onRetry={() => void persist(key)} />
+                    ) : (
+                      <ChecklistRow
+                        itemKey={key}
+                        item={item}
+                        onChoose={(r) => choose(key, r)}
+                        onNoteChange={(note) => changeNote(key, note)}
+                        onNoteBlur={() => {
+                          clearTimeout(noteTimers.current.get(key));
+                          void persist(key);
+                        }}
+                        onOpenNote={() => update(key, { noteOpen: true })}
+                        onToggleHelp={() => update(key, { helpOpen: !item.helpOpen })}
+                        onRetry={() => void persist(key)}
+                      />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        );
+      })}
+
+      {!progress.complete && progress.done > 0 && restEligible.length > 0 && (
+        <div className="flex flex-col items-center gap-1 text-center">
+          <TextButton tone="muted" onClick={() => setConfirmRest(true)}>
+            <CheckIcon size={16} />
+            {t.checklist.markRestOk(restEligible.length)}
+          </TextButton>
+          <p className="max-w-sm text-caption text-ink-subtle">{t.checklist.markRestHint}</p>
+        </div>
+      )}
 
       <ConfirmSheet
         open={confirmRest}
         onClose={() => setConfirmRest(false)}
-        title={t.checklist.markRestOk(remaining)}
-        description={t.checklist.markRestConfirm(remaining)}
+        title={t.checklist.markRestOk(restEligible.length)}
+        description={
+          <>
+            <span className="block">{t.checklist.markRestConfirm(restEligible.length)}</span>
+            <span className="mt-2 block font-medium text-ink">{restEligible.map((k) => t.checklist.items[k].label).join(", ")}</span>
+          </>
+        }
         confirmLabel={t.checklist.markRestYes}
         cancelLabel={t.common.cancel}
         closeLabel={t.common.close}
@@ -299,13 +353,40 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
             <ArrowRightIcon size={20} />
           </Button>
         ) : (
-          progress.done > 0 && (
-            <Button variant="secondary" onClick={() => setConfirmRest(true)} icon={<CheckIcon size={18} />}>
-              {t.checklist.markRestOk(remaining)}
+          nextKey && (
+            <Button onClick={() => goTo(nextKey)}>
+              {t.checklist.next(t.checklist.items[nextKey].label)}
+              <ArrowRightIcon size={20} />
             </Button>
           )
         )}
       </StickyBar>
+    </div>
+  );
+}
+
+/** An answered item, folded to one line: what was checked and the answer. Tap to change it. */
+function FoldedRow({ itemKey, item, onOpen, onRetry }: { itemKey: ChecklistKey; item: Item; onOpen: () => void; onRetry: () => void }) {
+  const t = useT();
+  const { label } = t.checklist.items[itemKey];
+  const result = item.result!;
+  return (
+    <div className="flex items-center gap-2 pr-2">
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-expanded={false}
+        aria-label={`${label}: ${t.checklist.results[result]}. ${t.checklist.change}`}
+        className="flex min-h-14 min-w-0 flex-1 items-center gap-4 py-2 pl-4 text-left transition-colors hover:bg-canvas sm:pl-6"
+      >
+        <span className="min-w-0 flex-1">
+          <span className="block font-medium break-words">{label}</span>
+          {item.note.trim() && <span className="block truncate text-small text-ink-muted">{item.note}</span>}
+        </span>
+        <Badge tone={resultTone[result]}>{t.checklist.results[result]}</Badge>
+        <ChevronDownIcon size={18} className="shrink-0 text-ink-subtle" />
+      </button>
+      {(item.save === "error" || item.save === "waiting") && <SaveState state={item.save} onRetry={onRetry} />}
     </div>
   );
 }

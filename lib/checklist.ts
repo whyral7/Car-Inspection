@@ -13,6 +13,16 @@ export type ChecklistKey = (typeof CHECKLIST_GROUPS)[number]["items"][number];
 
 export const CHECKLIST_KEYS: readonly ChecklistKey[] = CHECKLIST_GROUPS.flatMap((g) => g.items);
 
+/**
+ * Checks a buyer relies on for safety or legality. "Mark the rest OK" never answers these: each one
+ * needs a real look (or "Doesn't apply").
+ */
+export const MUST_ANSWER_KEYS = ["brakes", "steering", "flood_signs", "accident_signs", "rc_original", "insurance_valid"] as const satisfies readonly ChecklistKey[];
+
+export function isMustAnswer(key: ChecklistKey) {
+  return (MUST_ANSWER_KEYS as readonly string[]).includes(key);
+}
+
 export const CHECKLIST_RESULTS = ["ok", "attention", "fail", "na"] as const satisfies readonly ChecklistResult[];
 
 export function isChecklistKey(value: string): value is ChecklistKey {
