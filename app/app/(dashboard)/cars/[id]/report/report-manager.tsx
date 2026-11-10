@@ -282,9 +282,10 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
         <FormError message={priceError} />
       </Card>
 
-      <section aria-label={t.report.previewLabel} className="flex flex-col gap-4 rounded-sheet bg-sunken p-2 sm:p-4">
-        <p className="pt-2 text-center text-caption font-semibold tracking-wide text-ink-muted uppercase">{t.report.previewLabel}</p>
-        <div className="px-2 pb-2">
+      {/* The buyer's view, set off by a dashed rule rather than another box around the report's own cards. */}
+      <section aria-label={t.report.previewLabel} className="flex flex-col gap-4 border-t-2 border-dashed border-line-strong/40 pt-4">
+        <p className="text-center text-caption font-semibold tracking-wide text-ink-muted uppercase">{t.report.previewLabel}</p>
+        <div>
           <ReportView view={preview} t={t} pdfHref={null} />
           <div className="mt-4">
             <ContactButtons view={preview} t={t} preview />

@@ -120,7 +120,7 @@ export default async function HomePage() {
               <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-heading text-brand-700">{i + 1}</span>
               <div>
                 <h3 className="font-semibold">{step.title}</h3>
-                <p className="mt-1 text-ink-muted">{step.body}</p>
+                <p className="mt-1 text-balance text-ink-muted">{step.body}</p>
               </div>
             </li>
           ))}
@@ -137,7 +137,7 @@ export default async function HomePage() {
             {h.why.map((item) => (
               <li key={item.title} className="rounded-card bg-canvas p-4 sm:p-6">
                 <h3 className="font-semibold">{item.title}</h3>
-                <p className="mt-1 text-ink-muted">{item.body}</p>
+                <p className="mt-1 text-balance text-ink-muted">{item.body}</p>
               </li>
             ))}
           </ul>
@@ -166,7 +166,7 @@ export default async function HomePage() {
           <li className={cardClass("default", "md", "flex flex-col")}>
             <h3 className="font-semibold">{h.free.title}</h3>
             <p className="mt-2 text-display tabular">{h.free.price}</p>
-            <p className="mt-1 text-ink-muted">{h.free.body(FREE_CREDITS)}</p>
+            <p className="mt-1 text-balance text-ink-muted">{h.free.body(FREE_CREDITS)}</p>
             <LinkButton href="/login" className="mt-5">
               {h.cta}
             </LinkButton>
@@ -180,12 +180,12 @@ export default async function HomePage() {
                   {best && <span className="rounded-full bg-brand-50 px-2.5 py-1 text-caption font-semibold text-brand-800">{h.bestValue}</span>}
                 </div>
                 <p className="mt-2 text-display tabular">₹{formatRupees(pack.pricePaise)}</p>
-                <p className="mt-1 text-ink-muted">{h.perReport(formatRupees(pricePerReportPaise(pack)))}</p>
+                <p className="mt-1 text-balance text-ink-muted">{h.perReport(formatRupees(pricePerReportPaise(pack)))}</p>
               </li>
             );
           })}
         </ul>
-        <p className="mt-4 text-small text-ink-muted">{t.disclaimer}</p>
+        <p className="mt-4 text-small text-balance text-ink-muted">{t.disclaimer}</p>
       </section>
 
       <section className="bg-brand-800 text-white">

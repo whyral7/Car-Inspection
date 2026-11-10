@@ -11,18 +11,18 @@ export function LegalPage({ title, intro, sections }: { title: string; intro: st
       <BackLink href="/">{legal.back}</BackLink>
       <h1 className="mt-2 text-title">{title}</h1>
       <p className="mt-1 text-small text-ink-muted">{legal.updated(BUSINESS.legalUpdated)}</p>
-      <p className="mt-4 max-w-prose leading-relaxed text-ink-muted">{intro}</p>
+      <p className="mt-4 max-w-[28rem] leading-relaxed text-ink-muted">{intro}</p>
       {sections.map((section) => (
         <section key={section.heading} className="mt-6">
           <h2 className="text-heading">{section.heading}</h2>
           {section.body.length > 1 ? (
-            <ul className="mt-2 max-w-prose list-disc space-y-2 pl-5 leading-relaxed text-ink-muted">
+            <ul className="mt-2 max-w-[28rem] list-disc space-y-2 pl-5 leading-relaxed text-ink-muted">
               {section.body.map((line) => (
                 <li key={line}>{line}</li>
               ))}
             </ul>
           ) : (
-            <p className="mt-2 max-w-prose leading-relaxed text-ink-muted">{section.body[0]}</p>
+            <p className="mt-2 max-w-[28rem] leading-relaxed text-ink-muted">{section.body[0]}</p>
           )}
         </section>
       ))}

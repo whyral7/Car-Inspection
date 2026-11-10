@@ -606,3 +606,66 @@ Direction: **Option A, "Clear Teal"**. One accent colour (teal), white cards wit
   - team accounts.
 - **App icons** are still the earlier teal (#115e59, a hair lighter than the new #0f5e58). The difference is invisible at icon size.
 - **The login button stays under the phone field,** not in a sticky bar: with the keyboard open, that's where the thumb already is.
+
+---
+
+## 6. Impeccable critique and audit (round 3)
+
+Run with [impeccable](https://impeccable.style)'s `critique` and `audit` playbooks: an isolated design review, plus a detector pass. Impeccable's own detector program couldn't run in the sandbox, so its 62 published rules were checked by hand against the rendered pages at 360px and 1280px, in English and Hindi.
+
+**Scores before fixes:** critique 29/40 (Good); audit 14/20 (Good).
+
+**Detector, before → after (verified findings):**
+
+| Rule | Before | After |
+|---|---|---|
+| overused-font | 54 | 0 |
+| side-tab | 14 | 0 |
+| nested-cards | 20 | 0 * |
+| straggler | 42 | 0 |
+| line-length | 3 | 0 |
+| unbalanced-heading | 1 | 0 |
+
+\* Two remaining hits are the WhatsApp preview image in its captioned frame, which the detector exempts as a media frame.
+
+**Priority issues:**
+- ✅ **[P1] The quickest path made the report look better.**
+  - The checklist's bottom bar is now "Next: <item>".
+  - "Mark the rest OK" is a quiet link that never covers brakes, steering, flood and accident signs, RC or insurance, and its confirm sheet lists what it will mark.
+  - "Continue without accepting them" is now "Leave these N notes off the report".
+  - No score shows while AI notes wait for review.
+- ✅ **[P1] The public summary hid a document "Problem".**
+  - The summary, the page description and the PDF now count every shown check, documents included.
+  - They name what needs attention or failed right under the score.
+- 🟡 **[P1] The Terms page placeholder and dealer-only wording.**
+  - The terms and privacy text now cover owners, buyers and dealers.
+  - The registered business name, address and the GST line still need the owner's details in `BUSINESS` (lib/config.ts).
+- ✅ **[P2] "Damage notes" ticked before the photos were in.** It now waits for the required photos and says "Waiting for the required photos".
+- ✅ **[P2] Generated-UI tells.**
+  - Anek (Ek Type, made for Indian scripts) replaces Geist in the app, the PDF and the previews.
+  - Severity is an icon badge, not a side stripe.
+  - The score sits flush in its card, and the report preview has no frame.
+- ✅ **[P2] The checklist was a 5,600px wall.**
+  - Answered items fold to one line, and groups show progress.
+  - Answers are tinted, not filled.
+  - A legend explains "Needs attention" vs "Problem".
+
+**Audit P2s and minor items:**
+- ✅ Reduced motion now fades instead of cutting every animation.
+- ✅ Required photo tiles say "Required" instead of relying on colour.
+- ✅ The desktop action bar is anchored to the bottom edge.
+- ✅ Credits starts on the smaller pack.
+- ✅ Onboarding doesn't focus the name field before the role is chosen.
+- ✅ Captions under the action bar are 14px.
+- ✅ A broken report link shows the brand.
+- ✅ Step names show on phones.
+- ✅ RC and PUC are spelled out.
+- ✅ The landing page and sample report follow the Hindi setting.
+- ✅ Hindi footer links meet 44px.
+
+**Left for later:**
+- **Business details.** The legal name, address, city and GST wording in `BUSINESS`.
+- **The WhatsApp link preview stays English.** WhatsApp fetches one image per link for everyone who opens it, so it can't follow each viewer's language.
+- **Dated report changes.** Showing buyers "updated on" after a published report changes needs a timestamp column, which is a schema change.
+- **Product decisions.** Whether to show buyers how many AI notes the seller left out, or which photos came from the gallery.
+- **Dark mode.**

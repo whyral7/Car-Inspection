@@ -182,7 +182,7 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
           </div>
           <ScoreBadge view={view} t={t} />
         </div>
-        {summary && <p className="mt-4 font-medium">{summary}</p>}
+        {summary && <p className="mt-4 font-medium text-balance">{summary}</p>}
         <Flagged view={view} t={t} />
         {inspectedOn && (
           <p className="mt-1 flex items-center gap-2 text-small text-ink-muted">
@@ -190,7 +190,7 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
             {t.publicReport.inspectedOn(inspectedOn)}
           </p>
         )}
-        <p className="mt-4 flex items-start gap-2 text-caption text-ink-muted">
+        <p className="mt-4 flex items-start gap-2 text-caption text-balance text-ink-muted">
           <InfoIcon size={14} className="mt-px" />
           {t.disclaimer}
         </p>

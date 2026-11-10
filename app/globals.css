@@ -17,18 +17,23 @@ body {
   @apply bg-canvas font-sans text-body text-ink antialiased;
 }
 
-/* No one-word last lines in running text, and headings that break into even lines. */
-p,
-li,
-dd,
-figcaption,
-summary {
-  text-wrap: pretty;
-}
-h1,
-h2,
-h3 {
-  text-wrap: balance;
+/*
+ * No one-word last lines in running text, and headings that break into even lines. In the base
+ * layer, so a `text-balance` utility on a short line (the disclaimer) still wins.
+ */
+@layer base {
+  p,
+  li,
+  dd,
+  figcaption,
+  summary {
+    text-wrap: pretty;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
 }
 
 /* Numbers that change or line up (scores, counts, prices) don't jiggle. */

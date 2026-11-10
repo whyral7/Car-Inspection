@@ -38,7 +38,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
         </Link>
         .
       </p>
-      <p className="mt-auto text-center text-caption text-ink-muted">{t.disclaimer}</p>
+      <p className="mt-auto text-center text-caption text-balance text-ink-muted">{t.disclaimer}</p>
     </main>
   );
 }
