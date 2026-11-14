@@ -67,7 +67,7 @@ export function ScoreMeter({ score, scoreText, outOf, grade, sub, label, classNa
 export function ScoreChip({ score, scoreText, outOf, label }: Pick<MeterProps, "score" | "scoreText" | "outOf" | "label">) {
   return (
     <span role="img" aria-label={label} className="inline-flex shrink-0 items-end gap-1.5 tabular text-score-fg">
-      <span className="type-title-sm font-extrabold">
+      <span className="type-title-sm">
         {scoreText}
         <span className="type-caption-strong text-score-sub">{outOf}</span>
       </span>

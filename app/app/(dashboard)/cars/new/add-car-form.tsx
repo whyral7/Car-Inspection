@@ -26,7 +26,7 @@ const notices = (t: Strings): Record<Lookup["status"], string | null> => ({
 /** Amber note with an icon: something to know, not an error. */
 function Notice({ children }: { children: ReactNode }) {
   return (
-    <p className="flex animate-rise-in items-start gap-2 rounded-control bg-warning-50 px-4 py-3 text-small text-warning-800">
+    <p className="flex animate-rise-in items-start gap-2 rounded-md bg-attention-tint px-4 py-3 type-body-sm text-attention">
       <InfoIcon size={18} className="mt-px" />
       <span>{children}</span>
     </p>
@@ -70,7 +70,7 @@ export function AddCarForm() {
   return (
     <form onSubmit={onRegSubmit} className="flex flex-1 flex-col gap-6" noValidate>
       <Card className="flex flex-col gap-4">
-        <label htmlFor="reg_number" className="text-small font-medium">
+        <label htmlFor="reg_number" className="type-label ">
           {t.cars.regNumber}
         </label>
         {/* Styled like a number plate, so it's obvious what to type. */}
@@ -93,14 +93,14 @@ export function AddCarForm() {
           // Room for pasted spaces and hyphens; they're stripped as the user types.
           maxLength={20}
           autoFocus
-          className="block min-h-16 w-full rounded-control bg-surface px-4 text-center text-title tracking-[0.12em] text-ink uppercase ring-2 ring-ink transition-shadow ring-inset placeholder:font-semibold placeholder:tracking-[0.12em] placeholder:text-line-strong focus:shadow-focus focus:outline-none aria-invalid:ring-danger-700"
+          className="block min-h-16 w-full rounded-md bg-surface px-4 text-center type-heading-1 tracking-[0.12em] text-text uppercase ring-2 ring-text transition-shadow ring-inset placeholder:font-semibold placeholder:tracking-[0.12em] placeholder:text-border-control  focus:outline-none aria-invalid:ring-fail"
         />
         <div className="-mt-2">
           {regError ? <FieldMessage id={errorId} error={regError} /> : <FieldMessage hint={<span id="reg_number-hint">{t.cars.regHint}</span>} />}
         </div>
       </Card>
       <div className="flex flex-col items-center gap-1 text-center">
-        <p className="text-small text-ink-muted">{t.cars.noRc}</p>
+        <p className="type-body-sm text-text-muted">{t.cars.noRc}</p>
         <TextButton onClick={() => void runLookup(true)} disabled={looking !== null}>
           <PencilIcon size={18} />
           {t.cars.enterManually}
@@ -164,7 +164,7 @@ function CarDetailsStep({ lookup, onChangeReg }: { lookup: Lookup; onChangeReg: 
     <div className="flex flex-1 flex-col gap-6">
       <Card className="flex items-center justify-between gap-4">
         <div className="flex min-w-0 flex-col gap-2">
-          <p className="text-small text-ink-muted">{t.cars.regNumber}</p>
+          <p className="type-body-sm text-text-muted">{t.cars.regNumber}</p>
           <Plate reg={lookup.regNumber} />
         </div>
         <Button variant="secondary" size="sm" onClick={onChangeReg} disabled={isPending} className="shrink-0">
@@ -235,17 +235,17 @@ function RcSummary({
   return (
     <>
       <Card className="flex animate-rise-in flex-col gap-4">
-        <p className="flex items-center gap-2 text-small font-semibold text-success-700">
-          <span className="flex size-6 items-center justify-center rounded-full bg-success-50">
+        <p className="flex items-center gap-2 type-label text-pass">
+          <span className="flex size-6 items-center justify-center rounded-full bg-pass-tint">
             <CheckIcon size={16} />
           </span>
           {t.cars.foundShort}
         </p>
         <div className="flex flex-col gap-1">
-          <p className="text-title">{title}</p>
-          {facts.length > 0 && <p className="text-ink-muted">{facts.join(" · ")}</p>}
+          <p className="type-heading-1">{title}</p>
+          {facts.length > 0 && <p className="text-text-muted">{facts.join(" · ")}</p>}
           {values.insurance_valid_upto && (
-            <p className="text-small text-ink-muted">
+            <p className="type-body-sm text-text-muted">
               {t.cars.insurance}: {formatDate(values.insurance_valid_upto)}
             </p>
           )}

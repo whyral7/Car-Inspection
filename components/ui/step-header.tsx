@@ -7,7 +7,7 @@ export function BackLink({ href, children }: { href: string; children: ReactNode
   return (
     <Link
       href={href}
-      className="-ml-2 inline-flex min-h-11 items-center gap-2 self-start rounded-chip px-2 text-small font-semibold text-brand-700 transition-colors hover:bg-brand-50"
+      className="-ml-2 inline-flex min-h-11 items-center gap-2 self-start rounded-sm px-2 type-label text-button-ghost-fg transition-colors hover:bg-button-ghost-bg-hover"
     >
       <ArrowLeftIcon size={18} />
       {children}
@@ -34,14 +34,14 @@ export function PageHeader({ back, eyebrow, title, meta, description, aside, chi
       {back && <BackLink href={back.href}>{back.label}</BackLink>}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex min-w-0 flex-col gap-1">
-          {eyebrow && <p className="text-caption font-semibold tracking-wide text-brand-700 uppercase">{eyebrow}</p>}
-          <h1 className="text-title break-words">{title}</h1>
-          {meta && <div className="text-small text-ink-muted">{meta}</div>}
+          {eyebrow && <p className="caps type-overline text-text-subtle">{eyebrow}</p>}
+          <h1 className="type-heading-1 break-words">{title}</h1>
+          {meta && <div className="type-body-sm text-text-muted">{meta}</div>}
         </div>
         {aside}
       </div>
       {children}
-      {description && <p className="max-w-prose text-small text-ink-muted">{description}</p>}
+      {description && <p className="max-w-prose type-body-sm text-text-muted">{description}</p>}
     </header>
   );
 }
@@ -56,8 +56,8 @@ export function StepHeader({ step, labels, stepLabel, ...props }: HeaderProps & 
       <ol aria-label={stepLabel} className="mt-2 grid gap-1.5" style={{ gridTemplateColumns: `repeat(${labels.length}, minmax(0, 1fr))` }}>
         {labels.map((l, i) => (
           <li key={l} aria-current={i + 1 === step ? "step" : undefined} className="flex flex-col gap-1.5">
-            <span className={`h-1 rounded-full transition-colors duration-200 ${i + 1 <= step ? "bg-brand-700" : "bg-sunken"}`} />
-            <span className={`line-clamp-2 text-caption ${i + 1 === step ? "font-semibold text-ink" : "text-ink-subtle"}`}>{l}</span>
+            <span className={`h-[var(--progress-height)] rounded-2xs transition-colors ${i + 1 <= step ? "bg-progress-fill" : "bg-progress-track"}`} />
+            <span className={`line-clamp-2 ${i + 1 === step ? "type-caption-strong text-text" : "type-caption text-text-subtle"}`}>{l}</span>
           </li>
         ))}
       </ol>

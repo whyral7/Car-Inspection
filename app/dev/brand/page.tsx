@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { BottomBar } from "@/components/bottom-bar";
 import { LanguageToggle } from "@/components/language-toggle";
 import { RedFlag } from "@/components/red-flag";
-import { Button, Field, FormError, SelectField } from "@/components/ui";
+import { Button, Field, FormError, SelectField, StickyBar } from "@/components/ui";
 import { ScoreBadge } from "@/components/report/report-view";
 import { VerdictBadge, resultVerdict, severityVerdict } from "@/components/verdict-badge";
 import { getT } from "@/lib/i18n.server";
@@ -133,10 +132,10 @@ function Showcase({ t, dark }: { t: Strings; dark: boolean }) {
       <Block title="BottomBar">
         <div className="-mb-4 overflow-hidden rounded-md border border-border">
           <div className="px-4">
-            <BottomBar progress={12 / 19}>
+            <StickyBar step={t.common.stepOf(3, 4)} title={t.car.stepChecklist} progress={12 / 19}>
               <p className="text-center type-body-sm text-text-muted">{t.checklist.finishHint(7)}</p>
               <Button disabled>{t.checklist.finish}</Button>
-            </BottomBar>
+            </StickyBar>
           </div>
         </div>
       </Block>

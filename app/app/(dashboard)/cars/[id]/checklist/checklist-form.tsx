@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useOnline } from "@/components/connection-banner";
 import { useT } from "@/components/i18n-provider";
-import { AlertIcon, ArrowRightIcon, CheckIcon, ChevronDownIcon, CloudUploadIcon, HelpIcon, PlusIcon, XIcon } from "@/components/icons";
+import { AlertIcon, ArrowRightIcon, CheckIcon, ChevronDownIcon, CloudUploadIcon, CrossCircleIcon, HelpIcon, PlusIcon } from "@/components/icons";
 import { RememberStep } from "@/components/remember-step";
 import { Badge, Button, Card, ConfirmSheet, FormError, ProgressBar, Segmented, StepHeader, StickyBar, TextAreaField, TextButton, useToast, type BadgeTone, type SegmentOption } from "@/components/ui";
 import { CHECKLIST_GROUPS, CHECKLIST_KEYS, checklistProgress, isMustAnswer, type ChecklistKey } from "@/lib/checklist";
@@ -34,10 +34,10 @@ const NOTE_SAVE_MS = 1_200;
 
 // Answers are tinted, not filled, so the one solid colour on screen stays the teal next action.
 const resultOptions = (t: Strings): readonly SegmentOption<ChecklistResult>[] => [
-  { value: "ok", label: t.checklist.results.ok, icon: <CheckIcon size={16} />, selectedClass: "bg-success-50 text-success-800 ring-2 ring-success-600" },
-  { value: "attention", label: t.checklist.results.attention, icon: <AlertIcon size={16} />, selectedClass: "bg-warning-50 text-warning-800 ring-2 ring-warning-500" },
-  { value: "fail", label: t.checklist.results.fail, icon: <XIcon size={16} />, selectedClass: "bg-danger-50 text-danger-800 ring-2 ring-danger-600" },
-  { value: "na", label: t.checklist.results.na, selectedClass: "bg-sunken text-ink ring-2 ring-ink-muted" },
+  { value: "ok", label: t.checklist.results.ok, icon: <CheckIcon size={16} />, verdict: "pass" },
+  { value: "attention", label: t.checklist.results.attention, icon: <AlertIcon size={16} />, verdict: "attention" },
+  { value: "fail", label: t.checklist.results.fail, icon: <CrossCircleIcon size={16} />, verdict: "fail" },
+  { value: "na", label: t.checklist.results.na, verdict: "na" },
 ];
 
 const resultTone: Record<ChecklistResult, BadgeTone> = { ok: "success", attention: "warning", fail: "danger", na: "neutral" };
@@ -247,7 +247,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
         title={t.checklist.title}
         meta={
           <>
-            <span className="font-semibold tracking-wider text-ink tabular">{regNumber}</span>
+            <span className="font-semibold tracking-wider text-text tabular">{regNumber}</span>
             {carTitle && ` · ${carTitle}`}
           </>
         }
@@ -259,13 +259,13 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
       />
 
       <Card className="flex flex-col gap-4" aria-label={label}>
-        <p className="text-title tabular">{label}</p>
+        <p className="type-heading-1 tabular">{label}</p>
         <ProgressBar value={progress.done} max={progress.total} label={label} />
       </Card>
 
       {waiting > 0 && (
-        <p role="status" className="flex animate-rise-in items-start gap-2 rounded-control bg-brand-50 px-4 py-3 text-small text-brand-900">
-          <CloudUploadIcon size={18} className="mt-px text-brand-700" />
+        <p role="status" className="flex animate-rise-in items-start gap-2 rounded-md bg-accent-tint px-4 py-3 type-body-sm text-accent-hover">
+          <CloudUploadIcon size={18} className="mt-px text-accent" />
           {t.checklist.waitingCount(waiting)}
         </p>
       )}
@@ -275,14 +275,14 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
         return (
           <section key={group.key} aria-labelledby={`group-${group.key}`} className="flex flex-col gap-2">
             <div className="flex items-baseline justify-between gap-4 px-1">
-              <h2 id={`group-${group.key}`} className="text-heading">
+              <h2 id={`group-${group.key}`} className="type-heading-2">
                 {t.checklist.groups[group.key]}
               </h2>
-              <span className={`text-small tabular ${groupDone === group.items.length ? "font-medium text-success-700" : "text-ink-muted"}`}>
+              <span className={`tabular ${groupDone === group.items.length ? "type-label text-pass" : "type-body-sm text-text-muted"}`}>
                 {groupDone}/{group.items.length}
               </span>
             </div>
-            <ul className="divide-y divide-line overflow-hidden rounded-card bg-surface shadow-card">
+            <ul className="divide-y divide-border overflow-hidden rounded-lg bg-surface shadow-card">
               {group.items.map((key) => {
                 const item = items[key];
                 const folded = Boolean(item.result) && active !== key;
@@ -319,7 +319,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
             <CheckIcon size={16} />
             {t.checklist.markRestOk(restEligible.length)}
           </TextButton>
-          <p className="max-w-sm text-caption text-ink-subtle">{t.checklist.markRestHint}</p>
+          <p className="max-w-sm type-caption text-text-subtle">{t.checklist.markRestHint}</p>
         </div>
       )}
 
@@ -330,7 +330,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
         description={
           <>
             <span className="block">{t.checklist.markRestConfirm(restEligible.length)}</span>
-            <span className="mt-2 block font-medium text-ink">{restEligible.map((k) => t.checklist.items[k].label).join(", ")}</span>
+            <span className="mt-2 block font-medium text-text">{restEligible.map((k) => t.checklist.items[k].label).join(", ")}</span>
           </>
         }
         confirmLabel={t.checklist.markRestYes}
@@ -342,7 +342,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
       />
 
       <StickyBar>
-        <p aria-live="polite" className={`flex items-center justify-center gap-2 text-center text-small ${progress.complete ? "font-medium text-success-700" : "text-ink-muted"}`}>
+        <p aria-live="polite" className={`flex items-center justify-center gap-2 text-center ${progress.complete ? "type-label text-pass" : "type-body-sm text-text-muted"}`}>
           {progress.complete && <CheckIcon size={16} />}
           {progress.complete ? (finished ? t.checklist.finished : t.checklist.allDone) : t.checklist.finishHint(remaining)}
         </p>
@@ -377,14 +377,14 @@ function FoldedRow({ itemKey, item, onOpen, onRetry }: { itemKey: ChecklistKey; 
         onClick={onOpen}
         aria-expanded={false}
         aria-label={`${label}: ${t.checklist.results[result]}. ${t.checklist.change}`}
-        className="flex min-h-14 min-w-0 flex-1 items-center gap-4 py-2 pl-4 text-left transition-colors hover:bg-canvas sm:pl-6"
+        className="flex min-h-14 min-w-0 flex-1 items-center gap-4 py-2 pl-4 text-left transition-colors hover:bg-bg sm:pl-6"
       >
         <span className="min-w-0 flex-1">
           <span className="block font-medium break-words">{label}</span>
-          {item.note.trim() && <span className="block truncate text-small text-ink-muted">{item.note}</span>}
+          {item.note.trim() && <span className="block truncate type-body-sm text-text-muted">{item.note}</span>}
         </span>
         <Badge tone={resultTone[result]}>{t.checklist.results[result]}</Badge>
-        <ChevronDownIcon size={18} className="shrink-0 text-ink-subtle" />
+        <ChevronDownIcon size={18} className="shrink-0 text-text-subtle" />
       </button>
       {(item.save === "error" || item.save === "waiting") && <SaveState state={item.save} onRetry={onRetry} />}
     </div>
@@ -418,16 +418,16 @@ function ChecklistRow({
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 flex-col gap-1">
           <p className="font-semibold">{label}</p>
-          <p className="text-small text-ink-muted">{hint}</p>
+          <p className="type-body-sm text-text-muted">{hint}</p>
         </div>
         <SaveState state={item.save} onRetry={onRetry} />
       </div>
       {item.helpOpen && (
-        <p id={helpId} className="animate-rise-in rounded-control bg-brand-50 p-4 text-small text-brand-900">
+        <p id={helpId} className="animate-rise-in rounded-md bg-accent-tint p-4 type-body-sm text-accent-hover">
           {how}
         </p>
       )}
-      <Segmented label={label} options={resultOptions(t)} value={item.result} onChange={onChoose} columns="grid-cols-2 min-[420px]:grid-cols-4" />
+      <Segmented label={label} options={resultOptions(t)} value={item.result} onChange={onChoose} />
       <div className="-my-2 flex flex-wrap gap-x-6">
         {!item.noteOpen && (
           <TextButton onClick={onOpenNote}>
@@ -457,24 +457,24 @@ function ChecklistRow({
 
 function SaveState({ state, onRetry }: { state: SaveState; onRetry: () => void }) {
   const t = useT();
-  if (state === "saving") return <span className="shrink-0 text-caption text-ink-muted">{t.checklist.saving}</span>;
+  if (state === "saving") return <span className="shrink-0 type-caption text-text-muted">{t.checklist.saving}</span>;
   if (state === "saved")
     return (
-      <span className="inline-flex shrink-0 animate-fade-in items-center gap-1 text-caption font-semibold text-success-700">
+      <span className="inline-flex shrink-0 animate-fade-in items-center gap-1 type-caption-strong text-pass">
         <CheckIcon size={14} />
         {t.checklist.saved}
       </span>
     );
   if (state === "waiting")
     return (
-      <span className="inline-flex shrink-0 items-center gap-1 text-caption font-semibold text-ink-muted">
+      <span className="inline-flex shrink-0 items-center gap-1 type-caption-strong text-text-muted">
         <CloudUploadIcon size={14} />
         {t.checklist.waiting}
       </span>
     );
   if (state === "error")
     return (
-      <button type="button" onClick={onRetry} className="min-h-11 shrink-0 text-right text-caption font-semibold text-danger-700">
+      <button type="button" onClick={onRetry} className="min-h-11 shrink-0 text-right type-caption-strong text-fail">
         {t.checklist.saveFailed}
       </button>
     );

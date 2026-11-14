@@ -11,8 +11,8 @@ export default async function ReportNotFound() {
     <main className="flex flex-1 flex-col">
       {/* A buyer may land here from a WhatsApp link: show whose site this is. */}
       <header className="mx-auto flex w-full max-w-md px-4 pt-[calc(1rem+env(safe-area-inset-top))]">
-        <Link href="/" className="flex min-h-11 items-center gap-2 text-heading text-brand-700">
-          <span aria-hidden className="flex size-8 items-center justify-center rounded-chip bg-brand-700 text-small text-white">
+        <Link href="/" className="flex min-h-11 items-center gap-2 type-heading-2 text-accent">
+          <span aria-hidden className="flex size-8 items-center justify-center rounded-sm bg-accent type-body-sm text-white">
             {t.appName.charAt(0)}
           </span>
           {t.appName}

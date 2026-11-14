@@ -193,7 +193,7 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
     >
       <Card className="flex flex-col gap-6">
         <div>
-          <p className="mb-2 text-small font-medium">{t.onboarding.userType}</p>
+          <p className="mb-2 type-label ">{t.onboarding.userType}</p>
           <Segmented
             label={t.onboarding.userType}
             options={userTypeOptions(t)}
@@ -232,12 +232,12 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
       </Card>
 
       {/* Hidden rather than removed, so switching type and back keeps what was typed. */}
-      <section hidden={!isDealer} aria-labelledby="dealer-details" className="flex flex-col gap-6 rounded-card bg-surface p-4 shadow-card sm:p-6">
+      <section hidden={!isDealer} aria-labelledby="dealer-details" className="flex flex-col gap-6 rounded-lg bg-surface p-4 shadow-card sm:p-6">
         <div className="flex flex-col gap-1">
-          <h2 id="dealer-details" className="text-heading">
+          <h2 id="dealer-details" className="type-heading-2">
             {t.onboarding.dealerDetails}
           </h2>
-          <p className="text-small text-ink-muted">{t.onboarding.dealerDetailsHint}</p>
+          <p className="type-body-sm text-text-muted">{t.onboarding.dealerDetailsHint}</p>
         </div>
         <Field
           label={t.onboarding.businessName}
@@ -252,21 +252,21 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
         <div>
           <Label htmlFor="logo_file">{t.onboarding.logo}</Label>
           <div className="flex items-center gap-4">
-            <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-control bg-canvas ring-1 ring-line">
+            <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-md bg-bg ring-1 ring-border">
               {preview ? (
                 // eslint-disable-next-line @next/next/no-img-element -- blob: previews can't go through next/image
                 <img src={preview} alt="" className="size-full animate-fade-in object-contain" />
               ) : (
-                <TagIcon size={28} className="text-ink-subtle" />
+                <TagIcon size={28} className="text-text-subtle" />
               )}
             </div>
             <div className="flex flex-col items-start gap-1">
-              <label className={`${buttonClass("secondary", "cursor-pointer has-focus-visible:outline-2 has-focus-visible:outline-brand-700", false, "sm")}`}>
+              <label className={`${buttonClass("secondary", "cursor-pointer has-focus-visible:outline-2 has-focus-visible:outline-accent", false, "sm")}`}>
                 {preview ? t.onboarding.changeLogo : t.onboarding.chooseLogo}
                 <input ref={fileInput} id="logo_file" type="file" name="logo_file" accept={LOGO.mimeTypes.join(",")} onChange={onLogoChange} className="sr-only" />
               </label>
               {preview && (
-                <button type="button" onClick={removeLogo} className="min-h-11 rounded-chip px-2 text-small font-medium text-ink-muted transition-colors hover:bg-sunken">
+                <button type="button" onClick={removeLogo} className="min-h-11 rounded-sm px-2 type-label text-text-muted transition-colors hover:bg-surface-sunken">
                   {t.onboarding.removeLogo}
                 </button>
               )}
@@ -298,17 +298,17 @@ function ReportHeaderPreview({ logo, name, city }: { logo: string | null; name: 
   const t = useT();
   return (
     <div>
-      <p className="mb-2 text-small font-medium">{t.onboarding.previewTitle}</p>
-      <div className="flex items-center gap-4 rounded-control bg-canvas p-4">
+      <p className="mb-2 type-label ">{t.onboarding.previewTitle}</p>
+      <div className="flex items-center gap-4 rounded-md bg-bg p-4">
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element -- blob: preview
-          <img src={logo} alt="" className="size-12 shrink-0 rounded-control bg-surface object-contain ring-1 ring-line" />
+          <img src={logo} alt="" className="size-12 shrink-0 rounded-md bg-surface object-contain ring-1 ring-border" />
         ) : (
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-control bg-brand-700 font-semibold text-white">{name.trim().charAt(0).toUpperCase() || "?"}</span>
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-md bg-accent font-semibold text-white">{name.trim().charAt(0).toUpperCase() || "?"}</span>
         )}
         <div className="min-w-0">
           <p className="font-semibold break-words">{name}</p>
-          {city && <p className="text-small text-ink-muted">{city}</p>}
+          {city && <p className="type-body-sm text-text-muted">{city}</p>}
         </div>
       </div>
     </div>

@@ -66,10 +66,10 @@ const UNDO_MS = 6000;
 const typeOptions = (t: Strings) => FINDING_TYPES.map((value) => ({ value, label: t.findings.types[value] }));
 const severityOptions = (t: Strings) =>
   [
-    { value: "minor", label: t.findings.severities.minor, selectedClass: "bg-ink-muted text-white ring-ink-muted" },
-    { value: "moderate", label: t.findings.severities.moderate, selectedClass: "bg-warning-700 text-white ring-warning-700" },
-    { value: "major", label: t.findings.severities.major, selectedClass: "bg-danger-700 text-white ring-danger-700" },
-  ] as const satisfies readonly { value: Severity; label: string; selectedClass: string }[];
+    { value: "minor", label: t.findings.severities.minor, verdict: "attention" },
+    { value: "moderate", label: t.findings.severities.moderate, verdict: "attention" },
+    { value: "major", label: t.findings.severities.major, verdict: "fail" },
+  ] as const satisfies readonly { value: Severity; label: string; verdict: "attention" | "fail" }[];
 
 const kmFormat = new Intl.NumberFormat("en-IN");
 
@@ -268,7 +268,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
         title={t.findings.title}
         meta={
           <>
-            <span className="font-semibold tracking-wider text-ink tabular">{regNumber}</span>
+            <span className="font-semibold tracking-wider text-text tabular">{regNumber}</span>
             {carTitle && ` · ${carTitle}`}
           </>
         }
@@ -291,7 +291,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
 
       {attention.length > 0 && (
         <section aria-labelledby="needs-review" className="flex flex-col gap-4">
-          <h2 id="needs-review" className="px-1 text-heading">
+          <h2 id="needs-review" className="px-1 type-heading-2">
             {t.findings.sections.attention(attention.length)}
           </h2>
           {attention.map(photoGroup)}
@@ -300,7 +300,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
 
       {withNotes.length > 0 && (
         <section aria-labelledby="accepted-notes" className="flex flex-col gap-4">
-          <h2 id="accepted-notes" className="px-1 text-heading">
+          <h2 id="accepted-notes" className="px-1 type-heading-2">
             {t.findings.sections.accepted}
           </h2>
           {withNotes.map(photoGroup)}
@@ -308,15 +308,15 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
       )}
 
       {quiet.length > 0 && (
-        <details className="group rounded-card bg-surface shadow-card">
-          <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 rounded-card px-4 py-2 transition-colors hover:bg-canvas sm:px-6 [&::-webkit-details-marker]:hidden">
+        <details className="group rounded-lg bg-surface shadow-card">
+          <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 rounded-lg px-4 py-2 transition-colors hover:bg-bg sm:px-6 [&::-webkit-details-marker]:hidden">
             <span>
               <span className="block font-semibold">{t.findings.sections.quiet(quiet.length)}</span>
-              <span className="block text-small text-ink-muted">{t.findings.sections.quietHint}</span>
+              <span className="block type-body-sm text-text-muted">{t.findings.sections.quietHint}</span>
             </span>
-            <ChevronDownIcon size={20} className="shrink-0 text-ink-subtle transition-transform duration-200 group-open:rotate-180" />
+            <ChevronDownIcon size={20} className="shrink-0 text-text-subtle transition-transform duration-200 group-open:rotate-180" />
           </summary>
-          <div className="flex flex-col gap-4 border-t border-line bg-canvas/60 p-4">{quiet.map(photoGroup)}</div>
+          <div className="flex flex-col gap-4 border-t border-border bg-bg/60 p-4">{quiet.map(photoGroup)}</div>
         </details>
       )}
 
@@ -345,8 +345,8 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
         {active > 0 ? (
           <>
             <div className="flex flex-col gap-2">
-              <p className="flex items-center justify-center gap-2 text-small font-medium tabular">
-                <Spinner className="text-brand-700" />
+              <p className="flex items-center justify-center gap-2 type-label tabular">
+                <Spinner className="text-accent" />
                 {t.findings.analysing(photos.length - active, photos.length)}
               </p>
             </div>
@@ -369,7 +369,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
           </LinkButton>
         ) : (
           <>
-            <p className={`flex items-center justify-center gap-2 text-small font-medium ${failed.length ? "text-danger-700" : "text-success-700"}`}>
+            <p className={`flex items-center justify-center gap-2 type-label ${failed.length ? "text-fail" : "text-pass"}`}>
               {!failed.length && <CheckIcon size={16} />}
               {failed.length ? t.findings.someFailed(failed.length) : t.findings.allReviewed}
             </p>
@@ -394,23 +394,23 @@ function AnalysisProgress({ total, active, failed, onRetry }: { total: number; a
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <p className="flex items-center gap-2 font-semibold tabular">
-              <Spinner className="text-brand-700" />
+              <Spinner className="text-accent" />
               {label}
             </p>
-            <p className="text-small text-ink-muted">{t.findings.analysingHint}</p>
+            <p className="type-body-sm text-text-muted">{t.findings.analysingHint}</p>
           </div>
           <ProgressBar value={done} max={total} label={label} />
         </div>
       ) : failed > 0 ? (
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <p className="text-small font-medium text-danger-700">{t.findings.someFailed(failed)}</p>
+          <p className="type-label text-fail">{t.findings.someFailed(failed)}</p>
           <Button variant="secondary" size="sm" onClick={onRetry} icon={<RefreshIcon size={18} />} className="shrink-0">
             {t.findings.retryFailed}
           </Button>
         </div>
       ) : (
-        <p className="flex items-center gap-2 font-semibold text-success-700">
-          <span className="flex size-6 items-center justify-center rounded-full bg-success-50">
+        <p className="flex items-center gap-2 font-semibold text-pass">
+          <span className="flex size-6 items-center justify-center rounded-full bg-pass-tint">
             <CheckIcon size={16} />
           </span>
           {t.findings.analysisDone}
@@ -455,9 +455,9 @@ function OdometerCard({ carId, initialKm, photo }: { carId: string; initialKm: n
     return (
       <Card as="section" className="flex items-center justify-between gap-4">
         <div className="flex min-w-0 flex-col gap-1">
-          <h2 className="text-small text-ink-muted">{t.findings.odometer.title}</h2>
+          <h2 className="type-body-sm text-text-muted">{t.findings.odometer.title}</h2>
           <p className="flex items-center gap-2 font-semibold tabular">
-            <CheckIcon size={18} className="text-success-700" />
+            <CheckIcon size={18} className="text-pass" />
             {t.findings.odometer.confirmed(kmFormat.format(confirmed))}
           </p>
         </div>
@@ -480,8 +480,8 @@ function OdometerCard({ carId, initialKm, photo }: { carId: string; initialKm: n
     <form onSubmit={onSubmit} className={`${cardClass("warning")} flex flex-col gap-4`} noValidate>
       <div className="flex flex-col gap-1">
         <h2 className="font-semibold">{t.findings.odometer.title}</h2>
-        <p className="flex items-center gap-2 text-small text-ink-muted">
-          {checking && <Spinner className="text-brand-700" />}
+        <p className="flex items-center gap-2 type-body-sm text-text-muted">
+          {checking && <Spinner className="text-accent" />}
           {message}
         </p>
       </div>
@@ -535,12 +535,12 @@ function PhotoGroup({ photo, findings, onRetry, ...actions }: { photo: PhotoStat
             onClick={() => setExpanded((v) => !v)}
             aria-expanded={expanded}
             aria-label={`${label}: ${expanded ? t.findings.shrinkPhoto : t.findings.enlargePhoto}`}
-            className={`relative block shrink-0 overflow-hidden rounded-control transition-[width] ${expanded ? "bg-ink" : "bg-sunken"} duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 ${expanded ? "w-full" : "size-20"}`}
+            className={`relative block shrink-0 overflow-hidden rounded-md transition-[width] ${expanded ? "bg-text" : "bg-surface-sunken"} duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${expanded ? "w-full" : "size-20"}`}
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- private signed URL, not optimisable */}
             <img src={photo.url} alt="" loading="lazy" decoding="async" className={`size-full ${expanded ? "object-contain" : "object-cover"}`} />
             {!expanded && (
-              <span className="absolute right-1 bottom-1 flex size-7 items-center justify-center rounded-full bg-ink/70 text-white">
+              <span className="absolute right-1 bottom-1 flex size-7 items-center justify-center rounded-full bg-text/70 text-white">
                 <ZoomInIcon size={16} />
               </span>
             )}
@@ -556,18 +556,18 @@ function PhotoGroup({ photo, findings, onRetry, ...actions }: { photo: PhotoStat
 function PhotoStatus({ photo, findingCount, carId, onRetry }: { photo: PhotoState; findingCount: number; carId: string; onRetry: () => void }) {
   const t = useT();
   const s = t.findings.photoStatus;
-  if (photo.run === "queued" || (!photo.run && photo.aiStatus === "pending")) return <p className="text-small text-ink-muted">{s.queued}</p>;
+  if (photo.run === "queued" || (!photo.run && photo.aiStatus === "pending")) return <p className="type-body-sm text-text-muted">{s.queued}</p>;
   if (photo.run === "running")
     return (
-      <p className="flex items-center gap-2 text-small text-ink-muted">
-        <Spinner className="text-brand-700" />
+      <p className="flex items-center gap-2 type-body-sm text-text-muted">
+        <Spinner className="text-accent" />
         {s.pending}
       </p>
     );
   const retake = (
     <Link
       href={`/app/cars/${carId}/inspect?angle=${photo.angleKey}`}
-      className="-mx-2 inline-flex min-h-11 items-center gap-2 rounded-chip px-2 text-small font-semibold text-brand-700 transition-colors hover:bg-brand-50"
+      className="-mx-2 inline-flex min-h-11 items-center gap-2 rounded-sm px-2 type-label text-accent transition-colors hover:bg-accent-tint"
     >
       <RefreshIcon size={16} />
       {t.findings.retakePhoto}
@@ -576,14 +576,14 @@ function PhotoStatus({ photo, findingCount, carId, onRetry }: { photo: PhotoStat
   if (photo.limitReached)
     return (
       <div>
-        <p className="text-small font-medium text-danger-700">{s.limit}</p>
+        <p className="type-label text-fail">{s.limit}</p>
         {retake}
       </div>
     );
   if (photo.run === "error" || photo.aiStatus === "failed")
     return (
       <div>
-        <p className="text-small font-medium text-danger-700">{s.failed}</p>
+        <p className="type-label text-fail">{s.failed}</p>
         <div className="flex flex-wrap gap-x-4">
           <TextButton onClick={onRetry}>
             <RefreshIcon size={16} />
@@ -596,11 +596,11 @@ function PhotoStatus({ photo, findingCount, carId, onRetry }: { photo: PhotoStat
   if (photo.aiStatus === "unclear")
     return (
       <div>
-        <p className="text-small font-medium text-warning-700">{s.unclear}</p>
+        <p className="type-label text-attention">{s.unclear}</p>
         {retake}
       </div>
     );
-  return <p className="text-small text-ink-muted">{findingCount === 0 ? s.noDamage : s.done}</p>;
+  return <p className="type-body-sm text-text-muted">{findingCount === 0 ? s.noDamage : s.done}</p>;
 }
 
 function Group({
@@ -629,7 +629,7 @@ function Group({
         {media}
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <h3 className="font-semibold">{title}</h3>
-          {subtitle && <p className="text-small text-ink-muted">{subtitle}</p>}
+          {subtitle && <p className="type-body-sm text-text-muted">{subtitle}</p>}
           {status}
         </div>
       </div>
@@ -655,29 +655,29 @@ function Group({
 function FindingCard({ finding, onAccept, onEdit, onDelete }: { finding: FindingRow; onAccept: (accepted: boolean) => void; onEdit: () => void; onDelete: () => void }) {
   const t = useT();
   // Edit and Delete are compact (icon over a short label) so the row fits a 360px screen in any language.
-  const compact = "min-h-12 w-16 shrink-0 flex-col !gap-0.5 !px-1 !text-caption";
+  const compact = "min-h-12 w-16 shrink-0 flex-col !gap-0.5 !px-1 !type-caption";
 
   return (
     <article
-      className={`rounded-control p-4 ring-inset ${
-        finding.accepted ? "bg-surface ring-1 ring-line" : "bg-surface ring-2 ring-warning-200"
+      className={`rounded-md p-4 ring-inset ${
+        finding.accepted ? "bg-surface ring-1 ring-border" : "bg-surface ring-2 ring-attention/30"
       }`}
     >
       <div className="flex flex-wrap items-center gap-2">
         <span className="font-semibold">{t.findings.types[finding.type]}</span>
         <SeverityBadge severity={finding.severity} label={t.findings.severities[finding.severity]} />
         {finding.source === "ai" && (
-          <Badge icon={<SparklesIcon size={12} />} className="!bg-surface ring-1 ring-line ring-inset">
+          <Badge icon={<SparklesIcon size={12} />} className="!bg-surface ring-1 ring-border ring-inset">
             {t.findings.aiSuggestion}
           </Badge>
         )}
-        <span className={`ml-auto inline-flex items-center gap-1 text-caption font-semibold ${finding.accepted ? "text-success-700" : "text-warning-700"}`}>
+        <span className={`ml-auto inline-flex items-center gap-1 type-caption-strong ${finding.accepted ? "text-pass" : "text-attention"}`}>
           {finding.accepted && <CheckIcon size={14} />}
           {finding.accepted ? t.findings.accepted : t.findings.needsReview}
         </span>
       </div>
-      {finding.location && <p className="mt-2 text-small font-medium">{finding.location}</p>}
-      {finding.note && <p className="mt-1 text-small text-ink-muted">{finding.note}</p>}
+      {finding.location && <p className="mt-2 type-label ">{finding.location}</p>}
+      {finding.note && <p className="mt-1 type-body-sm text-text-muted">{finding.note}</p>}
 
       <div className="mt-4 flex gap-2">
         {finding.accepted ? (
@@ -693,7 +693,7 @@ function FindingCard({ finding, onAccept, onEdit, onDelete }: { finding: Finding
           <PencilIcon size={16} />
           {t.findings.edit}
         </Button>
-        <Button variant="secondary" size="sm" onClick={onDelete} className={`${compact} !text-danger-700`} aria-label={`${t.findings.delete}: ${t.findings.types[finding.type]}`}>
+        <Button variant="secondary" size="sm" onClick={onDelete} className={`${compact} !text-fail`} aria-label={`${t.findings.delete}: ${t.findings.types[finding.type]}`}>
           <TrashIcon size={16} />
           {t.findings.delete}
         </Button>
@@ -757,7 +757,7 @@ function FindingForm({
         error={errors.type}
       />
       <div>
-        <p className="mb-2 text-small font-medium">{t.findings.severity}</p>
+        <p className="mb-2 type-label ">{t.findings.severity}</p>
         <Segmented
           label={t.findings.severity}
           options={severityOptions(t)}

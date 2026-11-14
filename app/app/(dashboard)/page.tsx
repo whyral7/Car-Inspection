@@ -101,8 +101,8 @@ export default async function AppHome() {
       {noCredits && (
         <Card tone="warning" className="flex flex-col gap-4">
           <div>
-            <p className="font-semibold text-warning-800">{t.dashboard.noCreditsTitle}</p>
-            <p className="mt-1 text-small text-warning-800">{t.dashboard.noCreditsBody}</p>
+            <p className="font-semibold text-attention">{t.dashboard.noCreditsTitle}</p>
+            <p className="mt-1 type-body-sm text-attention">{t.dashboard.noCreditsBody}</p>
           </div>
           <LinkButton href="/app/credits" size="sm" className="self-start">
             {t.profile.buy}
@@ -116,8 +116,8 @@ export default async function AppHome() {
         <EmptyState icon={<CarIcon size={24} />} title={t.dashboard.emptyTitle} body={t.dashboard.emptyBody}>
           <ol className="flex flex-col gap-2 text-left">
             {t.dashboard.emptySteps.map((step, i) => (
-              <li key={step} className="flex items-center gap-4 rounded-control bg-canvas px-4 py-2 text-small">
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-700 text-caption font-semibold text-white">{i + 1}</span>
+              <li key={step} className="flex items-center gap-4 rounded-md bg-bg px-4 py-2 type-body-sm">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent type-caption-strong text-white">{i + 1}</span>
                 {step}
               </li>
             ))}

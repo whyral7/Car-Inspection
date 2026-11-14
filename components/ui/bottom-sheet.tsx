@@ -51,18 +51,18 @@ export function BottomSheet({
         onClose();
       }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
-      className="mx-auto mt-auto mb-0 max-h-[90dvh] w-full max-w-none animate-sheet-in overflow-y-auto rounded-t-sheet bg-surface p-0 text-ink shadow-sheet sm:my-auto sm:max-w-md sm:animate-rise-in sm:rounded-sheet"
+      className="mx-auto mt-auto mb-0 max-h-[90dvh] w-full max-w-none animate-sheet-in overflow-y-auto rounded-t-xl bg-surface p-0 text-text shadow-sheet sm:my-auto sm:max-w-md sm:animate-rise-in sm:rounded-xl"
     >
       {open && (
         <div className="flex flex-col gap-4 px-4 pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:p-6">
-          <span aria-hidden="true" className="mx-auto h-1 w-10 rounded-full bg-line sm:hidden" />
+          <span aria-hidden="true" className="mx-auto h-1 w-10 rounded-2xs bg-border sm:hidden" />
           <div className="flex items-start justify-between gap-4">
             <div className="flex flex-col gap-1">
-              <h2 id={titleId} className="text-heading">
+              <h2 id={titleId} className="type-heading-2">
                 {title}
               </h2>
               {description && (
-                <div id={descId} className="text-small text-ink-muted">
+                <div id={descId} className="type-body-sm text-text-muted">
                   {description}
                 </div>
               )}
@@ -71,7 +71,7 @@ export function BottomSheet({
               type="button"
               onClick={onClose}
               aria-label={closeLabel}
-              className="-mt-1 -mr-2 flex size-11 shrink-0 items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-sunken"
+              className="-mt-1 -mr-2 flex size-11 shrink-0 items-center justify-center rounded-md text-text-muted transition-colors hover:bg-surface-sunken"
             >
               <XIcon size={20} />
             </button>

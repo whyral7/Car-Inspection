@@ -22,8 +22,8 @@ function Section({ title, aside, children }: { title: string; aside?: string; ch
   return (
     <section className={cardClass()}>
       <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4">
-        <h2 className="text-heading">{title}</h2>
-        {aside && <p className="text-small text-ink-muted">{aside}</p>}
+        <h2 className="type-heading-2">{title}</h2>
+        {aside && <p className="type-body-sm text-text-muted">{aside}</p>}
       </div>
       {children}
     </section>
@@ -32,11 +32,11 @@ function Section({ title, aside, children }: { title: string; aside?: string; ch
 
 function Details({ rows }: { rows: DetailRow[] }) {
   return (
-    <dl className="divide-y divide-line">
+    <dl className="divide-y divide-border">
       {rows.map((row) => (
-        <div key={row.label} className="flex flex-wrap justify-between gap-x-4 py-3 text-small">
-          <dt className="text-ink-muted">{row.label}</dt>
-          <dd className={`text-right font-semibold ${row.warn ? "text-danger-700" : ""}`}>{row.value}</dd>
+        <div key={row.label} className="flex flex-wrap justify-between gap-x-4 py-3 type-body-sm">
+          <dt className="text-text-muted">{row.label}</dt>
+          <dd className={`text-right font-semibold ${row.warn ? "text-fail" : ""}`}>{row.value}</dd>
         </div>
       ))}
     </dl>
@@ -45,15 +45,15 @@ function Details({ rows }: { rows: DetailRow[] }) {
 
 function CheckList({ items }: { items: ReportCheckItem[] }) {
   return (
-    <ul className="divide-y divide-line">
+    <ul className="divide-y divide-border">
       {items.map((item) => (
         <li key={item.key} className="flex flex-wrap items-start gap-x-4 gap-y-1 py-3">
           <Badge tone={resultTone[item.result]} className="mt-px min-w-16 justify-center">
             {item.resultLabel}
           </Badge>
-          <span className="min-w-0 flex-1 text-small">
+          <span className="min-w-0 flex-1 type-body-sm">
             <span className="block">{item.label}</span>
-            {item.note && <span className="block text-ink-muted">{item.note}</span>}
+            {item.note && <span className="block text-text-muted">{item.note}</span>}
           </span>
         </li>
       ))}
@@ -113,15 +113,15 @@ function Flagged({ view, t }: { view: View; t: Strings }) {
   const { attention, fail } = flaggedChecks(view);
   if (attention.length + fail.length === 0) return null;
   return (
-    <ul className="mt-2 flex flex-col gap-1 text-small">
+    <ul className="mt-2 flex flex-col gap-1 type-body-sm">
       {fail.length > 0 && (
-        <li className="flex items-start gap-2 text-danger-700">
+        <li className="flex items-start gap-2 text-fail">
           <XIcon size={16} className="mt-0.5" />
           <span>{t.publicReport.flagged.fail(fail.join(", "))}</span>
         </li>
       )}
       {attention.length > 0 && (
-        <li className="flex items-start gap-2 text-warning-700">
+        <li className="flex items-start gap-2 text-attention">
           <AlertIcon size={16} className="mt-0.5" />
           <span>{t.publicReport.flagged.attention(attention.join(", "))}</span>
         </li>
@@ -162,13 +162,13 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
       <header className="flex items-center gap-4">
         {view.dealer.logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- small public logo, no need for the image optimiser
-          <img src={view.dealer.logoUrl} alt="" width={48} height={48} className="size-12 shrink-0 rounded-control bg-surface object-contain ring-1 ring-line" />
+          <img src={view.dealer.logoUrl} alt="" width={48} height={48} className="size-12 shrink-0 rounded-md bg-surface object-contain ring-1 ring-border" />
         ) : (
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-control bg-brand-700 text-heading text-white">{view.dealer.name.charAt(0).toUpperCase()}</span>
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-md bg-accent type-heading-2 text-white">{view.dealer.name.charAt(0).toUpperCase()}</span>
         )}
         <div className="min-w-0 flex-1">
-          <p className="text-heading break-words">{view.dealer.name}</p>
-          <p className="text-small text-ink-muted">{[view.dealer.city, t.publicReport.heading].filter(Boolean).join(" · ")}</p>
+          <p className="type-heading-2 break-words">{view.dealer.name}</p>
+          <p className="type-body-sm text-text-muted">{[view.dealer.city, t.publicReport.heading].filter(Boolean).join(" · ")}</p>
         </div>
         {shareUrl && <ShareButton url={shareUrl} title={shareTitle} className={buttonClass("ghost", "-mr-2 shrink-0 !px-2", false, "sm")} />}
       </header>
@@ -179,28 +179,28 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex min-w-0 flex-1 flex-col gap-2">
             <Plate reg={view.car.regNumber} className="self-start" />
-            <h1 className="text-title">{view.car.title}</h1>
+            <h1 className="type-heading-1">{view.car.title}</h1>
           </div>
           <ScoreBadge view={view} t={t} />
         </div>
         {summary && <p className="mt-4 font-medium text-balance">{summary}</p>}
         <Flagged view={view} t={t} />
         {inspectedOn && (
-          <p className="mt-1 flex items-center gap-2 text-small text-ink-muted">
-            <ShieldCheckIcon size={16} className="text-brand-700" />
+          <p className="mt-1 flex items-center gap-2 type-body-sm text-text-muted">
+            <ShieldCheckIcon size={16} className="text-accent" />
             {t.publicReport.inspectedOn(inspectedOn)}
           </p>
         )}
-        <p className="mt-4 flex items-start gap-2 text-caption text-balance text-ink-muted">
+        <p className="mt-4 flex items-start gap-2 type-caption text-balance text-text-muted">
           <InfoIcon size={14} className="mt-px" />
           {t.disclaimer}
         </p>
         <details className="group mt-2">
-          <summary className="-mx-2 inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-chip px-2 text-small font-semibold text-brand-700 transition-colors hover:bg-brand-50 [&::-webkit-details-marker]:hidden">
+          <summary className="-mx-2 inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm px-2 type-label text-accent transition-colors hover:bg-accent-tint [&::-webkit-details-marker]:hidden">
             {t.publicReport.scoreHowTitle}
             <ChevronDownIcon size={16} className="transition-transform duration-200 group-open:rotate-180" />
           </summary>
-          <p className="mt-2 animate-rise-in rounded-control bg-canvas p-4 text-small">{t.publicReport.scoreHow}</p>
+          <p className="mt-2 animate-rise-in rounded-md bg-bg p-4 type-body-sm">{t.publicReport.scoreHow}</p>
         </details>
         {view.car.details.length > 0 && (
           <div className="mt-2">
@@ -212,23 +212,23 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
       {view.findings && (
         <Section title={t.publicReport.findings} aside={t.publicReport.findingCount(view.findings.length)}>
           {view.findings.length === 0 ? (
-            <p className="text-small text-ink-muted">{t.publicReport.noFindings}</p>
+            <p className="type-body-sm text-text-muted">{t.publicReport.noFindings}</p>
           ) : (
             <ul className="flex flex-col gap-2">
               {view.findings.map((f, i) => (
                 <li
                   key={i}
-                  className="rounded-control p-4 ring-1 ring-line ring-inset"
+                  className="rounded-md p-4 ring-1 ring-border ring-inset"
                 >
                   <div className="flex flex-wrap items-start gap-2">
                     <SeverityBadge severity={f.severity} label={f.severityLabel} className="mt-px" />
                     <p className="min-w-0">
                       <span className="font-semibold">{f.typeLabel}</span>
-                      {f.location && <span className="text-ink"> · {f.location}</span>}
+                      {f.location && <span className="text-text"> · {f.location}</span>}
                     </p>
                   </div>
-                  {f.note && <p className="mt-1 text-small text-ink">{f.note}</p>}
-                  {f.photoLabel && <p className="mt-1 text-caption text-ink-muted">{t.publicReport.seenIn(f.photoLabel)}</p>}
+                  {f.note && <p className="mt-1 type-body-sm text-text">{f.note}</p>}
+                  {f.photoLabel && <p className="mt-1 type-caption text-text-muted">{t.publicReport.seenIn(f.photoLabel)}</p>}
                 </li>
               ))}
             </ul>
@@ -238,22 +238,22 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
 
       {view.price && (
         <Section title={t.publicReport.price}>
-          <p className="text-title tabular">{view.price.rangeText}</p>
-          <p className="mt-1 text-small text-ink-muted">
+          <p className="type-heading-1 tabular">{view.price.rangeText}</p>
+          <p className="mt-1 type-body-sm text-text-muted">
             {view.price.adjusted
               ? t.publicReport.priceAdjusted(view.price.marketRangeText, view.price.adjustmentText, view.scoreText)
               : t.publicReport.priceUnadjusted(view.price.marketRangeText)}
           </p>
-          {view.price.summary && <p className="mt-2 text-small text-ink">{view.price.summary}</p>}
-          <p className="mt-4 text-caption text-ink-muted">{t.publicReport.priceBasedOn(view.price.comparables.length, view.price.searchedOn)}</p>
+          {view.price.summary && <p className="mt-2 type-body-sm text-text">{view.price.summary}</p>}
+          <p className="mt-4 type-caption text-text-muted">{t.publicReport.priceBasedOn(view.price.comparables.length, view.price.searchedOn)}</p>
           {view.price.comparables.length > 0 && (
             <ul className="mt-1 flex flex-col">
               {view.price.comparables.map((c) => (
                 <li key={c.url}>
-                  <a href={c.url} target="_blank" rel="noopener noreferrer nofollow" className="-mx-2 flex min-h-12 items-center justify-between gap-4 rounded-chip px-2 py-1 text-small transition-colors hover:bg-canvas">
+                  <a href={c.url} target="_blank" rel="noopener noreferrer nofollow" className="-mx-2 flex min-h-12 items-center justify-between gap-4 rounded-sm px-2 py-1 type-body-sm transition-colors hover:bg-bg">
                     <span className="min-w-0">
-                      <span className="block truncate font-semibold text-brand-700 underline">{c.title}</span>
-                      <span className="block text-caption text-ink-muted">{[c.host, c.detail].filter(Boolean).join(" · ")}</span>
+                      <span className="block truncate font-semibold text-accent underline">{c.title}</span>
+                      <span className="block type-caption text-text-muted">{[c.host, c.detail].filter(Boolean).join(" · ")}</span>
                     </span>
                     {c.priceText && <span className="shrink-0 font-semibold">{c.priceText}</span>}
                   </a>
@@ -261,14 +261,14 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
               ))}
             </ul>
           )}
-          <p className="mt-4 text-caption text-ink-muted">{t.publicReport.priceDisclaimer}</p>
+          <p className="mt-4 type-caption text-text-muted">{t.publicReport.priceDisclaimer}</p>
         </Section>
       )}
 
       {view.photos && view.photos.length > 0 && (
         <Section title={t.publicReport.photos} aside={t.publicReport.photoCount(view.photos.length)}>
           <PhotoGallery photos={view.photos} />
-          <p className="mt-2 text-caption text-ink-muted">{t.publicReport.tapToEnlarge}</p>
+          <p className="mt-2 type-caption text-text-muted">{t.publicReport.tapToEnlarge}</p>
         </Section>
       )}
 
@@ -280,7 +280,7 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
           <div className="flex flex-col gap-4">
             {view.checklist.groups.map((g) => (
               <div key={g.key}>
-                <h3 className="text-caption font-semibold tracking-wide text-ink-muted uppercase">{g.label}</h3>
+                <h3 className="type-overline tracking-wide text-text-muted uppercase">{g.label}</h3>
                 <CheckList items={g.items} />
               </div>
             ))}
@@ -295,17 +295,17 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
         </Section>
       )}
 
-      <p className="flex items-start justify-center gap-2 rounded-card bg-sunken p-4 text-center text-small font-semibold">
-        <InfoIcon size={18} className="mt-px text-ink-muted" />
+      <p className="flex items-start justify-center gap-2 rounded-lg bg-surface-sunken p-4 text-center type-label ">
+        <InfoIcon size={18} className="mt-px text-text-muted" />
         {t.disclaimer}
       </p>
 
-      <footer className={cardClass("default", "md", "flex flex-col gap-1 text-small")}>
-        <p className="text-ink-muted">{t.publicReport.inspectedBy}</p>
+      <footer className={cardClass("default", "md", "flex flex-col gap-1 type-body-sm")}>
+        <p className="text-text-muted">{t.publicReport.inspectedBy}</p>
         <p className="font-semibold">{view.dealer.name}</p>
-        {view.dealer.ownerName && <p className="text-ink">{view.dealer.ownerName}</p>}
-        {place && <p className="text-ink">{place}</p>}
-        {phone && <p className="text-ink">{phone}</p>}
+        {view.dealer.ownerName && <p className="text-text">{view.dealer.ownerName}</p>}
+        {place && <p className="text-text">{place}</p>}
+        {phone && <p className="text-text">{phone}</p>}
         {pdfHref && (
           <a href={pdfHref} className={buttonClass("secondary", "mt-4")}>
             <DownloadIcon size={18} />
@@ -313,8 +313,8 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
           </a>
         )}
         {shareUrl && <ShareButton url={shareUrl} title={shareTitle} label={t.publicReport.shareLong} className={buttonClass("ghost", "mt-2")} />}
-        {view.publishedOn && <p className="mt-2 text-caption text-ink-muted">{t.publicReport.publishedOn(view.publishedOn)}</p>}
-        <p className="text-caption text-ink-muted">{t.publicReport.madeWith}</p>
+        {view.publishedOn && <p className="mt-2 type-caption text-text-muted">{t.publicReport.publishedOn(view.publishedOn)}</p>}
+        <p className="type-caption text-text-muted">{t.publicReport.madeWith}</p>
       </footer>
     </div>
   );

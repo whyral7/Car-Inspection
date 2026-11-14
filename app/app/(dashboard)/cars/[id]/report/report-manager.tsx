@@ -143,7 +143,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
         title={published ? t.report.publishedTitle : t.report.previewTitle}
         meta={
           <>
-            <span className="font-semibold tracking-wider text-ink tabular">{view.car.regNumber}</span>
+            <span className="font-semibold tracking-wider text-text tabular">{view.car.regNumber}</span>
             {view.car.title && ` · ${view.car.title}`}
           </>
         }
@@ -152,14 +152,14 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
 
       {!ready && (
         <Card tone="warning" className="flex items-start gap-4">
-          <AlertIcon className="mt-0.5 text-warning-700" />
-          <p className="text-small text-warning-800">{t.report.notReady}</p>
+          <AlertIcon className="mt-0.5 text-attention" />
+          <p className="type-body-sm text-attention">{t.report.notReady}</p>
         </Card>
       )}
 
       {unreviewed > 0 && (
         <Card tone="warning" className="flex flex-wrap items-center gap-4">
-          <p className="min-w-0 flex-1 text-small text-warning-800">{t.report.unreviewed(unreviewed)}</p>
+          <p className="min-w-0 flex-1 type-body-sm text-attention">{t.report.unreviewed(unreviewed)}</p>
           <LinkButton href={`/app/cars/${carId}/findings`} variant="secondary" size="sm" className="shrink-0">
             {t.report.reviewNotes}
           </LinkButton>
@@ -169,19 +169,19 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
       {published && (
         <Card as="section" className="flex animate-rise-in flex-col gap-4">
           <div className="flex items-center gap-4">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-success-50 text-success-700">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-pass-tint text-pass">
               <CheckIcon size={20} />
             </span>
             <div className="flex flex-col">
               <h2 className="font-semibold">{t.report.published}</h2>
-              {view.publishedOn && <p className="text-small text-ink-muted">{t.report.publishedOn(view.publishedOn)}</p>}
+              {view.publishedOn && <p className="type-body-sm text-text-muted">{t.report.publishedOn(view.publishedOn)}</p>}
             </div>
           </div>
           {/* What the buyer sees in WhatsApp before tapping the link. */}
-          <figure className="overflow-hidden rounded-control bg-canvas ring-1 ring-line">
+          <figure className="overflow-hidden rounded-md bg-bg ring-1 ring-border">
             {/* eslint-disable-next-line @next/next/no-img-element -- generated link preview image */}
             <img src={`${reportPath(published.slug)}/og.png`} alt="" width={1200} height={630} loading="lazy" className="aspect-[1200/630] w-full bg-surface object-cover" />
-            <figcaption className="px-4 py-2 text-caption text-ink-muted">{t.report.previewCard}</figcaption>
+            <figcaption className="px-4 py-2 type-caption text-text-muted">{t.report.previewCard}</figcaption>
           </figure>
           <div className="grid grid-cols-2 gap-2">
             <ShareButton url={published.url} title={shareText} text={shareText} label={t.report.shareOther} className={buttonClass("secondary", "", false, "sm")} />
@@ -197,16 +197,16 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
               {t.report.downloadPdf}
             </a>
           </div>
-          <label className="flex flex-col gap-2 text-small font-medium">
+          <label className="flex flex-col gap-2 type-label ">
             {t.report.link}
             <input
               readOnly
               value={published.url}
               onFocus={(e) => e.currentTarget.select()}
-              className="min-h-12 rounded-control bg-sunken px-4 text-body font-normal text-ink-muted tabular focus:shadow-focus focus:outline-none"
+              className="min-h-12 rounded-md bg-surface-sunken px-4 type-body font-normal text-text-muted tabular  focus:outline-none"
             />
           </label>
-          <p className="text-caption text-ink-muted">
+          <p className="type-caption text-text-muted">
             {t.report.liveHint} {t.report.pdfHint}
           </p>
         </Card>
@@ -217,19 +217,19 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
           title={t.report.sectionsTitle}
           aside={
             sectionsSave === "saving" ? (
-              <span className="inline-flex items-center gap-1.5 text-caption">
+              <span className="inline-flex items-center gap-1.5 type-caption">
                 <Spinner className="size-3.5" />
                 {t.report.savingSections}
               </span>
             ) : sectionsSave === "saved" ? (
-              <span className="inline-flex animate-fade-in items-center gap-1 text-caption font-medium text-success-700">
+              <span className="inline-flex animate-fade-in items-center gap-1 type-caption-strong text-pass">
                 <CheckIcon size={14} />
                 {t.report.sectionsSaved}
               </span>
             ) : null
           }
         />
-        <ul className="-my-2 divide-y divide-line">
+        <ul className="-my-2 divide-y divide-border">
           {REPORT_SECTIONS.filter((section) => section !== "price" || view.price).map((section) => {
             const shown = !hidden.includes(section);
             return (
@@ -248,26 +248,26 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
 
       <Card as="section" className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <h2 className="text-heading">{t.report.price.title}</h2>
+          <h2 className="type-heading-2">{t.report.price.title}</h2>
           {view.price ? (
             <>
-              <p className="text-title tabular">{view.price.rangeText}</p>
-              <p className="text-caption text-ink-muted">
+              <p className="type-heading-1 tabular">{view.price.rangeText}</p>
+              <p className="type-caption text-text-muted">
                 {view.price.searchedOn} · {hidden.includes("price") ? t.report.price.hiddenOnReport : t.report.price.shownOnReport}
               </p>
             </>
           ) : (
-            <p className="text-small text-ink-muted">{t.report.price.intro}</p>
+            <p className="type-body-sm text-text-muted">{t.report.price.intro}</p>
           )}
         </div>
         {searching !== null ? (
-          <div role="status" className="flex animate-rise-in flex-col gap-2 rounded-control bg-brand-50 p-4">
-            <p className="flex items-center gap-2 text-small font-medium text-brand-900">
-              <Spinner className="text-brand-700" />
+          <div role="status" className="flex animate-rise-in flex-col gap-2 rounded-md bg-accent-tint p-4">
+            <p className="flex items-center gap-2 type-label text-accent-hover">
+              <Spinner className="text-accent" />
               {t.report.price.stages[stage]}
             </p>
             <ProgressBar value={Math.min(57, searching)} max={60} label={t.report.price.stages[stage]} size="sm" className="!bg-surface" />
-            <p className="text-caption text-brand-900 tabular">{t.report.price.elapsed(searching)}</p>
+            <p className="type-caption text-accent-hover tabular">{t.report.price.elapsed(searching)}</p>
           </div>
         ) : (
           <Button variant={view.price ? "secondary" : "primary"} onClick={onEstimate} disabled={searchesLeft < 1} icon={view.price ? <RefreshIcon size={18} /> : <SearchIcon size={18} />}>
@@ -275,7 +275,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
           </Button>
         )}
         {searching === null && (
-          <p className="text-center text-caption text-ink-muted">
+          <p className="text-center type-caption text-text-muted">
             {searchesLeft < 1 ? t.report.price.errors.limit(PRICE.maxPerCarPerDay) : t.report.price.left(searchesLeft, PRICE.maxPerCarPerDay)}
           </p>
         )}
@@ -283,8 +283,8 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
       </Card>
 
       {/* The buyer's view, set off by a dashed rule rather than another box around the report's own cards. */}
-      <section aria-label={t.report.previewLabel} className="flex flex-col gap-4 border-t-2 border-dashed border-line-strong/40 pt-4">
-        <p className="text-center text-caption font-semibold tracking-wide text-ink-muted uppercase">{t.report.previewLabel}</p>
+      <section aria-label={t.report.previewLabel} className="flex flex-col gap-4 border-t-2 border-dashed border-border-control/40 pt-4">
+        <p className="text-center type-overline tracking-wide text-text-muted uppercase">{t.report.previewLabel}</p>
         <div>
           <ReportView view={preview} t={t} pdfHref={null} />
           <div className="mt-4">
@@ -312,7 +312,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
         {canPublish ? (
           outOfCredits ? (
             <>
-              <p className="text-center text-small font-medium text-warning-700">{t.report.noCredits}</p>
+              <p className="text-center type-label text-attention">{t.report.noCredits}</p>
               <LinkButton href={`/app/credits?next=${encodeURIComponent(`/app/cars/${carId}/report`)}`}>
                 {t.report.buyCredits}
                 <ArrowRightIcon size={20} />
@@ -324,7 +324,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
               <Button onClick={() => setConfirmPublish(true)} loading={publishing}>
                 {publishing ? t.report.publishing : t.report.publish}
               </Button>
-              <p className="text-center text-small text-ink-muted">{t.report.publishCost(credits)}</p>
+              <p className="text-center type-body-sm text-text-muted">{t.report.publishCost(credits)}</p>
             </>
           )
         ) : published ? (

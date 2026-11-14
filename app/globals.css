@@ -1,7 +1,52 @@
 @import "tailwindcss";
-@import "./tokens.css";
+/* Treadmark brand: tokens (primitive -> semantic -> component), base type, and the Tailwind theme that maps
+   utilities onto them. Rules live in .claude/skills/treadmark-brand/SKILL.md. Never add raw colours here. */
+@import "../brand/tokens/treadmark-tokens.css";
+@import "../brand/tokens/treadmark-base.css";
+@import "../brand/tokens/treadmark-tailwind-v4.css";
+
+/*
+ * Motion (brand book, "Motion"): dur-fast for presses and ticks, dur-base for sheets and toasts.
+ * Things fade or slide in once; nothing bounces.
+ */
+@theme inline {
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --default-transition-duration: var(--dur-fast);
+  --default-transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+
+  --animate-fade-in: fade-in var(--dur-base) var(--ease-standard);
+  --animate-rise-in: rise-in var(--dur-base) var(--ease-standard);
+  --animate-sheet-in: sheet-in var(--dur-base) var(--ease-standard);
+  --animate-pop: pop var(--dur-fast) var(--ease-standard);
+  --animate-spin: spin var(--dur-spin) linear infinite;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  @keyframes sheet-in {
+    from {
+      transform: translateY(100%);
+    }
+  }
+  @keyframes pop {
+    from {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+  }
+}
 
 :root {
+  /* Light only for now: <html data-theme="light"> in app/layout.tsx. Remove that attribute to let dark mode
+     follow the phone once every screen has been checked in dark. */
   color-scheme: light;
 }
 
@@ -14,7 +59,7 @@ html {
 }
 
 body {
-  @apply bg-canvas font-sans text-body text-ink antialiased;
+  @apply bg-bg text-text antialiased;
 }
 
 /*
@@ -36,22 +81,13 @@ body {
   }
 }
 
-/* Numbers that change or line up (scores, counts, prices) don't jiggle. */
-.tabular {
-  font-variant-numeric: tabular-nums;
-}
-
 ::selection {
-  background: var(--color-brand-100);
-}
-
-:focus-visible {
-  outline: 2px solid var(--color-brand-700);
-  outline-offset: 2px;
+  background: var(--accent-tint);
 }
 
 dialog::backdrop {
-  background: rgb(11 18 32 / 0.48);
+  /* Lighter than the photo scrim, so the screen behind a sheet stays recognisable. */
+  background: color-mix(in srgb, var(--scrim-75) 70%, transparent);
 }
 dialog[open]::backdrop {
   animation: var(--animate-fade-in);
@@ -59,18 +95,16 @@ dialog[open]::backdrop {
 
 /*
  * Reduced motion keeps the feedback and drops the movement: sheets, toasts and new cards fade in
- * instead of sliding or popping, presses don't shrink, and nothing pulses or scrolls smoothly.
- * Colour and opacity changes stay, so state changes are still visible. The spinner keeps turning:
- * it is the only sign that something is still happening.
+ * instead of sliding, presses don't shrink, and nothing pulses or scrolls smoothly. The brand base
+ * layer cuts every animation to 1ms; the spinner is put back, because it is the only sign that
+ * something is still happening.
  */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
-  .animate-sheet-in,
-  .animate-rise-in,
-  .animate-pop {
-    animation: var(--animate-fade-in);
+  .animate-spin {
+    animation-duration: var(--dur-spin) !important;
   }
   .animate-pulse {
     animation: none;
@@ -78,7 +112,6 @@ dialog[open]::backdrop {
   *,
   *::before,
   *::after {
-    transition-property: color, background-color, border-color, outline-color, opacity, box-shadow !important;
     scale: none !important;
   }
 }

@@ -111,13 +111,13 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
           <StatusBadge status={car.status} t={t} />
         </div>
         <div className="flex flex-col gap-1">
-          <h1 className="text-title break-words">{carTitle(car) || car.reg_number}</h1>
-          <p className="text-small text-ink-muted">{car.rc_raw ? t.car.fromRc : t.car.enteredManually}</p>
+          <h1 className="type-heading-1 break-words">{carTitle(car) || car.reg_number}</h1>
+          <p className="type-body-sm text-text-muted">{car.rc_raw ? t.car.fromRc : t.car.enteredManually}</p>
         </div>
       </header>
 
       {!state.score && state.toReview > 0 && state.checklist.done > 0 && (
-        <Card tone="muted" className="text-small text-ink-muted">
+        <Card tone="muted" className="type-body-sm text-text-muted">
           {t.car.scoreWaiting(state.toReview)}
         </Card>
       )}
@@ -137,10 +137,10 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
 
       <section aria-labelledby="steps-title" className="flex flex-col gap-2">
         <div className="flex items-baseline justify-between gap-4 px-1">
-          <h2 id="steps-title" className="text-heading">
+          <h2 id="steps-title" className="type-heading-2">
             {t.car.steps}
           </h2>
-          <p className="text-small text-ink-muted tabular">{t.car.stepsDone(state.stepsDone)}</p>
+          <p className="type-body-sm text-text-muted tabular">{t.car.stepsDone(state.stepsDone)}</p>
         </div>
         <ListCard>
           {steps.map((step, i) => {
@@ -152,36 +152,36 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
                 highlight={current}
                 leading={
                   <span
-                    className={`flex size-8 shrink-0 items-center justify-center rounded-full text-small font-semibold ${
-                      step.done ? "bg-brand-700 text-white" : step.warn ? "bg-warning-50 text-warning-800" : current ? "text-brand-800 ring-2 ring-brand-700 ring-inset" : "bg-sunken text-ink-muted"
+                    className={`flex size-8 shrink-0 items-center justify-center rounded-full type-label ${
+                      step.done ? "bg-accent text-white" : step.warn ? "bg-attention-tint text-attention" : current ? "text-accent-hover ring-2 ring-accent ring-inset" : "bg-surface-sunken text-text-muted"
                     }`}
                   >
                     {step.done ? <CheckIcon size={16} /> : i + 1}
                   </span>
                 }
                 title={step.title}
-                subtitle={<span className={step.warn ? "font-medium text-warning-700" : undefined}>{step.status}</span>}
+                subtitle={<span className={step.warn ? "font-medium text-attention" : undefined}>{step.status}</span>}
               />
             );
           })}
         </ListCard>
       </section>
 
-      <details className="group rounded-card bg-surface shadow-card">
-        <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded-card px-4 font-semibold transition-colors hover:bg-canvas sm:px-6 [&::-webkit-details-marker]:hidden">
+      <details className="group rounded-lg bg-surface shadow-card">
+        <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded-lg px-4 font-semibold transition-colors hover:bg-bg sm:px-6 [&::-webkit-details-marker]:hidden">
           {t.car.details}
-          <ChevronDownIcon size={20} className="text-ink-subtle transition-transform duration-200 group-open:rotate-180" />
+          <ChevronDownIcon size={20} className="text-text-subtle transition-transform duration-200 group-open:rotate-180" />
         </summary>
-        <dl className="divide-y divide-line border-t border-line px-4 sm:px-6">
+        <dl className="divide-y divide-border border-t border-border px-4 sm:px-6">
           {rows.map((row) => (
-            <div key={row.label} className="flex flex-wrap justify-between gap-x-4 py-3 text-small">
-              <dt className="text-ink-muted">{row.label}</dt>
-              <dd className={`text-right font-medium ${row.warn ? "text-danger-700" : row.value ? "" : "text-ink-subtle"}`}>{row.value ?? t.car.notSet}</dd>
+            <div key={row.label} className="flex flex-wrap justify-between gap-x-4 py-3 type-body-sm">
+              <dt className="text-text-muted">{row.label}</dt>
+              <dd className={`text-right font-medium ${row.warn ? "text-fail" : row.value ? "" : "text-text-subtle"}`}>{row.value ?? t.car.notSet}</dd>
             </div>
           ))}
         </dl>
-        <div className="border-t border-line px-4 py-2 sm:px-6">
-          <Link href={`${base}/edit`} className="-mx-2 inline-flex min-h-11 items-center gap-2 rounded-chip px-2 text-small font-semibold text-brand-700 transition-colors hover:bg-brand-50">
+        <div className="border-t border-border px-4 py-2 sm:px-6">
+          <Link href={`${base}/edit`} className="-mx-2 inline-flex min-h-11 items-center gap-2 rounded-sm px-2 type-label text-accent transition-colors hover:bg-accent-tint">
             <PencilIcon size={16} />
             {t.car.editDetails}
           </Link>
@@ -196,7 +196,7 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
           {nextLabel[state.next]}
           <ArrowRightIcon size={20} />
         </LinkButton>
-        <p className="text-center text-small text-ink-muted">{t.car.nextHint[state.next]}</p>
+        <p className="text-center type-body-sm text-text-muted">{t.car.nextHint[state.next]}</p>
       </StickyBar>
     </div>
   );

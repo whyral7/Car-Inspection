@@ -18,8 +18,8 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-8 px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <Link href="/" className="flex min-h-11 items-center gap-2 text-heading text-brand-700" aria-label={`${t.appName}: ${t.common.goToSite}`}>
-          <span aria-hidden className="flex size-8 items-center justify-center rounded-chip bg-brand-700 text-small text-white">
+        <Link href="/" className="flex min-h-11 items-center gap-2 type-heading-2 text-accent" aria-label={`${t.appName}: ${t.common.goToSite}`}>
+          <span aria-hidden className="flex size-8 items-center justify-center rounded-sm bg-accent type-body-sm text-white">
             T
           </span>
           {t.appName}
@@ -27,18 +27,18 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
         <LanguageToggle />
       </div>
       <LoginForm nextPath={nextPath} />
-      <p className="-mt-4 text-center text-small leading-10 text-ink-muted">
+      <p className="-mt-4 text-center type-body-sm leading-10 text-text-muted">
         {t.login.agree}{" "}
-        <Link href="/terms" className="py-2.5 font-semibold text-brand-700 underline">
+        <Link href="/terms" className="py-2.5 font-semibold text-accent underline">
           {t.login.terms}
         </Link>{" "}
         {t.login.and}{" "}
-        <Link href="/privacy" className="py-2.5 font-semibold text-brand-700 underline">
+        <Link href="/privacy" className="py-2.5 font-semibold text-accent underline">
           {t.login.privacy}
         </Link>
         .
       </p>
-      <p className="mt-auto text-center text-caption text-balance text-ink-muted">{t.disclaimer}</p>
+      <p className="mt-auto text-center type-caption text-balance text-text-muted">{t.disclaimer}</p>
     </main>
   );
 }

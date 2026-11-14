@@ -1,28 +1,34 @@
 import type { ComponentProps, ReactNode } from "react";
-import { AlertIcon } from "@/components/icons";
+import { AlertIcon, ChevronDownIcon } from "@/components/icons";
 
+// Brand TextField (brand/reference/components/TextField.md): a label above, the input, then one line of
+// help or error below. 48px tall, 16px text so iOS doesn't zoom, a border-control edge (3:1). Reads only input-* tokens.
 export const inputClass =
-  "block min-h-12 w-full rounded-control border border-line-strong bg-surface px-4 text-body text-ink transition-[border-color,box-shadow] duration-150 placeholder:text-ink-subtle focus:border-brand-700 focus:shadow-focus focus:outline-none disabled:bg-sunken disabled:text-ink-muted aria-invalid:border-danger-700 aria-invalid:focus:shadow-[0_0_0_4px_var(--color-danger-50)]";
+  "block min-h-[var(--input-height)] w-full rounded-md border border-input-border bg-input-bg px-[var(--input-padding-x)] text-input-fg transition-[border-color] [font:var(--input-font)] placeholder:text-input-placeholder hover:border-input-border-hover focus:border-input-border-focus disabled:bg-input-disabled-bg disabled:opacity-[var(--button-disabled-opacity)] aria-invalid:border-2 aria-invalid:border-input-border-error";
+
+/** Registration and chassis numbers: mono, uppercase, spaced. Add autoCapitalize="characters". */
+export const plateInputClass = "uppercase tracking-[var(--tracking-wide)] [font:var(--input-plate-font)] placeholder:normal-case placeholder:tracking-normal placeholder:[font:var(--input-font)]";
 
 export function Label({ htmlFor, children, optional }: { htmlFor: string; children: ReactNode; optional?: string }) {
   return (
-    <label htmlFor={htmlFor} className="mb-2 flex items-baseline justify-between gap-2 text-small font-medium text-ink">
+    <label htmlFor={htmlFor} className="mb-[var(--field-gap)] flex items-baseline justify-between gap-2 type-label text-input-label">
       {children}
-      {optional && <span className="text-caption font-normal text-ink-subtle">{optional}</span>}
+      {optional && <span className="type-caption text-input-help">{optional}</span>}
     </label>
   );
 }
 
+/** The line under a field: help, or the error written as the fix. */
 export function FieldMessage({ id, error, hint }: { id?: string; error?: string; hint?: ReactNode }) {
   if (error) {
     return (
-      <p id={id} className="mt-2 flex items-start gap-1.5 text-small font-medium text-danger-700">
-        <AlertIcon size={16} className="mt-0.5" />
+      <p id={id} className="mt-[var(--field-gap)] flex items-start gap-1.5 type-caption-strong text-input-error">
+        <AlertIcon size={16} className="mt-px" />
         {error}
       </p>
     );
   }
-  return hint ? <p className="mt-2 text-small text-ink-muted">{hint}</p> : null;
+  return hint ? <p className="mt-[var(--field-gap)] type-caption text-input-help">{hint}</p> : null;
 }
 
 type FieldProps = {
@@ -31,11 +37,15 @@ type FieldProps = {
   error?: string;
   hint?: ReactNode;
   prefix?: string;
+  /** Unit shown inside the field on the right, in mono: km, mm, µm, V. */
+  unit?: string;
+  /** Sets the value like a number plate (mono, uppercase, spaced). */
+  plate?: boolean;
   optional?: string;
 } & Omit<ComponentProps<"input">, "name" | "prefix">;
 
 /** Label, input, then a hint or an error. Pass `inputMode`, `autoComplete` and `enterKeyHint` so phones show the right keyboard. */
-export function Field({ label, name, error, hint, prefix, optional, className, ...props }: FieldProps) {
+export function Field({ label, name, error, hint, prefix, unit, plate, optional, className, ...props }: FieldProps) {
   const errorId = error ? `${name}-error` : undefined;
   return (
     <div className={className}>
@@ -44,9 +54,19 @@ export function Field({ label, name, error, hint, prefix, optional, className, .
       </Label>
       <div className="flex items-stretch gap-2">
         {prefix && (
-          <span className="flex min-h-12 items-center rounded-control bg-sunken px-4 text-body font-medium text-ink-muted tabular">{prefix}</span>
+          <span className="flex min-h-[var(--input-height)] items-center rounded-md bg-surface-sunken px-[var(--input-padding-x)] type-reading text-text-muted">{prefix}</span>
         )}
-        <input id={name} name={name} aria-invalid={Boolean(error)} aria-describedby={errorId} className={inputClass} {...props} />
+        <span className="relative min-w-0 flex-1">
+          <input
+            id={name}
+            name={name}
+            aria-invalid={Boolean(error)}
+            aria-describedby={errorId}
+            className={`${inputClass} ${plate ? plateInputClass : ""} ${unit ? "pr-12" : ""}`}
+            {...props}
+          />
+          {unit && <span className="pointer-events-none absolute top-1/2 right-[var(--input-padding-x)] -translate-y-1/2 text-input-unit [font:var(--input-unit-font)]">{unit}</span>}
+        </span>
       </div>
       <FieldMessage id={errorId} error={error} hint={hint} />
     </div>
@@ -85,9 +105,7 @@ export function SelectField({ label, name, options, placeholder, error, optional
             </option>
           ))}
         </select>
-        <svg aria-hidden="true" viewBox="0 0 24 24" className="pointer-events-none absolute top-1/2 right-4 size-5 -translate-y-1/2 text-ink-muted" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-          <path d="m6 9 6 6 6-6" />
-        </svg>
+        <ChevronDownIcon size={20} className="pointer-events-none absolute top-1/2 right-[var(--input-padding-x)] -translate-y-1/2 text-text-muted" />
       </div>
       <FieldMessage id={errorId} error={error} />
     </div>
@@ -118,8 +136,8 @@ export function TextAreaField({ label, name, error, optional, className, ...prop
 export function FormError({ message }: { message?: string | null }) {
   if (!message) return null;
   return (
-    <p role="alert" className="flex animate-rise-in items-start gap-2 rounded-control bg-danger-50 px-4 py-3 text-small font-medium text-danger-800">
-      <AlertIcon size={18} className="mt-px" />
+    <p role="alert" className="flex animate-rise-in items-start gap-2 rounded-md bg-fail-tint px-4 py-3 type-label text-text">
+      <AlertIcon size={18} className="mt-px text-fail" />
       <span>{message}</span>
     </p>
   );

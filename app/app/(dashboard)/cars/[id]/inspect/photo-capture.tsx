@@ -291,7 +291,7 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
         title={t.photos.title}
         meta={
           <>
-            <span className="font-semibold tracking-wider text-ink tabular">{regNumber}</span>
+            <span className="font-semibold tracking-wider text-text tabular">{regNumber}</span>
             {carTitle && ` · ${carTitle}`}
           </>
         }
@@ -323,7 +323,7 @@ export function PhotoCapture({ carId, carTitle, regNumber, initialPhotos, startA
           </>
         ) : (
           <>
-            <p className="text-center text-small text-ink-muted">{t.photos.missingRequired(progress.requiredTotal - requiredCovered)}</p>
+            <p className="text-center type-body-sm text-text-muted">{t.photos.missingRequired(progress.requiredTotal - requiredCovered)}</p>
             {nextAngle && (
               <Button onClick={() => go(nextIndex)} icon={<CameraIcon />}>
                 {t.photos.continueWith(t.photos.angles[nextAngle.key].label)}
@@ -342,7 +342,7 @@ function ProgressCard({ progress }: { progress: ReturnType<typeof photoProgress>
   return (
     <Card className="flex flex-col gap-4" aria-label={label}>
       <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-        <p className="text-title tabular">{label}</p>
+        <p className="type-heading-1 tabular">{label}</p>
         <Badge tone={progress.allRequiredDone ? "success" : "warning"} dot className="tabular">
           {t.photos.requiredProgress(progress.requiredDone, progress.requiredTotal)}
         </Badge>
@@ -355,8 +355,8 @@ function ProgressCard({ progress }: { progress: ReturnType<typeof photoProgress>
 function WaitingNote({ count }: { count: number }) {
   const t = useT();
   return (
-    <p role="status" className="flex animate-rise-in items-start gap-2 rounded-control bg-brand-50 px-4 py-3 text-small text-brand-900">
-      <CloudUploadIcon size={18} className="mt-px text-brand-700" />
+    <p role="status" className="flex animate-rise-in items-start gap-2 rounded-md bg-accent-tint px-4 py-3 type-body-sm text-accent-hover">
+      <CloudUploadIcon size={18} className="mt-px text-accent" />
       {t.photos.waitingCount(count)}
     </p>
   );
@@ -370,12 +370,12 @@ function Tile({ angle, slot, onOpen }: { angle: Angle; slot: Slot | undefined; o
   // Ring colour says what needs doing: red for a problem, amber for a required photo still to take.
   const ring =
     status === "failed" || status === "review"
-      ? "ring-2 ring-danger-600"
+      ? "ring-2 ring-fail"
       : status
-        ? "ring-1 ring-line"
+        ? "ring-1 ring-border"
         : angle.required
-          ? "ring-1 ring-line-strong/60"
-          : "ring-1 ring-line";
+          ? "ring-1 ring-border-control/60"
+          : "ring-1 ring-border";
   const statusText = status ? t.photos.status[status] : angle.required ? t.photos.required : t.photos.optional;
   const src = (!thumbBroken && slot?.thumbUrl) || slot?.url;
 
@@ -384,23 +384,23 @@ function Tile({ angle, slot, onOpen }: { angle: Angle; slot: Slot | undefined; o
       type="button"
       onClick={onOpen}
       aria-label={`${angle.number}. ${label}. ${statusText}`}
-      className={`block w-full overflow-hidden rounded-card bg-surface text-left shadow-card transition-transform duration-150 ring-inset active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 ${ring}`}
+      className={`block w-full overflow-hidden rounded-lg bg-surface text-left shadow-card transition-transform duration-150 ring-inset active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${ring}`}
     >
-      <div className="relative aspect-square bg-canvas">
+      <div className="relative aspect-square bg-bg">
         {src ? (
           // eslint-disable-next-line @next/next/no-img-element -- private signed URL or local blob, not optimisable
           <img src={src} alt="" loading="lazy" decoding="async" onError={() => setThumbBroken(true)} className="size-full object-cover" />
         ) : (
-          <AngleHint angle={angle} className="size-full p-2 text-ink-subtle" />
+          <AngleHint angle={angle} className="size-full p-2 text-text-subtle" />
         )}
         {!status && angle.required && (
           // Said in words, not just colour: which photos still have to be taken.
-          <span className="absolute bottom-2 left-2 rounded-full bg-warning-50 px-2 py-0.5 text-caption font-semibold text-warning-800">{t.photos.required}</span>
+          <span className="absolute bottom-2 left-2 rounded-full bg-attention-tint px-2 py-0.5 type-caption-strong text-attention">{t.photos.required}</span>
         )}
-        <span className="absolute top-2 left-2 flex size-6 items-center justify-center rounded-full bg-ink/70 text-caption font-semibold text-white tabular">{angle.number}</span>
+        <span className="absolute top-2 left-2 flex size-6 items-center justify-center rounded-full bg-text/70 type-caption-strong text-white tabular">{angle.number}</span>
         <TileBadge status={status} />
       </div>
-      <p className="line-clamp-2 min-h-12 px-2 py-2 text-caption font-medium text-ink">{label}</p>
+      <p className="line-clamp-2 min-h-12 px-2 py-2 type-caption-strong text-text">{label}</p>
     </button>
   );
 }
@@ -410,24 +410,24 @@ function TileBadge({ status }: { status: SlotStatus | undefined }) {
   const base = "absolute top-2 right-2 flex size-6 animate-pop items-center justify-center rounded-full text-white shadow-card";
   if (status === "saved")
     return (
-      <span className={`${base} bg-success-600`}>
+      <span className={`${base} bg-pass`}>
         <CheckIcon size={14} strokeWidth={3} />
       </span>
     );
   if (status === "failed" || status === "review")
     return (
-      <span className={`${base} bg-danger-700`}>
+      <span className={`${base} bg-fail`}>
         <AlertIcon size={14} />
       </span>
     );
   if (status === "waiting")
     return (
-      <span className={`${base} bg-ink-muted`}>
+      <span className={`${base} bg-text-muted`}>
         <CloudUploadIcon size={14} />
       </span>
     );
   return (
-    <span className={`${base} bg-ink/75`}>
+    <span className={`${base} bg-text/75`}>
       <Spinner className="size-3.5" />
     </span>
   );
@@ -462,12 +462,12 @@ function GuideScreen({ angle, slot, progress, waiting, pickError, onPick, onKeep
           <button
             type="button"
             onClick={onGrid}
-            className="-ml-2 inline-flex min-h-11 items-center gap-2 rounded-chip px-2 text-small font-semibold text-brand-700 transition-colors hover:bg-brand-50"
+            className="-ml-2 inline-flex min-h-11 items-center gap-2 rounded-sm px-2 type-label text-accent transition-colors hover:bg-accent-tint"
           >
             <ArrowLeftIcon size={18} />
             {t.photos.grid} <span className="tabular">({progress.done}/{progress.total})</span>
           </button>
-          <p className="text-small text-ink-muted tabular">{t.photos.stepOf(angle.number, ANGLES.length)}</p>
+          <p className="type-body-sm text-text-muted tabular">{t.photos.stepOf(angle.number, ANGLES.length)}</p>
         </div>
         <ProgressBar value={angle.number} max={ANGLES.length} label={t.photos.stepOf(angle.number, ANGLES.length)} size="sm" />
       </div>
@@ -476,20 +476,20 @@ function GuideScreen({ angle, slot, progress, waiting, pickError, onPick, onKeep
 
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-title">{label}</h1>
+          <h1 className="type-heading-1">{label}</h1>
           <Badge tone={angle.required ? "warning" : "neutral"}>{angle.required ? t.photos.required : t.photos.optional}</Badge>
         </div>
-        <p className="text-ink-muted">{tip}</p>
+        <p className="text-text-muted">{tip}</p>
       </div>
 
-      <div className="relative aspect-[4/3] overflow-hidden rounded-card bg-surface shadow-card">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-surface shadow-card">
         {slot?.url ? (
           // eslint-disable-next-line @next/next/no-img-element -- private signed URL or local blob, not optimisable
-          <img src={slot.url} alt={label} decoding="async" className="size-full animate-fade-in bg-ink object-contain" />
+          <img src={slot.url} alt={label} decoding="async" className="size-full animate-fade-in bg-text object-contain" />
         ) : (
           <>
-            <AngleHint angle={angle} className="size-full p-8 text-ink-subtle" />
-            <p className="absolute inset-x-0 bottom-4 text-center text-caption text-ink-subtle">{t.photos.noPhotoYet}</p>
+            <AngleHint angle={angle} className="size-full p-8 text-text-subtle" />
+            <p className="absolute inset-x-0 bottom-4 text-center type-caption text-text-subtle">{t.photos.noPhotoYet}</p>
           </>
         )}
       </div>
@@ -497,7 +497,7 @@ function GuideScreen({ angle, slot, progress, waiting, pickError, onPick, onKeep
       <div aria-live="polite" className="flex flex-col gap-2 empty:hidden">
         <SlotStatusLine slot={slot} onRetry={onRetry} />
         {pickError && (
-          <p className="flex items-start gap-2 text-small font-medium text-danger-700">
+          <p className="flex items-start gap-2 type-label text-fail">
             <AlertIcon size={18} className="mt-px" />
             {pickError}
           </p>
@@ -554,29 +554,29 @@ function SlotStatusLine({ slot, onRetry }: { slot: Slot | undefined; onRetry: ()
       return <StatusRow icon={<Spinner />}>{slot.retry ? t.photos.status.retrying(slot.retry, PHOTO.uploadRetries) : t.photos.status.uploading}</StatusRow>;
     case "saved":
       return (
-        <StatusRow icon={<CheckIcon size={18} />} className="text-success-700">
+        <StatusRow icon={<CheckIcon size={18} />} className="text-pass">
           {t.photos.status.saved}
         </StatusRow>
       );
     case "waiting":
       return (
-        <StatusRow icon={<CloudUploadIcon size={18} />} className="text-ink">
+        <StatusRow icon={<CloudUploadIcon size={18} />} className="text-text">
           {t.photos.status.waitingLong}
         </StatusRow>
       );
     case "review":
       return (
-        <div role="alert" className="animate-rise-in rounded-control bg-warning-50 p-4 text-warning-800">
+        <div role="alert" className="animate-rise-in rounded-md bg-attention-tint p-4 text-attention">
           <p className="flex items-center gap-2 font-semibold">
             <AlertIcon size={18} />
             {slot.issue ? t.photos.issues[slot.issue] : t.photos.issues.blurry}
           </p>
-          <p className="mt-1 text-small">{t.photos.issueHint}</p>
+          <p className="mt-1 type-body-sm">{t.photos.issueHint}</p>
         </div>
       );
     case "failed":
       return (
-        <div role="alert" className="flex animate-rise-in flex-col gap-4 rounded-control bg-danger-50 p-4 text-danger-800">
+        <div role="alert" className="flex animate-rise-in flex-col gap-4 rounded-md bg-fail-tint p-4 text-fail">
           <p className="font-medium">{slot.error ?? t.photos.errors.upload}</p>
           <Button variant="secondary" size="sm" onClick={onRetry} className="self-start">
             {t.photos.tryAgain}
@@ -586,9 +586,9 @@ function SlotStatusLine({ slot, onRetry }: { slot: Slot | undefined; onRetry: ()
   }
 }
 
-function StatusRow({ icon, className = "text-ink-muted", children }: { icon?: ReactNode; className?: string; children: ReactNode }) {
+function StatusRow({ icon, className = "text-text-muted", children }: { icon?: ReactNode; className?: string; children: ReactNode }) {
   return (
-    <p className={`flex items-center gap-2 text-small font-medium ${className}`}>
+    <p className={`flex items-center gap-2 type-label ${className}`}>
       {icon}
       {children}
     </p>
@@ -611,10 +611,10 @@ function PickButton({
   // A label around a visually hidden input opens the camera/gallery on every mobile browser.
   const look =
     variant === "link"
-      ? `inline-flex min-h-11 items-center justify-center gap-2 self-center rounded-chip px-4 text-small font-semibold transition-colors ${disabled ? "text-ink-subtle" : "text-brand-700 hover:bg-brand-50"}`
+      ? `inline-flex min-h-11 items-center justify-center gap-2 self-center rounded-sm px-4 type-label transition-colors ${disabled ? "text-text-subtle" : "text-accent hover:bg-accent-tint"}`
       : buttonClass(variant, "w-full", disabled);
   return (
-    <label aria-disabled={disabled} className={`${look} cursor-pointer has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-brand-700 ${disabled ? "pointer-events-none" : ""}`}>
+    <label aria-disabled={disabled} className={`${look} cursor-pointer has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent ${disabled ? "pointer-events-none" : ""}`}>
       <input type="file" accept="image/*" capture={capture ? "environment" : undefined} disabled={disabled} onChange={onPick} className="sr-only" />
       {children}
     </label>

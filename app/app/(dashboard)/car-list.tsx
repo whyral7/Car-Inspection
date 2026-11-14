@@ -56,7 +56,7 @@ export function CarList({ cars }: { cars: CarCard[] }) {
         <div className="flex flex-col gap-4">
           <label className="relative block">
             <span className="sr-only">{t.dashboard.search}</span>
-            <SearchIcon size={20} className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-ink-subtle" />
+            <SearchIcon size={20} className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-text-subtle" />
             <input
               type="search"
               value={query}
@@ -65,7 +65,7 @@ export function CarList({ cars }: { cars: CarCard[] }) {
               autoCapitalize="characters"
               autoComplete="off"
               enterKeyHint="search"
-              className="block min-h-12 w-full rounded-control bg-surface pr-4 pl-12 text-body shadow-card ring-1 ring-line transition-shadow ring-inset placeholder:text-ink-subtle focus:shadow-focus focus:ring-brand-700 focus:outline-none"
+              className="block min-h-12 w-full rounded-md bg-surface pr-4 pl-12 type-body shadow-card ring-1 ring-border transition-shadow ring-inset placeholder:text-text-subtle  focus:ring-accent focus:outline-none"
             />
           </label>
           <div role="radiogroup" aria-label={t.dashboard.filterLabel} className="-mx-4 flex gap-2 overflow-x-auto px-4">
@@ -76,8 +76,8 @@ export function CarList({ cars }: { cars: CarCard[] }) {
                 role="radio"
                 aria-checked={filter === f}
                 onClick={() => setFilter(f)}
-                className={`min-h-11 shrink-0 rounded-full px-4 text-small font-semibold transition-colors ${
-                  filter === f ? "bg-ink text-white" : "bg-surface text-ink-muted shadow-card hover:text-ink"
+                className={`min-h-11 shrink-0 rounded-full px-4 type-label transition-colors ${
+                  filter === f ? "bg-text text-white" : "bg-surface text-text-muted shadow-card hover:text-text"
                 }`}
               >
                 {f === "all" ? t.dashboard.filterAll : t.dashboard.status[f]}
@@ -88,12 +88,12 @@ export function CarList({ cars }: { cars: CarCard[] }) {
       )}
 
       {shown.length === 0 ? (
-        <Card className="text-center text-ink-muted">{t.dashboard.noMatches}</Card>
+        <Card className="text-center text-text-muted">{t.dashboard.noMatches}</Card>
       ) : (
         <ul className="flex flex-col gap-4">
           {shown.map((car) => (
-            <li key={car.id} className="overflow-hidden rounded-card bg-surface shadow-card">
-              <Link href={`/app/cars/${car.id}`} className="flex items-center gap-4 p-4 transition-colors hover:bg-canvas active:bg-sunken">
+            <li key={car.id} className="overflow-hidden rounded-lg bg-surface shadow-card">
+              <Link href={`/app/cars/${car.id}`} className="flex items-center gap-4 p-4 transition-colors hover:bg-bg active:bg-surface-sunken">
                 <Thumb url={car.thumbUrl} />
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
                   <div className="flex flex-wrap items-center gap-2">
@@ -101,13 +101,13 @@ export function CarList({ cars }: { cars: CarCard[] }) {
                     {car.score && <ScoreChip score={car.score.value} scoreText={car.score.text} outOf={t.car.scoreOutOf} label={`${t.car.score} ${car.score.text}${t.car.scoreOutOf}`} />}
                   </div>
                   {car.title && <p className="line-clamp-2 font-medium break-words">{car.title}</p>}
-                  <p className={`text-small ${car.attention ? "font-medium text-warning-700" : "text-ink-muted"}`}>{car.progress}</p>
+                  <p className={car.attention ? "type-label text-attention" : "type-body-sm text-text-muted"}>{car.progress}</p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <span className="hidden min-[420px]:inline-flex">
                     <StatusBadge status={car.status} t={t} />
                   </span>
-                  <ChevronRightIcon size={20} className="text-ink-subtle" />
+                  <ChevronRightIcon size={20} className="text-text-subtle" />
                 </div>
               </Link>
               {car.share && (
@@ -115,7 +115,7 @@ export function CarList({ cars }: { cars: CarCard[] }) {
                   href={whatsappShareUrl(car.share.message)}
                   target="_blank"
                   rel="noopener"
-                  className="flex min-h-12 items-center justify-center gap-2 border-t border-line text-small font-semibold text-brand-700 transition-colors hover:bg-brand-50"
+                  className="flex min-h-12 items-center justify-center gap-2 border-t border-border type-label text-accent transition-colors hover:bg-accent-tint"
                 >
                   <ChatIcon size={18} />
                   {t.dashboard.shareAgain}
@@ -146,27 +146,27 @@ function Resume({ cars }: { cars: CarCard[] }) {
   const step = remembered && last && order.indexOf(last.step) >= order.indexOf(car.next.step) ? last.step : car.next.step;
 
   return (
-    <section aria-labelledby="resume-title" className="flex animate-rise-in flex-col gap-4 rounded-card bg-brand-800 p-4 text-white shadow-raised sm:p-6">
+    <section aria-labelledby="resume-title" className="flex animate-rise-in flex-col gap-4 rounded-lg bg-accent-hover p-4 text-white shadow-bar sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 flex-col gap-1">
-          <h2 id="resume-title" className="text-caption font-semibold tracking-wide text-brand-100 uppercase">
+          <h2 id="resume-title" className="type-overline tracking-wide text-accent-tint uppercase">
             {t.dashboard.resumeTitle}
           </h2>
-          <p className="text-heading break-words">
+          <p className="type-heading-2 break-words">
             <span className="tabular tracking-wider">{car.reg}</span>
-            {car.title && <span className="font-normal text-brand-100"> · {car.title}</span>}
+            {car.title && <span className="font-normal text-accent-tint"> · {car.title}</span>}
           </p>
         </div>
         <Thumb url={car.thumbUrl} size="sm" />
       </div>
       <div className="flex flex-col gap-2">
-        <div className="flex justify-between gap-4 text-small text-brand-100">
+        <div className="flex justify-between gap-4 type-body-sm text-accent-tint">
           <span>{car.progress}</span>
           <span className="tabular">{t.dashboard.stepsDone(car.next.stepsDone)}</span>
         </div>
-        <ProgressBar value={car.next.stepsDone} max={4} label={t.dashboard.stepsDone(car.next.stepsDone)} className="!bg-white/15 [&>div]:!bg-white" />
+        <ProgressBar value={car.next.stepsDone} max={4} label={t.dashboard.stepsDone(car.next.stepsDone)} className="!bg-white/15 [&>div]:!bg-surface" />
       </div>
-      <LinkButton href={stepHref(car.id, step)} variant="secondary" className="!bg-white !text-brand-800 !ring-0">
+      <LinkButton href={stepHref(car.id, step)} variant="secondary" className="!bg-surface !text-accent-hover !ring-0">
         {t.dashboard.continueStep(stepLabel(t, step))}
         <ArrowRightIcon size={18} />
       </LinkButton>
@@ -179,13 +179,13 @@ function Thumb({ url, size = "md" }: { url: string | null; size?: "sm" | "md" })
   const box = size === "sm" ? "size-12" : "size-16";
   if (!url || broken) {
     return (
-      <span className={`flex ${box} shrink-0 items-center justify-center rounded-control bg-sunken text-ink-subtle`}>
+      <span className={`flex ${box} shrink-0 items-center justify-center rounded-md bg-surface-sunken text-text-subtle`}>
         <CarIcon size={size === "sm" ? 22 : 28} />
       </span>
     );
   }
   return (
     // eslint-disable-next-line @next/next/no-img-element -- private signed URL of the small copy, not optimisable
-    <img src={url} alt="" width={64} height={64} loading="lazy" decoding="async" onError={() => setBroken(true)} className={`${box} shrink-0 rounded-control bg-sunken object-cover`} />
+    <img src={url} alt="" width={64} height={64} loading="lazy" decoding="async" onError={() => setBroken(true)} className={`${box} shrink-0 rounded-md bg-surface-sunken object-cover`} />
   );
 }

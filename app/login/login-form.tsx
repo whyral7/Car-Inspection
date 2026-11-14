@@ -127,8 +127,8 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
     return (
       <form onSubmit={onPhoneSubmit} className="flex animate-fade-in flex-col gap-6" noValidate>
         <div className="flex flex-col gap-2">
-          <h1 className="text-title">{t.login.title}</h1>
-          <p className="text-ink-muted">{t.login.subtitle}</p>
+          <h1 className="type-heading-1">{t.login.title}</h1>
+          <p className="text-text-muted">{t.login.subtitle}</p>
         </div>
         <Card className="flex flex-col gap-6">
           <Field
@@ -159,8 +159,8 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
   return (
     <form onSubmit={onOtpSubmit} className="flex animate-fade-in flex-col gap-6" noValidate>
       <div className="flex flex-col gap-2">
-        <h1 className="text-title">{t.login.otpTitle}</h1>
-        <p className="text-ink-muted tabular">{t.login.otpSentTo(formatPhone(phone))}</p>
+        <h1 className="type-heading-1">{t.login.otpTitle}</h1>
+        <p className="text-text-muted tabular">{t.login.otpSentTo(formatPhone(phone))}</p>
       </div>
       <Card className="flex flex-col gap-6">
         <Field

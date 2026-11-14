@@ -28,15 +28,16 @@ export function useToast() {
   return useContext(ToastContext);
 }
 
+// Icons take the toast's own text colour: on the inverse ground the rating colours don't pass contrast.
 const icons: Record<ToastTone, ReactNode> = {
-  success: <CheckIcon size={18} className="text-success-200" />,
-  error: <AlertIcon size={18} className="text-danger-200" />,
-  info: <InfoIcon size={18} className="text-brand-200" />,
+  success: <CheckIcon size={18} />,
+  error: <AlertIcon size={18} />,
+  info: <InfoIcon size={18} />,
 };
 
 /**
  * One toast at a time, just above the sticky action bar (it reads --sticky-bar-height), so it never
- * covers the main button. Dark on light for contrast outdoors.
+ * covers the main button. Ink on paper inverted (text on bg), for contrast outdoors; it flips with the theme.
  */
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toast, setToast] = useState<Toast | null>(null);
@@ -83,7 +84,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div
             key={toast.id}
             role={toast.tone === "error" ? "alert" : "status"}
-            className="pointer-events-auto flex w-full max-w-md animate-rise-in items-center gap-3 rounded-control bg-ink py-2 pr-2 pl-4 text-small font-medium text-white shadow-raised"
+            className="pointer-events-auto flex w-full max-w-md animate-rise-in items-center gap-3 rounded-md bg-text py-2 pr-2 pl-4 type-label text-bg shadow-bar"
           >
             {icons[toast.tone ?? "success"]}
             <span className="min-w-0 flex-1 py-2">{toast.message}</span>
@@ -94,7 +95,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   toast.action?.onClick();
                   dismiss(toast.id);
                 }}
-                className="min-h-11 shrink-0 rounded-chip px-3 font-semibold text-brand-200 transition-colors hover:bg-white/10"
+                className="min-h-11 shrink-0 rounded-sm px-3 type-label underline underline-offset-4 transition-opacity hover:opacity-80"
               >
                 {toast.action.label}
               </button>

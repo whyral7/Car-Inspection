@@ -36,14 +36,14 @@ export default async function CreditsPage({ searchParams }: PageProps<"/app/cred
     <div className="flex flex-1 flex-col gap-6">
       <PageHeader back={{ href: nextPath ?? "/app", label: t.credits.back }} title={t.credits.title} description={t.credits.subtitle} />
       {/* The balance, like a wallet card. */}
-      <section aria-label={t.dashboard.credits} className="flex items-start justify-between gap-4 rounded-card bg-brand-800 p-6 text-white shadow-raised">
+      <section aria-label={t.dashboard.credits} className="flex items-start justify-between gap-4 rounded-lg bg-accent-hover p-6 text-white shadow-bar">
         <div className="flex flex-col gap-1">
-          <p className="text-caption font-semibold tracking-wide text-brand-100 uppercase">{t.dashboard.credits}</p>
-          <p className="text-display tabular">{profile.credits}</p>
-          <p className="text-small text-brand-100">{t.dashboard.creditsHint}</p>
+          <p className="type-overline tracking-wide text-accent-tint uppercase">{t.dashboard.credits}</p>
+          <p className="type-display-lg tabular">{profile.credits}</p>
+          <p className="type-body-sm text-accent-tint">{t.dashboard.creditsHint}</p>
           <Link
             href="/app/profile#history"
-            className="-mx-2 mt-2 inline-flex min-h-11 items-center gap-2 self-start rounded-chip px-2 text-small font-semibold text-white transition-colors hover:bg-white/10"
+            className="-mx-2 mt-2 inline-flex min-h-11 items-center gap-2 self-start rounded-sm px-2 type-label text-white transition-colors hover:bg-white/10"
           >
             {t.credits.history}
             <ArrowRightIcon size={16} />

@@ -24,15 +24,15 @@ export default function ContactPage() {
     // Legal text is English only, so say so for screen readers even when the site is in Hindi.
     <article lang="en" className="mx-auto w-full max-w-2xl px-4 py-8">
       <BackLink href="/">{legal.back}</BackLink>
-      <h1 className="mt-2 text-title">{copy.title}</h1>
-      <p className="mt-2 text-ink-muted">{copy.intro}</p>
-      <dl className="mt-6 divide-y divide-line overflow-hidden rounded-card bg-surface shadow-card">
+      <h1 className="mt-2 type-heading-1">{copy.title}</h1>
+      <p className="mt-2 text-text-muted">{copy.intro}</p>
+      <dl className="mt-6 divide-y divide-border overflow-hidden rounded-lg bg-surface shadow-card">
         {rows.map((row) => (
           <div key={row.label} className="flex flex-col gap-1 p-4 sm:px-6">
-            <dt className="text-small text-ink-muted">{row.label}</dt>
+            <dt className="type-body-sm text-text-muted">{row.label}</dt>
             <dd className="font-medium break-words">
               {row.href ? (
-                <a href={row.href} className="text-brand-700 underline" {...(row.href.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}>
+                <a href={row.href} className="text-accent underline" {...(row.href.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}>
                   {row.value}
                 </a>
               ) : (
@@ -48,7 +48,7 @@ export default function ContactPage() {
           {t.home.whatsapp}
         </a>
       )}
-      <p className="mt-6 text-small text-ink-muted">{copy.paymentHelp}</p>
+      <p className="mt-6 type-body-sm text-text-muted">{copy.paymentHelp}</p>
     </article>
   );
 }

@@ -109,7 +109,7 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
   if (phase.kind === "confirming") {
     return (
       <Card role="status" className="flex animate-rise-in items-center gap-4">
-        <Spinner className="size-5 text-brand-700" />
+        <Spinner className="size-5 text-accent" />
         <p className="font-medium">{t.credits.confirming}</p>
       </Card>
     );
@@ -120,12 +120,12 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
     return (
       <div className="flex flex-1 flex-col gap-6">
         <Card role="status" tone={success ? "success" : "warning"} className="flex animate-rise-in items-start gap-4">
-          <span aria-hidden className={`flex size-10 shrink-0 animate-pop items-center justify-center rounded-full text-white ${success ? "bg-success-700" : "bg-warning-500"}`}>
+          <span aria-hidden className={`flex size-10 shrink-0 animate-pop items-center justify-center rounded-full text-white ${success ? "bg-pass" : "bg-attention"}`}>
             {success ? <CheckIcon size={22} /> : <ClockIcon size={22} />}
           </span>
           <div className="flex flex-col gap-1">
-            <h2 className="text-heading">{success ? t.credits.successTitle : t.credits.slowTitle}</h2>
-            <p className="text-ink-muted">{success ? t.credits.successBody(phase.added, phase.total) : t.credits.slowBody}</p>
+            <h2 className="type-heading-2">{success ? t.credits.successTitle : t.credits.slowTitle}</h2>
+            <p className="text-text-muted">{success ? t.credits.successBody(phase.added, phase.total) : t.credits.slowBody}</p>
           </div>
         </Card>
         <StickyBar>
@@ -144,7 +144,7 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
   return (
     <div className="flex flex-1 flex-col gap-4">
       {phase.kind === "failed" && (
-        <Card role="alert" tone="danger" className="flex animate-rise-in flex-col gap-1 text-small text-danger-800">
+        <Card role="alert" tone="danger" className="flex animate-rise-in flex-col gap-1 type-body-sm text-fail">
           <p className="font-semibold">{t.credits.failedTitle}</p>
           <p>{t.credits.failedBody(phase.reason)}</p>
         </Card>
@@ -154,7 +154,7 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
           <FormError message={error} />
           <a
             href={supportHref}
-            className="-mx-2 inline-flex min-h-11 items-center gap-2 self-start rounded-chip px-2 text-small font-semibold text-brand-700 transition-colors hover:bg-brand-50"
+            className="-mx-2 inline-flex min-h-11 items-center gap-2 self-start rounded-sm px-2 type-label text-accent transition-colors hover:bg-accent-tint"
             {...(supportHref.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}
           >
             <ChatIcon size={18} />
@@ -173,26 +173,26 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
               aria-checked={active}
               disabled={phase.kind === "opening"}
               onClick={() => setSelected(pack.key)}
-              className={`flex items-center gap-4 rounded-card bg-surface p-4 text-left shadow-card transition-[box-shadow,transform] duration-150 active:scale-[0.99] sm:p-6 ${
-                active ? "ring-2 ring-brand-700" : "ring-1 ring-line"
+              className={`flex items-center gap-4 rounded-lg bg-surface p-4 text-left shadow-card transition-[box-shadow,transform] duration-150 active:scale-[0.99] sm:p-6 ${
+                active ? "ring-2 ring-accent" : "ring-1 ring-border"
               }`}
             >
-              <span aria-hidden className={`flex size-6 shrink-0 items-center justify-center rounded-full ring-2 ring-inset ${active ? "bg-brand-700 ring-brand-700" : "ring-line-strong"}`}>
-                {active && <span className="size-2 rounded-full bg-white" />}
+              <span aria-hidden className={`flex size-6 shrink-0 items-center justify-center rounded-full ring-2 ring-inset ${active ? "bg-accent ring-accent" : "ring-border-control"}`}>
+                {active && <span className="size-2 rounded-full bg-surface" />}
               </span>
               <span className="flex min-w-0 flex-1 flex-col gap-1">
                 <span className="flex flex-wrap items-center gap-2">
-                  <span className="text-heading">{t.credits.pack(pack.credits)}</span>
+                  <span className="type-heading-2">{t.credits.pack(pack.credits)}</span>
                   {pack.best && <Badge tone="brand">{t.credits.bestValue}</Badge>}
                 </span>
-                <span className="text-small text-ink-muted">{t.credits.perReport(formatRupees(pack.perReportPaise))}</span>
+                <span className="type-body-sm text-text-muted">{t.credits.perReport(formatRupees(pack.perReportPaise))}</span>
               </span>
-              <span className="shrink-0 text-heading tabular">₹{formatRupees(pack.pricePaise)}</span>
+              <span className="shrink-0 type-heading-2 tabular">₹{formatRupees(pack.pricePaise)}</span>
             </button>
           );
         })}
       </div>
-      <p className="flex items-start justify-center gap-2 text-center text-caption text-ink-muted">
+      <p className="flex items-start justify-center gap-2 text-center type-caption text-text-muted">
         <ShieldCheckIcon size={16} className="mt-px shrink-0" />
         {t.credits.secure}
       </p>

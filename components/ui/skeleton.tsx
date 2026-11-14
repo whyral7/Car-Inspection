@@ -2,7 +2,7 @@
 // gives instant feedback instead of a frozen screen.
 
 export function Skeleton({ className = "" }: { className?: string }) {
-  return <div aria-hidden="true" className={`animate-pulse rounded-control bg-sunken ${className}`} />;
+  return <div aria-hidden="true" className={`animate-pulse rounded-md bg-surface-sunken ${className}`} />;
 }
 
 /** Back link, title and a few cards: the shape of most app screens. */
@@ -17,11 +17,11 @@ export function PageSkeleton({ cards = 3, grid = false, label }: { cards?: numbe
       {grid ? (
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
           {Array.from({ length: 9 }, (_, i) => (
-            <Skeleton key={i} className="aspect-[4/3] rounded-card" />
+            <Skeleton key={i} className="aspect-[4/3] rounded-lg" />
           ))}
         </div>
       ) : (
-        Array.from({ length: cards }, (_, i) => <Skeleton key={i} className="h-28 rounded-card" />)
+        Array.from({ length: cards }, (_, i) => <Skeleton key={i} className="h-28 rounded-lg" />)
       )}
       <span className="sr-only">{label}</span>
     </div>

@@ -20,10 +20,11 @@ export function EmptyState({
   as?: "h1" | "h2" | "h3";
 }) {
   return (
-    <div className={`flex flex-col items-center px-6 py-8 text-center ${plain ? "" : "rounded-card bg-surface shadow-card"}`}>
-      <span className="flex size-12 items-center justify-center rounded-full bg-brand-50 text-brand-700">{icon}</span>
-      <Heading className="mt-4 text-heading">{title}</Heading>
-      {body && <div className="mt-2 max-w-sm text-small text-ink-muted">{body}</div>}
+    <div className={`flex flex-col items-center px-6 py-8 text-center ${plain ? "" : "rounded-lg bg-surface shadow-card"}`}>
+      {/* Icons are ink; olive is kept for the one action below. */}
+      <span className="flex size-12 items-center justify-center rounded-md bg-surface-sunken text-text">{icon}</span>
+      <Heading className="mt-4 type-heading-2">{title}</Heading>
+      {body && <div className="mt-2 max-w-sm type-body text-text-muted">{body}</div>}
       {children && <div className="mt-6 flex w-full max-w-xs flex-col gap-2">{children}</div>}
     </div>
   );

@@ -2,17 +2,26 @@
 
 import { useRef, type KeyboardEvent, type ReactNode } from "react";
 
+// Brand rating control (brand/reference/components/ChecklistItem.md): joined segments, 44px tall, a
+// border-control edge with hairline dividers. A chosen rating takes its rating tint; any other choice
+// takes the accent tint. Behaves like a radio group (arrow keys move the selection).
+
 export type SegmentOption<V extends string> = {
   value: V;
   label: string;
   icon?: ReactNode;
-  /** Classes for the selected state, e.g. "bg-danger-700 text-white ring-danger-700". */
-  selectedClass?: string;
+  /** A rating option: the selected state uses that rating's tint and colour. */
+  verdict?: "pass" | "attention" | "fail" | "na";
 };
 
-const defaultSelected = "bg-brand-700 text-white shadow-card ring-brand-700";
+const selectedLook = {
+  pass: "bg-verdict-pass-bg text-verdict-pass-fg",
+  attention: "bg-verdict-attention-bg text-verdict-attention-fg",
+  fail: "bg-verdict-fail-bg text-verdict-fail-fg",
+  na: "bg-seg-na-bg-on text-seg-na-fg-on",
+  choice: "bg-accent-tint text-text",
+} as const;
 
-/** A row of big tap targets that behaves like a radio group (arrow keys move the selection). */
 export function Segmented<V extends string>({
   label,
   options,
@@ -30,7 +39,7 @@ export function Segmented<V extends string>({
   onChange: (value: V) => void;
   disabled?: boolean;
   className?: string;
-  /** Grid column classes, e.g. "grid-cols-2 min-[400px]:grid-cols-4". Default: one row. */
+  /** Grid column classes for options that can't share one row, e.g. "grid-cols-1 min-[380px]:grid-cols-3". Default: one joined row. */
   columns?: string;
   /** Marks the group as unanswered after a submit; focusFirstError() lands on its first option. */
   invalid?: boolean;
@@ -49,6 +58,7 @@ export function Segmented<V extends string>({
   }
 
   const focusIndex = Math.max(0, options.findIndex((o) => o.value === value));
+  const edge = invalid ? "border-2 border-input-border-error" : "border border-seg-border";
 
   return (
     <div
@@ -56,7 +66,8 @@ export function Segmented<V extends string>({
       aria-label={label}
       aria-invalid={invalid || undefined}
       aria-describedby={describedBy}
-      className={`grid gap-2 ${columns ?? ""} ${className}`}
+      // Joined: one outline around the row. In columns: each option keeps its own outline, with gaps.
+      className={`grid ${columns ? `gap-2 ${columns}` : `overflow-hidden rounded-md bg-seg-divider gap-px ${edge}`} ${className}`}
       style={columns ? undefined : { gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
     >
       {options.map((o, i) => {
@@ -76,9 +87,9 @@ export function Segmented<V extends string>({
             disabled={disabled}
             onClick={() => onChange(o.value)}
             onKeyDown={(e) => onKeyDown(e, i)}
-            className={`min-h-12 rounded-control px-1 text-small font-semibold ring-1 transition-[background-color,color,box-shadow] duration-150 ring-inset focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:bg-sunken disabled:text-ink-subtle disabled:ring-line ${
-              selected ? (o.selectedClass ?? defaultSelected) : `bg-surface text-ink hover:bg-canvas active:bg-sunken ${invalid ? "ring-danger-700" : "ring-line-strong/60"}`
-            }`}
+            className={`min-h-[var(--seg-height)] px-1 transition-[background-color,color] [font:var(--seg-font)] focus-visible:relative focus-visible:z-10 disabled:opacity-[var(--button-disabled-opacity)] ${columns ? `rounded-md ${edge}` : ""} ${
+              selected ? selectedLook[o.verdict ?? "choice"] : "bg-seg-bg text-seg-fg hover:bg-surface-sunken"
+            } ${selected && columns && !o.verdict ? "border-accent" : ""}`}
           >
             <span className="inline-flex items-center justify-center gap-1.5">
               {o.icon}

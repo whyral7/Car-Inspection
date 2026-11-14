@@ -61,17 +61,17 @@ export function InstallPrompt({ eligible }: { eligible: boolean }) {
   }
 
   return (
-    <section className="flex animate-rise-in items-start gap-4 rounded-card bg-surface p-4 shadow-card">
+    <section className="flex animate-rise-in items-start gap-4 rounded-lg bg-surface p-4 shadow-card">
       {/* eslint-disable-next-line @next/next/no-img-element -- tiny static app icon */}
-      <img src="/icons/icon-192.png" alt="" width={40} height={40} className="size-10 shrink-0 rounded-control" />
+      <img src="/icons/icon-192.png" alt="" width={40} height={40} className="size-10 shrink-0 rounded-md" />
       <div className="min-w-0 flex-1">
         <p className="font-semibold">{t.install.title}</p>
-        <p className="text-small text-ink-muted">{t.install.body}</p>
+        <p className="type-body-sm text-text-muted">{t.install.body}</p>
         <Button size="sm" onClick={install} className="mt-4">
           {t.install.action}
         </Button>
       </div>
-      <button type="button" onClick={dismiss} aria-label={t.common.close} className="-m-2 flex size-11 shrink-0 items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-sunken">
+      <button type="button" onClick={dismiss} aria-label={t.common.close} className="-m-2 flex size-11 shrink-0 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-surface-sunken">
         <XIcon size={18} />
       </button>
     </section>

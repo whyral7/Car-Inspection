@@ -18,16 +18,16 @@ export default async function OnboardingPage() {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-4 pt-[calc(1.5rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
       <div className="flex items-center justify-between gap-4">
-        <p className="flex items-center gap-2 font-semibold text-brand-700">
-          <span className="flex size-8 items-center justify-center rounded-chip bg-brand-700 text-small text-white">{t.appName.charAt(0)}</span>
+        <p className="flex items-center gap-2 font-semibold text-accent">
+          <span className="flex size-8 items-center justify-center rounded-sm bg-accent type-body-sm text-white">{t.appName.charAt(0)}</span>
           {t.appName}
         </p>
         {/* Signed in with the wrong number? Way out before the profile is set up. */}
         {!editing && <SignOut compact />}
       </div>
       <header className="flex flex-col gap-1">
-        <h1 className="text-title">{editing ? t.onboarding.editTitle : t.onboarding.title}</h1>
-        <p className="text-ink-muted">{t.onboarding.subtitle}</p>
+        <h1 className="type-heading-1">{editing ? t.onboarding.editTitle : t.onboarding.title}</h1>
+        <p className="text-text-muted">{t.onboarding.subtitle}</p>
       </header>
       <OnboardingForm
         profileId={user.id}

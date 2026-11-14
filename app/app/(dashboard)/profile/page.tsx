@@ -79,40 +79,40 @@ export default async function ProfilePage() {
         <div className="flex items-center gap-4">
           {logo ? (
             // eslint-disable-next-line @next/next/no-img-element -- small public logo, no need for the image optimiser
-            <img src={logo} alt="" className="size-16 shrink-0 rounded-card bg-surface object-contain shadow-card ring-1 ring-line" />
+            <img src={logo} alt="" className="size-16 shrink-0 rounded-lg bg-surface object-contain shadow-card ring-1 ring-border" />
           ) : (
-            <span className="flex size-16 shrink-0 items-center justify-center rounded-card bg-brand-700 text-title text-white">{name.charAt(0).toUpperCase()}</span>
+            <span className="flex size-16 shrink-0 items-center justify-center rounded-lg bg-accent type-heading-1 text-white">{name.charAt(0).toUpperCase()}</span>
           )}
           <div className="flex min-w-0 flex-col gap-1">
-            <h1 className="text-title break-words">{name}</h1>
-            {profile.city && <p className="text-ink-muted">{profile.city}</p>}
+            <h1 className="type-heading-1 break-words">{name}</h1>
+            {profile.city && <p className="text-text-muted">{profile.city}</p>}
           </div>
         </div>
       </header>
 
       <section aria-labelledby="account-title" className="flex flex-col gap-2">
-        <h2 id="account-title" className="px-1 text-heading">
+        <h2 id="account-title" className="px-1 type-heading-2">
           {t.profile.title}
         </h2>
         <ListCard>
           {facts.map((f) => (
-            <ListRow key={f.label} title={<span className="text-small font-normal text-ink-muted">{f.label}</span>} subtitle={<span className="whitespace-pre-line text-body text-ink">{f.value}</span>} />
+            <ListRow key={f.label} title={<span className="type-body-sm font-normal text-text-muted">{f.label}</span>} subtitle={<span className="whitespace-pre-line type-body text-text">{f.value}</span>} />
           ))}
-          <ListRow href="/app/onboarding" leading={<PencilIcon size={20} className="text-brand-700" />} title={<span className="text-brand-700">{t.profile.edit}</span>} />
+          <ListRow href="/app/onboarding" leading={<PencilIcon size={20} className="text-accent" />} title={<span className="text-accent">{t.profile.edit}</span>} />
         </ListCard>
       </section>
 
       <Card as="section" className="flex flex-col gap-4">
         <div className="flex items-center gap-4">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-700">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-accent-tint text-accent">
             <CreditIcon />
           </span>
           <div className="flex flex-col">
-            <p className="text-small text-ink-muted">{t.profile.creditsTitle}</p>
-            <p className="text-title tabular">{t.profile.balance(profile.credits)}</p>
+            <p className="type-body-sm text-text-muted">{t.profile.creditsTitle}</p>
+            <p className="type-heading-1 tabular">{t.profile.balance(profile.credits)}</p>
           </div>
         </div>
-        <p className="text-small text-ink-muted tabular">
+        <p className="type-body-sm text-text-muted tabular">
           {t.profile.bought(totalBought(history))} · {t.profile.used(totalUsed(history))}
         </p>
         <LinkButton href="/app/credits" size="sm">
@@ -126,7 +126,7 @@ export default async function ProfilePage() {
       </Card>
 
       <section id="history" aria-labelledby="history-title" className="flex scroll-mt-24 flex-col gap-2">
-        <h2 id="history-title" className="px-1 text-heading">
+        <h2 id="history-title" className="px-1 type-heading-2">
           {t.profile.historyTitle}
         </h2>
         {history.length === 0 ? (
@@ -140,11 +140,11 @@ export default async function ProfilePage() {
                 subtitle={
                   <>
                     {formatDateTime(entry.at)}
-                    {entry.kind === "purchase" && entry.paymentId && <span className="block text-caption break-all">{t.profile.paymentId(entry.paymentId)}</span>}
+                    {entry.kind === "purchase" && entry.paymentId && <span className="block type-caption break-all">{t.profile.paymentId(entry.paymentId)}</span>}
                   </>
                 }
                 trailing={
-                  <span className={`shrink-0 font-semibold tabular ${entry.change > 0 ? "text-success-700" : "text-ink-muted"}`}>
+                  <span className={`shrink-0 font-semibold tabular ${entry.change > 0 ? "text-pass" : "text-text-muted"}`}>
                     {entry.change > 0 ? `+${entry.change}` : entry.change}
                   </span>
                 }
@@ -152,19 +152,19 @@ export default async function ProfilePage() {
             ))}
           </ListCard>
         )}
-        <p className="px-1 text-small text-ink-muted">{t.profile.help}</p>
+        <p className="px-1 type-body-sm text-text-muted">{t.profile.help}</p>
       </section>
 
       <section className="flex flex-col gap-2">
         <SignOut />
         <a
           href={deleteHref}
-          className="inline-flex min-h-11 items-center justify-center self-center rounded-chip px-2 text-small font-semibold text-danger-700 transition-colors hover:bg-danger-50"
+          className="inline-flex min-h-11 items-center justify-center self-center rounded-sm px-2 type-label text-fail transition-colors hover:bg-fail-tint"
           {...(deleteHref.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}
         >
           {t.profile.deleteAccount}
         </a>
-        <p className="text-center text-caption text-ink-muted">{t.profile.deleteAccountHint}</p>
+        <p className="text-center type-caption text-text-muted">{t.profile.deleteAccountHint}</p>
       </section>
     </div>
   );

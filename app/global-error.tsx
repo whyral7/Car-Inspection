@@ -1,13 +1,18 @@
 "use client";
 
-// Last resort when the root layout itself fails: plain HTML, no app styles guaranteed.
+import { martelSans, plexMono } from "@/brand/next/fonts";
+import { buttonClass } from "@/components/ui/button";
+import "./globals.css";
+
+// Last resort when the root layout itself fails. It replaces that layout, so it brings the brand
+// stylesheet and fonts itself. English only: the reader's language can't be read here.
 export default function GlobalError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
-    <html lang="en">
-      <body style={{ fontFamily: "system-ui, sans-serif", padding: 24, textAlign: "center", color: "#0b1220" }}>
-        <h1 style={{ fontSize: 20 }}>Something went wrong</h1>
-        <p>Please try again in a minute.</p>
-        <button onClick={reset} style={{ minHeight: 48, padding: "0 20px", borderRadius: 12, border: 0, background: "#0f5e58", color: "#fff", fontSize: 16, fontWeight: 600 }}>
+    <html lang="en" data-theme="light" className={`h-full ${martelSans.variable} ${plexMono.variable}`}>
+      <body className="flex min-h-full flex-col items-center justify-center gap-4 bg-bg p-6 text-center text-text">
+        <h1 className="type-heading-1">This page didn&apos;t load</h1>
+        <p className="type-body text-text-muted">Check your internet and try again in a minute.</p>
+        <button type="button" onClick={reset} className={buttonClass("primary", "", false, "lg")}>
           Try again
         </button>
       </body>

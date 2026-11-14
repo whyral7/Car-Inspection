@@ -17,18 +17,18 @@ export default async function DashboardLayout({ children }: LayoutProps<"/app">)
   return (
     <div className="flex flex-1 flex-col">
       {/* Log out lives on the profile page, away from where thumbs land while scrolling. */}
-      <header className="sticky top-0 z-20 border-b border-line bg-surface pt-[env(safe-area-inset-top)]">
+      <header className="sticky top-0 z-20 border-b border-border bg-surface pt-[env(safe-area-inset-top)]">
         <div className="mx-auto flex min-h-16 w-full max-w-2xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2">
           <Link
             href="/app/profile"
-            className="-ml-2 flex min-h-12 min-w-0 flex-1 basis-40 items-center gap-4 rounded-control px-2 transition-colors hover:bg-canvas"
+            className="-ml-2 flex min-h-12 min-w-0 flex-1 basis-40 items-center gap-4 rounded-md px-2 transition-colors hover:bg-bg"
             aria-label={`${name}, ${t.profile.title}`}
           >
             {logo ? (
               // eslint-disable-next-line @next/next/no-img-element -- small public logo, no need for the image optimiser
-              <img src={logo} alt="" className="size-10 shrink-0 rounded-control bg-surface object-contain ring-1 ring-line" />
+              <img src={logo} alt="" className="size-10 shrink-0 rounded-md bg-surface object-contain ring-1 ring-border" />
             ) : (
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-control bg-brand-700 font-semibold text-white">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-accent font-semibold text-white">
                 {name.charAt(0).toUpperCase()}
               </span>
             )}
