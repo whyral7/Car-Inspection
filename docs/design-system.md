@@ -1,0 +1,69 @@
+# Treadmark design system
+
+Direction **A, "Clear Teal"**: calm and crisp, with one accent colour, plenty of white space and a strong type hierarchy. Cards are white with soft shadows, not borders. The bar to aim for is a well-made banking app, not a template.
+
+- Tokens: [`app/tokens.css`](../app/tokens.css), a Tailwind v4 `@theme` block.
+- Components: [`components/ui`](../components/ui), imported from `@/components/ui`.
+- The PDF and the WhatsApp preview image can't use Tailwind. They read the same values from [`lib/report/colors.ts`](../lib/report/colors.ts); keep the two in step.
+
+Before and after screenshots, phone and desktop, are in [`design-system/`](design-system/).
+
+## Tokens
+
+| Group | Tokens | Rule |
+|---|---|---|
+| Accent | `brand-50 … brand-900` (700 = `#0f5e58`) | The only accent: primary buttons, links, progress, selection. |
+| Text | `ink`, `ink-muted`, `ink-subtle` | `ink` for anything people must read. `ink-muted` for secondary text (7.7:1). `ink-subtle` for captions only (5.6:1). |
+| Surfaces | `surface` (white cards), `canvas` (page), `sunken` (insets, tracks), `line` (hairlines), `line-strong` (input outlines, 3:1) | |
+| Status | `success-*`, `warning-*`, `danger-*` | Status only, never decoration. |
+| Type | `text-display` 32, `text-title` 24, `text-heading` 18/600, `text-body` 16, `text-small` 14, `text-caption` 12 | One `title` per screen. Section headings use `heading`. |
+| Radius | `rounded-chip` 8, `rounded-control` 12, `rounded-card` 16, `rounded-sheet` 24 | Badges and plates · buttons and inputs · cards · sheets. |
+| Elevation | `shadow-card`, `shadow-raised`, `shadow-bar`, `shadow-sheet`, `shadow-focus` | Cards have a shadow and no border. Nothing uses blur. |
+| Motion | `ease-standard`; 150ms by default; `animate-fade-in`, `animate-rise-in` (200ms), `animate-sheet-in` (250ms), `animate-pop` | With reduced motion, things fade instead of sliding, presses don't shrink and nothing pulses; colour and opacity changes stay, and the spinner keeps turning. |
+| Spacing | Tailwind 4px steps, used as 8px rhythm: 2, 4, 6, 8, 12 | Odd steps only to nudge an icon against its label. |
+
+Font: **Anek** (Ek Type, OFL), made for Indian scripts, self-hosted in `public/fonts`: Latin 400/600/700 (about 60 KB), a ₹ subset, and Devanagari that only downloads when Hindi text is on screen. The PDF and link preview use merged Latin + ₹ TTFs in `assets/fonts`.
+
+## Components
+
+| Component | Use for |
+|---|---|
+| `Button`, `LinkButton`, `TextButton` | `primary` (one per screen), `secondary`, `ghost`, `danger`, `danger-ghost`. Sizes `sm` 44px, `md` 48px, `lg` 56px. `loading` shows a spinner; `disabled` turns grey. |
+| `Field`, `SelectField`, `TextAreaField`, `FormError`, `FieldMessage` | Label, input, then a hint or an error with an icon. Always pass `inputMode`, `autoComplete` and `enterKeyHint`. |
+| `Card`, `CardHeader`, `ListCard`, `ListRow` | The one surface. Tones (`warning`, `success`…) are for status only. `ListRow` with `href` makes the whole row tappable. |
+| `Badge` | Small status label; `dot` adds a coloured dot, so status doesn't rest on text colour alone. |
+| `SeverityBadge` (components/severity.tsx) | Damage severity: a badge with a different icon per level (info circle, triangle, cross). Never a coloured stripe down the side of a card. |
+| `PageHeader`, `StepHeader`, `BackLink` | The top of every screen. `StepHeader` adds "Step N of 4" and the four-part indicator for photos, damage notes, checklist and report. |
+| `StickyBar` | The main action, in thumb reach. Sits at the bottom of the screen even on short pages, and publishes `--sticky-bar-height` for toasts and scroll padding. |
+| `BottomSheet`, `ConfirmSheet` | Editing in context (damage notes), and confirming anything destructive or paid. Built on `<dialog>`: focus trap, Esc and backdrop close it. |
+| `Toast` / `useToast()` | Success after an action, errors that don't belong to a field, and Undo. One at a time, above the sticky bar. |
+| `EmptyState` | What a list shows when it's empty: what it is, why it's empty, and the one thing to do. |
+| `ProgressBar`, `Skeleton`, `PageSkeleton` | Progress with an accessible name; loading placeholders for `loading.tsx`. |
+| `Segmented`, `Switch` | Big radio groups (checklist answers, severity) and on/off settings. |
+
+## Patterns
+
+- **Every async action has three states.**
+  - Loading: a spinner on the button.
+  - Success: a toast, or the screen moving on.
+  - Error: `FormError` or a field error, plus an offline-aware message.
+- **Destructive or paid actions** confirm in a `ConfirmSheet`, or use an Undo toast when undo is cheap (deleting a note).
+- **Forms people fill in at the car keep a draft.**
+  - Uncontrolled forms use `useFormDraft(key, formRef)`.
+  - Controlled forms use `readDraft` and `saveDraft`.
+  - The draft is cleared on save or cancel.
+- **Inspection screens call `<RememberStep>`,** so the home screen can offer "Pick up where you left off".
+- **Redirects that need a confirmation** add a query flag (`?saved=1`), and the page shows it with `<FlashToast>`.
+- **The bottom bar always names the next real step** ("Next: Brakes", "Review damage notes"). Shortcuts that answer for the user ("Mark the rest OK", "Leave these notes off the report") are quiet links that say exactly what they do, and never cover the safety and legal checks (`MUST_ANSWER_KEYS` in lib/checklist.ts).
+- **Long lists fold what's done.** Answered checklist items collapse to one line with their answer; the item being worked on stays open.
+- **Nothing that changes how good a car looks is shown early.** The score waits until the damage notes are reviewed; a summary names every "Problem" and "Needs attention", documents included.
+- **Text wraps cleanly.** Paragraphs use `text-wrap: pretty` and headings `text-wrap: balance` (globals.css), so there are no one-word last lines.
+
+## Things to avoid
+
+These read as generated templates (impeccable's detector flags them):
+- a coloured stripe down one side of a card;
+- a card with its own background and shadow inside another card (put the content flush, or use a hairline divider);
+- a tiny uppercase label above every heading (the step header's "Step 2 of 4" is the one exception);
+- the overused faces: Inter, Roboto, Geist, Plus Jakarta Sans, Space Grotesk, Fraunces.
+

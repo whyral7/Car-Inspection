@@ -1,17 +1,13 @@
+import { Badge, type BadgeTone } from "@/components/ui";
+import type { Strings } from "@/lib/strings";
 import type { CarStatus } from "@/lib/supabase/database.types";
-import { getT } from "@/lib/i18n.server";
 
-const styles: Record<CarStatus, string> = {
-  draft: "bg-surface-sunken text-text-muted",
-  inspected: "bg-surface-sunken text-text",
-  published: "bg-accent-tint text-accent",
-};
+const tones: Record<CarStatus, BadgeTone> = { draft: "neutral", inspected: "warning", published: "brand" };
 
-export async function StatusBadge({ status }: { status: CarStatus }) {
-  const t = await getT();
+export function StatusBadge({ status, t }: { status: CarStatus; t: Strings }) {
   return (
-    <span className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-sm px-2 py-1 type-caption-strong ${styles[status]}`}>
+    <Badge tone={tones[status]} dot>
       {t.dashboard.status[status]}
-    </span>
+    </Badge>
   );
 }

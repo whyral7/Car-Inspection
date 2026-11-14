@@ -1,0 +1,66 @@
+import { describe, expect, it } from "vitest";
+import { inspectionState, type InspectionInput } from "@/lib/inspection";
+import { ANGLE_KEYS } from "@/lib/photos/angles";
+import { CHECKLIST_KEYS } from "@/lib/checklist";
+
+const photos = (n: number, ai_status: InspectionInput["photos"][number]["ai_status"] = "done") => ANGLE_KEYS.slice(0, n).map((angle_key) => ({ angle_key, ai_status }));
+const checklist = (n: number) => CHECKLIST_KEYS.slice(0, n).map((item_key) => ({ item_key, result: "ok" as const }));
+const base: InspectionInput = { status: "draft", photos: [], findings: [], checklist: [] };
+
+describe("inspectionState", () => {
+  it("starts on photos with no score", () => {
+    const s = inspectionState(base);
+    expect(s.next).toBe("photos");
+    expect(s.score).toBeNull();
+    expect(s.stepsDone).toBe(0);
+  });
+
+  it("moves to damage notes once the 12 required photos are in", () => {
+    expect(inspectionState({ ...base, photos: photos(11) }).next).toBe("photos");
+    expect(inspectionState({ ...base, photos: photos(12, "pending") }).next).toBe("findings");
+  });
+
+  it("waits for AI checks and unreviewed notes before the checklist", () => {
+    const withNote = { ...base, photos: photos(12), findings: [{ severity: "minor" as const, accepted: false }] };
+    expect(inspectionState(withNote).next).toBe("findings");
+    expect(inspectionState(withNote).toReview).toBe(1);
+    expect(inspectionState({ ...withNote, findings: [{ severity: "minor", accepted: true }] }).next).toBe("checklist");
+  });
+
+  it("counts unclear photos as checked", () => {
+    expect(inspectionState({ ...base, photos: [...photos(11), { angle_key: "dashboard", ai_status: "unclear" }] }).analysed).toBe(true);
+  });
+
+  it("hides the score until the checklist is started, then marks it provisional", () => {
+    expect(inspectionState({ ...base, photos: photos(20) }).score).toBeNull();
+    const started = inspectionState({ ...base, photos: photos(20), checklist: checklist(3) });
+    expect(started.score).toEqual({ value: 10, band: "excellent", provisional: true });
+  });
+
+  it("hides the score while AI notes are waiting to be reviewed", () => {
+    const pending = inspectionState({ ...base, photos: photos(20), findings: [{ severity: "moderate", accepted: false }], checklist: checklist(5) });
+    expect(pending.score).toBeNull();
+    const reviewed = inspectionState({ ...base, photos: photos(20), findings: [{ severity: "moderate", accepted: true }], checklist: checklist(5) });
+    expect(reviewed.score?.value).toBeLessThan(10);
+  });
+
+  it("doesn't count damage notes as done before the required photos are in", () => {
+    const early = inspectionState({ ...base, photos: photos(7) });
+    expect(early.analysed).toBe(true);
+    expect(early.findingsDone).toBe(false);
+    expect(early.stepsDone).toBe(0);
+  });
+
+  it("goes to the report once finished, even with a photo the AI couldn't check", () => {
+    const failedPhoto = [...photos(11), { angle_key: "dashboard", ai_status: "failed" as const }];
+    expect(inspectionState({ ...base, status: "inspected", photos: failedPhoto, checklist: checklist(19) }).next).toBe("report");
+  });
+
+  it("goes to the report once the inspection is finished", () => {
+    const done = inspectionState({ ...base, status: "inspected", photos: photos(20), checklist: checklist(19) });
+    expect(done.next).toBe("report");
+    expect(done.score?.provisional).toBe(false);
+    expect(done.stepsDone).toBe(3);
+    expect(inspectionState({ ...base, status: "published", photos: photos(20), checklist: checklist(19) }).stepsDone).toBe(4);
+  });
+});

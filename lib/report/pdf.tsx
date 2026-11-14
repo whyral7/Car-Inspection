@@ -4,7 +4,7 @@ import { Circle, Document, Font, Image as PdfPicture, Link, Page, Path, StyleShe
 import { APP_NAME } from "@/lib/config";
 import { formatPhone } from "@/lib/report/share";
 import { scoreBars } from "@/lib/score";
-import { t } from "@/lib/strings";
+import { en as t } from "@/lib/strings";
 import { FONT_FILES, PDF_ART } from "./brand-assets";
 import { C, RESULT_COLORS, SEVERITY_COLORS, VERDICT_COLORS, type Verdict } from "./colors";
 import { redFlags, type DetailRow, type ReportCheckItem, type ReportView } from "./view";

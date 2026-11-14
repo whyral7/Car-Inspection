@@ -1,21 +1,29 @@
-// The report body shared by the public page (/r/[slug]) and the dealer's preview. No hooks, so it
-// renders on the server for buyers and in the browser for the live preview.
+// The report body shared by the public page (/r/[slug]), the sample report and the sharer's preview.
+// No hooks, so it renders on the server for buyers and in the browser for the live preview.
+//
+// Order follows what a buyer wants first: the car's photos, then one summary card (plate, score,
+// what was found, when), then price and the details.
 import type { ReactNode } from "react";
-import { ChatIcon, DownloadIcon, PhoneIcon } from "@/components/icons";
-import { RedFlag } from "@/components/red-flag";
-import { PhotoGallery } from "@/components/report/photo-gallery";
-import { VerdictBadge, resultVerdict, severityVerdict } from "@/components/verdict-badge";
+import { AlertIcon, ChatIcon, ChevronDownIcon, DownloadIcon, InfoIcon, PhoneIcon, ShieldCheckIcon, XIcon } from "@/components/icons";
+import { Plate } from "@/components/plate";
+import { PhotoGallery, PhotoHero } from "@/components/report/photo-gallery";
+import { ShareButton } from "@/components/report/share-button";
+import { ScoreMeter } from "@/components/score-meter";
+import { SeverityBadge } from "@/components/severity";
+import { Badge, buttonClass, cardClass, type BadgeTone } from "@/components/ui";
 import { formatPhone, telHref, whatsappChatUrl } from "@/lib/report/share";
-import { redFlags, type DetailRow, type ReportCheckItem, type ReportView as View } from "@/lib/report/view";
-import { scoreBars } from "@/lib/score";
+import { checkCounts, flaggedChecks, shownChecks, type DetailRow, type ReportCheckItem, type ReportView as View } from "@/lib/report/view";
 import type { Strings } from "@/lib/strings";
+import type { ChecklistResult } from "@/lib/supabase/database.types";
+
+const resultTone: Record<ChecklistResult, BadgeTone> = { ok: "success", attention: "warning", fail: "danger", na: "neutral" };
 
 function Section({ title, aside, children }: { title: string; aside?: string; children: ReactNode }) {
   return (
-    <section className="rounded-lg border border-border bg-surface p-4">
-      <div className="mb-3 flex items-baseline justify-between gap-3">
-        <h2 className="type-heading-2">{title}</h2>
-        {aside && <p className="text-right text-sm text-text-subtle">{aside}</p>}
+    <section className={cardClass()}>
+      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4">
+        <h2 className="text-heading">{title}</h2>
+        {aside && <p className="text-small text-ink-muted">{aside}</p>}
       </div>
       {children}
     </section>
@@ -24,11 +32,11 @@ function Section({ title, aside, children }: { title: string; aside?: string; ch
 
 function Details({ rows }: { rows: DetailRow[] }) {
   return (
-    <dl className="divide-y divide-border">
+    <dl className="divide-y divide-line">
       {rows.map((row) => (
-        <div key={row.label} className="flex justify-between gap-4 py-2 text-sm">
-          <dt className="text-text-muted">{row.label}</dt>
-          <dd className={`text-right font-medium ${row.warn ? "text-fail" : ""}`}>{row.value}</dd>
+        <div key={row.label} className="flex flex-wrap justify-between gap-x-4 py-3 text-small">
+          <dt className="text-ink-muted">{row.label}</dt>
+          <dd className={`text-right font-semibold ${row.warn ? "text-danger-700" : ""}`}>{row.value}</dd>
         </div>
       ))}
     </dl>
@@ -37,15 +45,15 @@ function Details({ rows }: { rows: DetailRow[] }) {
 
 function CheckList({ items }: { items: ReportCheckItem[] }) {
   return (
-    <ul className="divide-y divide-border">
+    <ul className="divide-y divide-line">
       {items.map((item) => (
-        <li key={item.key} className="flex items-start gap-3 py-2">
-          <VerdictBadge verdict={resultVerdict[item.result]} className="mt-0.5 w-24">
+        <li key={item.key} className="flex flex-wrap items-start gap-x-4 gap-y-1 py-3">
+          <Badge tone={resultTone[item.result]} className="mt-px min-w-16 justify-center">
             {item.resultLabel}
-          </VerdictBadge>
-          <span className="min-w-0 text-sm">
+          </Badge>
+          <span className="min-w-0 flex-1 text-small">
             <span className="block">{item.label}</span>
-            {item.note && <span className="block text-text-muted">{item.note}</span>}
+            {item.note && <span className="block text-ink-muted">{item.note}</span>}
           </span>
         </li>
       ))}
@@ -53,38 +61,23 @@ function CheckList({ items }: { items: ReportCheckItem[] }) {
   );
 }
 
-/** Score out of 10 in ink, five rising bars (the highest filled one in olive) and the grade word. */
-// Strings come in as a prop: this renders on the server (public report) and inside the dealer's client preview.
-export function ScoreBadge({ view, t, className = "" }: { view: Pick<View, "score" | "scoreText" | "band">; t: Strings; className?: string }) {
-  const filled = scoreBars(view.score);
+/** The report's score: ink number, five bars, grade word. Strings come in as a prop (server page and client preview). */
+export function ScoreBadge({ view, t, sub, className = "" }: { view: Pick<View, "score" | "scoreText" | "band">; t: Strings; sub?: ReactNode; className?: string }) {
+  const grade = t.publicReport.bands[view.band];
   return (
-    <div
-      role="img"
-      aria-label={`${t.publicReport.score} ${view.scoreText} ${t.publicReport.outOf}, ${t.publicReport.bands[view.band]}`}
-      className={`flex shrink-0 flex-col items-end gap-1 ${className}`}
-    >
-      <span className="type-overline uppercase tracking-[0.06em] text-text-subtle">{t.publicReport.score}</span>
-      <div className="flex items-end gap-2">
-        <span className="type-display-lg tabular text-text">
-          {view.scoreText}
-          <span className="type-body text-text-subtle">{t.publicReport.outOf}</span>
-        </span>
-        <span aria-hidden="true" className="mb-1.5 flex items-end gap-0.5">
-          {[16, 20, 24, 28, 32].map((h, i) => (
-            <span
-              key={h}
-              style={{ height: h }}
-              className={`w-1.5 rounded-xs ${i + 1 === filled ? "bg-accent" : i < filled ? "bg-text" : "bg-border"}`}
-            />
-          ))}
-        </span>
-      </div>
-      <span className="type-title-sm text-text">{t.publicReport.bands[view.band]}</span>
-    </div>
+    <ScoreMeter
+      score={view.score}
+      scoreText={view.scoreText}
+      outOf={t.publicReport.outOf}
+      grade={grade}
+      sub={sub}
+      label={`${t.publicReport.score} ${view.scoreText}${t.publicReport.outOf}, ${grade}`}
+      className={className}
+    />
   );
 }
 
-/** "Call dealer" and "WhatsApp dealer" (or owner). In the sharer's own preview they are shown but do nothing. */
+/** "Call" and "WhatsApp" for whoever shared the report. In the sharer's own preview they are shown but do nothing. */
 export function ContactButtons({ view, t, preview = false }: { view: View; t: Strings; preview?: boolean }) {
   const { userType, phone } = view.dealer;
   const message = t.publicReport.contactMessage(view.car.title || view.car.regNumber, view.car.regNumber, userType !== "buyer");
@@ -92,21 +85,20 @@ export function ContactButtons({ view, t, preview = false }: { view: View; t: St
   const chat = whatsappChatUrl(phone, message);
   if (!call || !chat) return null;
   const labels = t.publicReport.contact[userType];
-  const base = "flex min-h-12 flex-1 items-center justify-center gap-2 rounded-md px-3 type-title-sm";
   const buttons = [
-    { href: call, label: labels.call, icon: <PhoneIcon size={18} />, style: "border border-button-secondary-border bg-button-secondary-bg text-button-secondary-fg active:bg-button-secondary-bg-hover" },
-    { href: chat, label: labels.whatsapp, icon: <ChatIcon size={18} />, style: "bg-button-primary-bg text-button-primary-fg active:bg-button-primary-bg-hover" },
+    { href: call, label: t.publicReport.callShort, aria: labels.call, icon: <PhoneIcon size={18} />, style: buttonClass("secondary", "flex-1 whitespace-nowrap") },
+    { href: chat, label: t.publicReport.whatsappShort, aria: labels.whatsapp, icon: <ChatIcon size={18} />, style: buttonClass("primary", "flex-1 whitespace-nowrap") },
   ];
   return (
     <div className="flex gap-2">
       {buttons.map((b) =>
         preview ? (
-          <span key={b.label} aria-disabled="true" className={`${base} ${b.style}`}>
+          <span key={b.label} aria-disabled="true" aria-label={b.aria} className={b.style}>
             {b.icon}
             {b.label}
           </span>
         ) : (
-          <a key={b.label} href={b.href} className={`${base} ${b.style}`} {...(b.href.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}>
+          <a key={b.label} href={b.href} aria-label={b.aria} className={b.style} {...(b.href.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}>
             {b.icon}
             {b.label}
           </a>
@@ -116,111 +108,167 @@ export function ContactButtons({ view, t, preview = false }: { view: View; t: St
   );
 }
 
-export function ReportView({ view, t, pdfHref }: { view: View; t: Strings; pdfHref?: string | null }) {
+/** Names the answers that need attention or failed, right under the score, so nothing bad hides further down. */
+function Flagged({ view, t }: { view: View; t: Strings }) {
+  const { attention, fail } = flaggedChecks(view);
+  if (attention.length + fail.length === 0) return null;
+  return (
+    <ul className="mt-2 flex flex-col gap-1 text-small">
+      {fail.length > 0 && (
+        <li className="flex items-start gap-2 text-danger-700">
+          <XIcon size={16} className="mt-0.5" />
+          <span>{t.publicReport.flagged.fail(fail.join(", "))}</span>
+        </li>
+      )}
+      {attention.length > 0 && (
+        <li className="flex items-start gap-2 text-warning-700">
+          <AlertIcon size={16} className="mt-0.5" />
+          <span>{t.publicReport.flagged.attention(attention.join(", "))}</span>
+        </li>
+      )}
+    </ul>
+  );
+}
+
+/** One line on what was found, for the summary card: "3 damage notes · 15 OK, 2 need attention, 1 problem". */
+function summaryLine(view: View, t: Strings) {
+  const parts: string[] = [];
+  if (view.findings) parts.push(t.publicReport.summary.findings(view.findings.length).replace(/[.।]$/, ""));
+  if (shownChecks(view).length > 0) {
+    const c = checkCounts(view);
+    parts.push(t.publicReport.checklistSummary(c.ok, c.attention, c.fail));
+  }
+  return parts.join(" · ");
+}
+
+type ReportViewProps = {
+  view: View;
+  t: Strings;
+  pdfHref?: string | null;
+  /** The public link, for the buyer's Share button. Not shown in the sharer's preview. */
+  shareUrl?: string | null;
+};
+
+export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
   const phone = formatPhone(view.dealer.phone);
   const place = [view.dealer.address, view.dealer.city].filter(Boolean).join(", ");
-  const flags = redFlags(view);
+  const takenOn = view.photos?.find((p) => p.takenAt)?.takenAt?.split(",")[0] ?? null;
+  const inspectedOn = view.publishedOn ?? takenOn;
+  const summary = summaryLine(view, t);
+  const shareTitle = t.publicReport.ogTitle(view.car.title || view.car.regNumber, view.scoreText);
 
   return (
     <div className="flex flex-col gap-4">
-      <header className="flex items-center gap-3">
+      <header className="flex items-center gap-4">
         {view.dealer.logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- small public logo, no need for the image optimiser
-          <img src={view.dealer.logoUrl} alt="" width={48} height={48} className="size-12 shrink-0 rounded-md border border-border bg-surface object-contain" />
+          <img src={view.dealer.logoUrl} alt="" width={48} height={48} className="size-12 shrink-0 rounded-control bg-surface object-contain ring-1 ring-line" />
         ) : (
-          // eslint-disable-next-line @next/next/no-img-element -- static brand SVG
-          <img src="/brand/treadmark-mark-small-color.svg" alt="" width={48} height={48} className="size-12 shrink-0" />
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-control bg-brand-700 text-heading text-white">{view.dealer.name.charAt(0).toUpperCase()}</span>
         )}
         <div className="min-w-0 flex-1">
-          <p className="truncate type-title-sm text-text">{view.dealer.name}</p>
-          {view.dealer.city && <p className="truncate type-caption text-text-muted">{view.dealer.city}</p>}
+          <p className="text-heading break-words">{view.dealer.name}</p>
+          <p className="text-small text-ink-muted">{[view.dealer.city, t.publicReport.heading].filter(Boolean).join(" · ")}</p>
         </div>
-        <span className="shrink-0 type-overline uppercase tracking-[0.06em] text-text-subtle">{t.publicReport.heading}</span>
+        {shareUrl && <ShareButton url={shareUrl} title={shareTitle} className={buttonClass("ghost", "-mr-2 shrink-0 !px-2", false, "sm")} />}
       </header>
 
-      {flags.length > 0 && (
-        <section aria-label={t.publicReport.flagsTitle(flags.length)} className="flex flex-col gap-2">
-          <h2 className="type-overline uppercase tracking-[0.06em] text-text-subtle">{t.publicReport.flagsTitle(flags.length)}</h2>
-          {flags.map((flag) => (
-            <RedFlag key={flag.key} title={flag.title}>
-              {flag.body}
-            </RedFlag>
-          ))}
-        </section>
-      )}
+      {view.photos && view.photos.length > 0 && <PhotoHero photos={view.photos} />}
 
-      <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="inline-block rounded-xs border-[1.5px] border-plate-border px-2 py-0.5 font-mono text-base font-medium tracking-[0.08em]">{view.car.regNumber}</p>
-            <h1 className="mt-2 type-heading-2 text-text">{view.car.title}</h1>
+      <section className={cardClass()}>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
+            <Plate reg={view.car.regNumber} className="self-start" />
+            <h1 className="text-title">{view.car.title}</h1>
           </div>
           <ScoreBadge view={view} t={t} />
         </div>
+        {summary && <p className="mt-4 font-medium text-balance">{summary}</p>}
+        <Flagged view={view} t={t} />
+        {inspectedOn && (
+          <p className="mt-1 flex items-center gap-2 text-small text-ink-muted">
+            <ShieldCheckIcon size={16} className="text-brand-700" />
+            {t.publicReport.inspectedOn(inspectedOn)}
+          </p>
+        )}
+        <p className="mt-4 flex items-start gap-2 text-caption text-balance text-ink-muted">
+          <InfoIcon size={14} className="mt-px" />
+          {t.disclaimer}
+        </p>
+        <details className="group mt-2">
+          <summary className="-mx-2 inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-chip px-2 text-small font-semibold text-brand-700 transition-colors hover:bg-brand-50 [&::-webkit-details-marker]:hidden">
+            {t.publicReport.scoreHowTitle}
+            <ChevronDownIcon size={16} className="transition-transform duration-200 group-open:rotate-180" />
+          </summary>
+          <p className="mt-2 animate-rise-in rounded-control bg-canvas p-4 text-small">{t.publicReport.scoreHow}</p>
+        </details>
         {view.car.details.length > 0 && (
-          <div className="mt-3">
+          <div className="mt-2">
             <Details rows={view.car.details} />
           </div>
         )}
       </section>
 
+      {view.findings && (
+        <Section title={t.publicReport.findings} aside={t.publicReport.findingCount(view.findings.length)}>
+          {view.findings.length === 0 ? (
+            <p className="text-small text-ink-muted">{t.publicReport.noFindings}</p>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {view.findings.map((f, i) => (
+                <li
+                  key={i}
+                  className="rounded-control p-4 ring-1 ring-line ring-inset"
+                >
+                  <div className="flex flex-wrap items-start gap-2">
+                    <SeverityBadge severity={f.severity} label={f.severityLabel} className="mt-px" />
+                    <p className="min-w-0">
+                      <span className="font-semibold">{f.typeLabel}</span>
+                      {f.location && <span className="text-ink"> · {f.location}</span>}
+                    </p>
+                  </div>
+                  {f.note && <p className="mt-1 text-small text-ink">{f.note}</p>}
+                  {f.photoLabel && <p className="mt-1 text-caption text-ink-muted">{t.publicReport.seenIn(f.photoLabel)}</p>}
+                </li>
+              ))}
+            </ul>
+          )}
+        </Section>
+      )}
+
       {view.price && (
         <Section title={t.publicReport.price}>
-          <p className="font-mono text-xl font-medium text-text">{view.price.rangeText}</p>
-          <p className="mt-1 text-sm text-text-muted">{view.price.adjusted
+          <p className="text-title tabular">{view.price.rangeText}</p>
+          <p className="mt-1 text-small text-ink-muted">
+            {view.price.adjusted
               ? t.publicReport.priceAdjusted(view.price.marketRangeText, view.price.adjustmentText, view.scoreText)
-              : t.publicReport.priceUnadjusted(view.price.marketRangeText)}</p>
-          {view.price.summary && <p className="mt-2 text-sm text-text-muted">{view.price.summary}</p>}
-          <p className="mt-3 text-xs text-text-subtle">{t.publicReport.priceBasedOn(view.price.comparables.length, view.price.searchedOn)}</p>
+              : t.publicReport.priceUnadjusted(view.price.marketRangeText)}
+          </p>
+          {view.price.summary && <p className="mt-2 text-small text-ink">{view.price.summary}</p>}
+          <p className="mt-4 text-caption text-ink-muted">{t.publicReport.priceBasedOn(view.price.comparables.length, view.price.searchedOn)}</p>
           {view.price.comparables.length > 0 && (
             <ul className="mt-1 flex flex-col">
               {view.price.comparables.map((c) => (
                 <li key={c.url}>
-                  <a href={c.url} target="_blank" rel="noopener noreferrer nofollow" className="flex min-h-11 items-center justify-between gap-3 py-1 text-sm">
+                  <a href={c.url} target="_blank" rel="noopener noreferrer nofollow" className="-mx-2 flex min-h-12 items-center justify-between gap-4 rounded-chip px-2 py-1 text-small transition-colors hover:bg-canvas">
                     <span className="min-w-0">
-                      <span className="block truncate font-medium text-accent underline">{c.title}</span>
-                      <span className="block text-xs text-text-subtle">{[c.host, c.detail].filter(Boolean).join(" · ")}</span>
+                      <span className="block truncate font-semibold text-brand-700 underline">{c.title}</span>
+                      <span className="block text-caption text-ink-muted">{[c.host, c.detail].filter(Boolean).join(" · ")}</span>
                     </span>
-                    {c.priceText && <span className="shrink-0 font-mono font-medium">{c.priceText}</span>}
+                    {c.priceText && <span className="shrink-0 font-semibold">{c.priceText}</span>}
                   </a>
                 </li>
               ))}
             </ul>
           )}
-          <p className="mt-3 text-xs text-text-subtle">{t.publicReport.priceDisclaimer}</p>
+          <p className="mt-4 text-caption text-ink-muted">{t.publicReport.priceDisclaimer}</p>
         </Section>
       )}
 
       {view.photos && view.photos.length > 0 && (
         <Section title={t.publicReport.photos} aside={t.publicReport.photoCount(view.photos.length)}>
           <PhotoGallery photos={view.photos} />
-          <p className="mt-2 text-xs text-text-subtle">{t.publicReport.tapToEnlarge}</p>
-        </Section>
-      )}
-
-      {view.findings && (
-        <Section title={t.publicReport.findings} aside={t.publicReport.findingCount(view.findings.length)}>
-          {view.findings.length === 0 ? (
-            <p className="text-sm text-text-muted">{t.publicReport.noFindings}</p>
-          ) : (
-            <ul className="flex flex-col gap-2">
-              {view.findings.map((f, i) => (
-                <li key={i} className="rounded-md border border-border p-3">
-                  <div className="flex items-start gap-2">
-                    <VerdictBadge verdict={severityVerdict[f.severity]} className="mt-0.5">
-                      {f.severityLabel}
-                    </VerdictBadge>
-                    <p className="min-w-0">
-                      <span className="font-semibold">{f.typeLabel}</span>
-                      {f.location && <span className="text-text-muted"> · {f.location}</span>}
-                    </p>
-                  </div>
-                  {f.note && <p className="mt-1 text-sm text-text-muted">{f.note}</p>}
-                  {f.photoLabel && <p className="mt-1 text-xs text-text-subtle">{t.publicReport.seenIn(f.photoLabel)}</p>}
-                </li>
-              ))}
-            </ul>
-          )}
+          <p className="mt-2 text-caption text-ink-muted">{t.publicReport.tapToEnlarge}</p>
         </Section>
       )}
 
@@ -229,10 +277,10 @@ export function ReportView({ view, t, pdfHref }: { view: View; t: Strings; pdfHr
           title={t.publicReport.checklist}
           aside={t.publicReport.checklistSummary(view.checklist.counts.ok, view.checklist.counts.attention, view.checklist.counts.fail)}
         >
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             {view.checklist.groups.map((g) => (
               <div key={g.key}>
-                <h3 className="type-overline uppercase tracking-[0.06em] text-text-subtle">{g.label}</h3>
+                <h3 className="text-caption font-semibold tracking-wide text-ink-muted uppercase">{g.label}</h3>
                 <CheckList items={g.items} />
               </div>
             ))}
@@ -247,28 +295,26 @@ export function ReportView({ view, t, pdfHref }: { view: View; t: Strings; pdfHr
         </Section>
       )}
 
-      <p className="rounded-lg bg-surface-sunken p-4 text-center type-label text-text">{t.disclaimer}</p>
+      <p className="flex items-start justify-center gap-2 rounded-card bg-sunken p-4 text-center text-small font-semibold">
+        <InfoIcon size={18} className="mt-px text-ink-muted" />
+        {t.disclaimer}
+      </p>
 
-      <footer className="flex flex-col gap-1 rounded-lg border border-border bg-surface p-4 text-sm">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-text-subtle">{t.publicReport.inspectedBy}</p>
-            <p className="font-semibold">{view.dealer.name}</p>
-          </div>
-          {/* eslint-disable-next-line @next/next/no-img-element -- static brand SVG */}
-          <img src="/brand/treadmark-seal-olive.svg" alt="" width={64} height={64} className="size-16 shrink-0" />
-        </div>
-        {view.dealer.ownerName && <p className="text-text-muted">{view.dealer.ownerName}</p>}
-        {place && <p className="text-text-muted">{place}</p>}
-        {phone && <p className="text-text-muted">{phone}</p>}
+      <footer className={cardClass("default", "md", "flex flex-col gap-1 text-small")}>
+        <p className="text-ink-muted">{t.publicReport.inspectedBy}</p>
+        <p className="font-semibold">{view.dealer.name}</p>
+        {view.dealer.ownerName && <p className="text-ink">{view.dealer.ownerName}</p>}
+        {place && <p className="text-ink">{place}</p>}
+        {phone && <p className="text-ink">{phone}</p>}
         {pdfHref && (
-          <a href={pdfHref} className="mt-2 flex min-h-12 items-center justify-center gap-2 rounded-md border border-button-secondary-border bg-button-secondary-bg type-title-sm text-button-secondary-fg active:bg-button-secondary-bg-hover">
+          <a href={pdfHref} className={buttonClass("secondary", "mt-4")}>
             <DownloadIcon size={18} />
             {t.publicReport.downloadPdf}
           </a>
         )}
-        {view.publishedOn && <p className="mt-2 text-xs text-text-subtle">{t.publicReport.publishedOn(view.publishedOn)}</p>}
-        <p className="text-xs text-text-subtle">{t.publicReport.madeWith}</p>
+        {shareUrl && <ShareButton url={shareUrl} title={shareTitle} label={t.publicReport.shareLong} className={buttonClass("ghost", "mt-2")} />}
+        {view.publishedOn && <p className="mt-2 text-caption text-ink-muted">{t.publicReport.publishedOn(view.publishedOn)}</p>}
+        <p className="text-caption text-ink-muted">{t.publicReport.madeWith}</p>
       </footer>
     </div>
   );

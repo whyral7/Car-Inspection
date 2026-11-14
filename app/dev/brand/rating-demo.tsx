@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useT } from "@/components/i18n-provider";
-import { Segmented, type SegmentOption } from "@/components/segmented";
+import { Segmented, type SegmentOption } from "@/components/ui";
 import type { ChecklistResult } from "@/lib/supabase/database.types";
 
 /** The checklist rating control, live, so its selected states can be tried on the brand page. */

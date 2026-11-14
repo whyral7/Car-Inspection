@@ -3,7 +3,8 @@
 import { z } from "zod";
 import { CHECKLIST_KEYS, checklistProgress } from "@/lib/checklist";
 import { getCurrentProfile } from "@/lib/profile";
-import { getT, getTranslateMessage } from "@/lib/i18n.server";
+import { errorText } from "@/lib/i18n";
+import { getT } from "@/lib/i18n.server";
 import { checklistItemSchema } from "@/lib/validation/finding";
 
 // Every query runs as the dealer, so RLS limits it to their own cars.
@@ -13,13 +14,27 @@ export type ChecklistActionResult = { ok: true } | { ok: false; error: string };
 /** Saves one item's result and note. Called on every tap, so it upserts. */
 export async function saveChecklistItem(carId: string, input: { item_key: string; result: string; note: string | null }): Promise<ChecklistActionResult> {
   const t = await getT();
-  const tr = await getTranslateMessage();
   if (!z.uuid().safeParse(carId).success) return { ok: false, error: t.common.somethingWrong };
   const parsed = checklistItemSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: tr(parsed.error.issues[0]?.message ?? t.common.somethingWrong) };
+  if (!parsed.success) return { ok: false, error: errorText(t, parsed.error.issues[0]?.message) || t.common.somethingWrong };
 
   const { supabase } = await getCurrentProfile();
   const { error } = await supabase.from("checklist_items").upsert({ car_id: carId, ...parsed.data }, { onConflict: "car_id,item_key" });
+  return error ? { ok: false, error: t.checklist.saveFailed } : { ok: true };
+}
+
+/** Saves several answers at once ("Mark the rest OK", or answers sent after being offline). */
+export async function saveChecklistItems(carId: string, inputs: { item_key: string; result: string; note: string | null }[]): Promise<ChecklistActionResult> {
+  const t = await getT();
+  if (!z.uuid().safeParse(carId).success) return { ok: false, error: t.common.somethingWrong };
+  const parsed = z.array(checklistItemSchema).min(1).max(CHECKLIST_KEYS.length).safeParse(inputs);
+  if (!parsed.success) return { ok: false, error: t.common.somethingWrong };
+
+  const { supabase } = await getCurrentProfile();
+  const { error } = await supabase.from("checklist_items").upsert(
+    parsed.data.map((item) => ({ car_id: carId, ...item })),
+    { onConflict: "car_id,item_key" },
+  );
   return error ? { ok: false, error: t.checklist.saveFailed } : { ok: true };
 }
 

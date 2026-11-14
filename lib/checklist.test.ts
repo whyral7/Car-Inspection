@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CHECKLIST_KEYS, checklistProgress, isChecklistKey } from "./checklist";
+import { CHECKLIST_KEYS, MUST_ANSWER_KEYS, checklistProgress, isChecklistKey, isMustAnswer } from "./checklist";
 
 // Must match the item_key check constraint in supabase/migrations/20261019000000_init.sql.
 const DB_KEYS = [
@@ -23,5 +23,13 @@ describe("checklist", () => {
     expect(checklistProgress([])).toEqual({ done: 0, total: 19, complete: false });
     expect(checklistProgress(["brakes", "horn", "sunroof"])).toEqual({ done: 2, total: 19, complete: false });
     expect(checklistProgress(DB_KEYS)).toEqual({ done: 19, total: 19, complete: true });
+  });
+});
+
+describe("must-answer checks", () => {
+  it("covers the safety and legal checks, all real checklist items", () => {
+    expect(MUST_ANSWER_KEYS).toEqual(expect.arrayContaining(["brakes", "flood_signs", "accident_signs", "rc_original"]));
+    for (const key of MUST_ANSWER_KEYS) expect(CHECKLIST_KEYS).toContain(key);
+    expect(isMustAnswer("horn")).toBe(false);
   });
 });

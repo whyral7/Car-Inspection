@@ -1,35 +1,46 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
-import { BottomBar } from "@/components/bottom-bar";
-import { Button } from "@/components/button";
-import { FormError, TextAreaField } from "@/components/field";
-import { CheckIcon } from "@/components/icons";
-import { Segmented, type SegmentOption } from "@/components/segmented";
-import { CHECKLIST_GROUPS, CHECKLIST_KEYS, checklistProgress, type ChecklistKey } from "@/lib/checklist";
-import { FINDING_LIMITS } from "@/lib/findings";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useOnline } from "@/components/connection-banner";
 import { useT } from "@/components/i18n-provider";
+import { AlertIcon, ArrowRightIcon, CheckIcon, ChevronDownIcon, CloudUploadIcon, HelpIcon, PlusIcon, XIcon } from "@/components/icons";
+import { RememberStep } from "@/components/remember-step";
+import { Badge, Button, Card, ConfirmSheet, FormError, ProgressBar, Segmented, StepHeader, StickyBar, TextAreaField, TextButton, useToast, type BadgeTone, type SegmentOption } from "@/components/ui";
+import { CHECKLIST_GROUPS, CHECKLIST_KEYS, checklistProgress, isMustAnswer, type ChecklistKey } from "@/lib/checklist";
+import { FINDING_LIMITS } from "@/lib/findings";
+import { checklistOutbox } from "@/lib/outbox";
 import type { Strings } from "@/lib/strings";
 import type { ChecklistResult } from "@/lib/supabase/database.types";
-import { finishInspection, saveChecklistItem } from "./actions";
+import { finishInspection, saveChecklistItem, saveChecklistItems } from "./actions";
 
+// Every answer is written to the phone's outbox first, then sent. Failed sends (no signal) are
+// retried when the connection comes back and every RETRY_MS while online, so nothing is lost and
+// nobody has to hunt for red "not saved" items before finishing.
+
+type SaveState = "idle" | "saving" | "saved" | "waiting" | "error";
 type Item = {
   result: ChecklistResult | null;
   note: string;
   noteOpen: boolean;
-  save: "idle" | "saving" | "saved" | "error";
+  helpOpen: boolean;
+  save: SaveState;
 };
 type Items = Record<ChecklistKey, Item>;
 
+const RETRY_MS = 15_000;
+/** A note is saved this long after the last keystroke (and on leaving the box). */
+const NOTE_SAVE_MS = 1_200;
+
+// Answers are tinted, not filled, so the one solid colour on screen stays the teal next action.
 const resultOptions = (t: Strings): readonly SegmentOption<ChecklistResult>[] => [
-  // Brand ChecklistItem spec: the selected rating takes its verdict tint, edge and word colour.
-  { value: "ok", label: t.checklist.results.ok, selectedClass: "border-verdict-pass-fg bg-verdict-pass-bg text-verdict-pass-fg" },
-  { value: "attention", label: t.checklist.results.attention, selectedClass: "border-verdict-attention-fg bg-verdict-attention-bg text-verdict-attention-fg" },
-  { value: "fail", label: t.checklist.results.fail, selectedClass: "border-verdict-fail-fg bg-verdict-fail-bg text-verdict-fail-fg" },
-  { value: "na", label: t.checklist.results.na, selectedClass: "border-text bg-seg-na-bg-on text-seg-na-fg-on" },
+  { value: "ok", label: t.checklist.results.ok, icon: <CheckIcon size={16} />, selectedClass: "bg-success-50 text-success-800 ring-2 ring-success-600" },
+  { value: "attention", label: t.checklist.results.attention, icon: <AlertIcon size={16} />, selectedClass: "bg-warning-50 text-warning-800 ring-2 ring-warning-500" },
+  { value: "fail", label: t.checklist.results.fail, icon: <XIcon size={16} />, selectedClass: "bg-danger-50 text-danger-800 ring-2 ring-danger-600" },
+  { value: "na", label: t.checklist.results.na, selectedClass: "bg-sunken text-ink ring-2 ring-ink-muted" },
 ];
+
+const resultTone: Record<ChecklistResult, BadgeTone> = { ok: "success", attention: "warning", fail: "danger", na: "neutral" };
 
 type Props = {
   carId: string;
@@ -42,10 +53,12 @@ type Props = {
 export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }: Props) {
   const t = useT();
   const router = useRouter();
+  const online = useOnline();
+  const toast = useToast();
   const [items, setItems] = useState<Items>(() => {
     const entries = CHECKLIST_KEYS.map((key) => {
       const saved = initial[key];
-      return [key, { result: saved?.result ?? null, note: saved?.note ?? "", noteOpen: Boolean(saved?.note), save: "idle" } satisfies Item];
+      return [key, { result: saved?.result ?? null, note: saved?.note ?? "", noteOpen: Boolean(saved?.note), helpOpen: false, save: "idle" } satisfies Item];
     });
     return Object.fromEntries(entries) as Items;
   });
@@ -54,48 +67,158 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
   const chains = useRef(new Map<ChecklistKey, Promise<void>>());
   const [finishing, setFinishing] = useState(false);
   const [finishError, setFinishError] = useState<string | null>(null);
+  const [confirmRest, setConfirmRest] = useState(false);
+  // The item being worked on stays open; other answered items fold to one line.
+  const [active, setActive] = useState<ChecklistKey | null>(() => CHECKLIST_KEYS.find((k) => !initial[k]) ?? null);
 
-  function update(key: ChecklistKey, patch: Partial<Item>) {
+  const update = useCallback((key: ChecklistKey, patch: Partial<Item>) => {
     itemsRef.current = { ...itemsRef.current, [key]: { ...itemsRef.current[key], ...patch } };
     setItems(itemsRef.current);
-  }
+  }, []);
 
-  function persist(key: ChecklistKey) {
-    const previous = chains.current.get(key) ?? Promise.resolve();
-    const next = previous.then(async () => {
-      const { result, note } = itemsRef.current[key];
-      if (!result) return;
-      update(key, { save: "saving" });
-      try {
-        const res = await saveChecklistItem(carId, { item_key: key, result, note: note.trim() || null });
-        update(key, { save: res.ok ? "saved" : "error" });
-      } catch {
-        update(key, { save: "error" });
+  const persist = useCallback(
+    (key: ChecklistKey) => {
+      const previous = chains.current.get(key) ?? Promise.resolve();
+      const next = previous.then(async () => {
+        const { result, note } = itemsRef.current[key];
+        if (!result) return;
+        const value = { item_key: key, result, note: note.trim() || null };
+        await checklistOutbox.put({ carId, itemKey: key, result, note: value.note });
+        if (!navigator.onLine) {
+          update(key, { save: "waiting" });
+          return;
+        }
+        update(key, { save: "saving" });
+        try {
+          const res = await saveChecklistItem(carId, value);
+          if (!res.ok) throw new Error(res.error);
+          // Only clear the outbox if nothing newer was chosen while this was sending.
+          const now = itemsRef.current[key];
+          if (now.result === result && (now.note.trim() || null) === value.note) await checklistOutbox.remove(carId, key);
+          update(key, { save: "saved" });
+        } catch {
+          update(key, { save: navigator.onLine ? "error" : "waiting" });
+        }
+      });
+      chains.current.set(key, next);
+      return next;
+    },
+    [carId, update],
+  );
+
+  const resendUnsaved = useCallback(() => {
+    for (const key of CHECKLIST_KEYS) {
+      const s = itemsRef.current[key].save;
+      if (s === "waiting" || s === "error") void persist(key);
+    }
+  }, [persist]);
+
+  // Answers left on the phone by an earlier visit win over the server's older copy; send them now.
+  useEffect(() => {
+    let cancelled = false;
+    void checklistOutbox.list(carId).then((entries) => {
+      if (cancelled) return;
+      for (const e of entries) {
+        if (!(CHECKLIST_KEYS as readonly string[]).includes(e.itemKey)) continue;
+        const key = e.itemKey as ChecklistKey;
+        update(key, { result: e.result, note: e.note ?? "", noteOpen: Boolean(e.note), save: "waiting" });
+        void persist(key);
       }
     });
-    chains.current.set(key, next);
-    return next;
+    return () => {
+      cancelled = true;
+    };
+  }, [carId, persist, update]);
+
+  useEffect(() => {
+    window.addEventListener("online", resendUnsaved);
+    const timer = setInterval(() => navigator.onLine && resendUnsaved(), RETRY_MS);
+    return () => {
+      window.removeEventListener("online", resendUnsaved);
+      clearInterval(timer);
+    };
+  }, [resendUnsaved]);
+
+  // Back on a half-done checklist: start at the first unanswered item.
+  useEffect(() => {
+    const answered = CHECKLIST_KEYS.filter((k) => initial[k]);
+    const first = CHECKLIST_KEYS.find((k) => !initial[k]);
+    if (answered.length > 0 && first) document.getElementById(`item-${first}`)?.scrollIntoView({ block: "start" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, on arrival
+  }, []);
+
+  const noteTimers = useRef(new Map<ChecklistKey, ReturnType<typeof setTimeout>>());
+  useEffect(() => {
+    const timers = noteTimers.current;
+    return () => timers.forEach((timer) => clearTimeout(timer));
+  }, []);
+
+  function changeNote(key: ChecklistKey, note: string) {
+    update(key, { note });
+    clearTimeout(noteTimers.current.get(key));
+    noteTimers.current.set(key, setTimeout(() => void persist(key), NOTE_SAVE_MS));
+  }
+
+  /** Jumps to an item and opens it, focusing its first answer so keyboard users land there too. */
+  function goTo(key: ChecklistKey) {
+    setActive(key);
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`item-${key}`);
+      el?.scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      el?.querySelector<HTMLElement>("[role=radio]")?.focus({ preventScroll: true });
+    });
   }
 
   function choose(key: ChecklistKey, result: ChecklistResult) {
+    setActive(key);
     // Open the note box for anything worth explaining to a buyer.
     const openNote = result === "attention" || result === "fail" ? { noteOpen: true } : {};
     update(key, { result, ...openNote });
     void persist(key);
   }
 
+  async function markRestOk() {
+    setConfirmRest(false);
+    const rest = CHECKLIST_KEYS.filter((k) => !itemsRef.current[k].result && !isMustAnswer(k));
+    if (rest.length === 0) return;
+    for (const key of rest) {
+      update(key, { result: "ok", save: "saving" });
+      await checklistOutbox.put({ carId, itemKey: key, result: "ok", note: null });
+    }
+    try {
+      if (!navigator.onLine) throw new Error("offline");
+      const res = await saveChecklistItems(
+        carId,
+        rest.map((key) => ({ item_key: key, result: "ok", note: null })),
+      );
+      if (!res.ok) throw new Error(res.error);
+      for (const key of rest) {
+        await checklistOutbox.remove(carId, key);
+        update(key, { save: "saved" });
+      }
+    } catch {
+      for (const key of rest) update(key, { save: navigator.onLine ? "error" : "waiting" });
+    }
+  }
+
   async function onFinish() {
     setFinishError(null);
+    if (!navigator.onLine) {
+      setFinishError(t.checklist.finishOffline);
+      return;
+    }
     setFinishing(true);
     try {
+      resendUnsaved();
       await Promise.all(chains.current.values());
-      if (CHECKLIST_KEYS.some((k) => itemsRef.current[k].save === "error")) throw new Error("unsaved");
+      if (CHECKLIST_KEYS.some((k) => ["error", "waiting"].includes(itemsRef.current[k].save))) throw new Error("unsaved");
       const res = await finishInspection(carId);
       if (!res.ok) {
         setFinishError(res.error);
         return;
       }
-      router.push(`/app/cars/${carId}`);
+      if (!finished) toast.show({ tone: "success", message: t.checklist.finished });
+      router.push(`/app/cars/${carId}/report`);
       router.refresh();
     } catch {
       setFinishError(navigator.onLine ? t.checklist.saveFailed : t.common.offline);
@@ -105,59 +228,165 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
   }
 
   const progress = checklistProgress(CHECKLIST_KEYS.filter((k) => items[k].result));
+  const remaining = progress.total - progress.done;
+  const waiting = CHECKLIST_KEYS.filter((k) => items[k].save === "waiting").length;
+  const label = t.checklist.progress(progress.done, progress.total);
+  const nextKey = CHECKLIST_KEYS.find((k) => !items[k].result) ?? null;
+  // What "Mark the rest OK" would answer: never the safety and legal checks.
+  const restEligible = CHECKLIST_KEYS.filter((k) => !items[k].result && !isMustAnswer(k));
 
+  const stepLabels = [t.car.stepPhotos, t.car.stepFindings, t.car.stepChecklist, t.car.stepReport];
   return (
-    <div className="flex flex-col gap-4">
-      <Link href={`/app/cars/${carId}`} className="-ml-1 inline-flex min-h-11 items-center self-start px-1 text-sm font-medium text-accent">
-        ← {t.checklist.backToCar}
-      </Link>
+    <div className="flex flex-1 flex-col gap-6">
+      <RememberStep carId={carId} step="checklist" />
+      <StepHeader
+        step={3}
+        labels={stepLabels}
+        stepLabel={t.common.stepOf(3, 4)}
+        back={{ href: `/app/cars/${carId}`, label: t.checklist.backToCar }}
+        title={t.checklist.title}
+        meta={
+          <>
+            <span className="font-semibold tracking-wider text-ink tabular">{regNumber}</span>
+            {carTitle && ` · ${carTitle}`}
+          </>
+        }
+        description={
+          <>
+            {t.checklist.subtitle} <span className="block pt-1">{t.checklist.legend}</span>
+          </>
+        }
+      />
 
-      <header>
-        <h1 className="text-xl font-bold">{t.checklist.title}</h1>
-        <p className="text-sm text-text-muted">
-          <span className="font-mono font-medium tracking-[0.08em]">{regNumber}</span>
-          {carTitle && ` · ${carTitle}`}
+      <Card className="flex flex-col gap-4" aria-label={label}>
+        <p className="text-title tabular">{label}</p>
+        <ProgressBar value={progress.done} max={progress.total} label={label} />
+      </Card>
+
+      {waiting > 0 && (
+        <p role="status" className="flex animate-rise-in items-start gap-2 rounded-control bg-brand-50 px-4 py-3 text-small text-brand-900">
+          <CloudUploadIcon size={18} className="mt-px text-brand-700" />
+          {t.checklist.waitingCount(waiting)}
         </p>
-        <p className="mt-2 text-sm text-text-muted">{t.checklist.subtitle}</p>
-      </header>
+      )}
 
-      <section className="rounded-lg border border-border bg-surface p-4" aria-label={t.checklist.progress(progress.done, progress.total)}>
-        <p className="font-mono text-2xl font-medium">{t.checklist.progress(progress.done, progress.total)}</p>
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-surface-sunken" role="progressbar" aria-valuemin={0} aria-valuemax={progress.total} aria-valuenow={progress.done}>
-          <div className="h-full rounded-full bg-accent transition-[width]" style={{ width: `${(progress.done / progress.total) * 100}%` }} />
+      {CHECKLIST_GROUPS.map((group) => {
+        const groupDone = group.items.filter((k) => items[k].result).length;
+        return (
+          <section key={group.key} aria-labelledby={`group-${group.key}`} className="flex flex-col gap-2">
+            <div className="flex items-baseline justify-between gap-4 px-1">
+              <h2 id={`group-${group.key}`} className="text-heading">
+                {t.checklist.groups[group.key]}
+              </h2>
+              <span className={`text-small tabular ${groupDone === group.items.length ? "font-medium text-success-700" : "text-ink-muted"}`}>
+                {groupDone}/{group.items.length}
+              </span>
+            </div>
+            <ul className="divide-y divide-line overflow-hidden rounded-card bg-surface shadow-card">
+              {group.items.map((key) => {
+                const item = items[key];
+                const folded = Boolean(item.result) && active !== key;
+                return (
+                  <li key={key} id={`item-${key}`} className={`scroll-mt-24 ${folded ? "" : "px-4 py-4 sm:px-6"}`}>
+                    {folded ? (
+                      <FoldedRow itemKey={key} item={item} onOpen={() => setActive(key)} onRetry={() => void persist(key)} />
+                    ) : (
+                      <ChecklistRow
+                        itemKey={key}
+                        item={item}
+                        onChoose={(r) => choose(key, r)}
+                        onNoteChange={(note) => changeNote(key, note)}
+                        onNoteBlur={() => {
+                          clearTimeout(noteTimers.current.get(key));
+                          void persist(key);
+                        }}
+                        onOpenNote={() => update(key, { noteOpen: true })}
+                        onToggleHelp={() => update(key, { helpOpen: !item.helpOpen })}
+                        onRetry={() => void persist(key)}
+                      />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        );
+      })}
+
+      {!progress.complete && progress.done > 0 && restEligible.length > 0 && (
+        <div className="flex flex-col items-center gap-1 text-center">
+          <TextButton tone="muted" onClick={() => setConfirmRest(true)}>
+            <CheckIcon size={16} />
+            {t.checklist.markRestOk(restEligible.length)}
+          </TextButton>
+          <p className="max-w-sm text-caption text-ink-subtle">{t.checklist.markRestHint}</p>
         </div>
-      </section>
+      )}
 
-      {CHECKLIST_GROUPS.map((group) => (
-        <section key={group.key} className="rounded-lg border border-border bg-surface">
-          <h2 className="border-b border-border px-4 py-3 type-overline uppercase tracking-[0.06em] text-text-subtle">{t.checklist.groups[group.key]}</h2>
-          <ul className="divide-y divide-border">
-            {group.items.map((key) => (
-              <li key={key} className="p-4">
-                <ChecklistRow
-                  itemKey={key}
-                  item={items[key]}
-                  onChoose={(r) => choose(key, r)}
-                  onNoteChange={(note) => update(key, { note })}
-                  onNoteBlur={() => void persist(key)}
-                  onOpenNote={() => update(key, { noteOpen: true })}
-                  onRetry={() => void persist(key)}
-                />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+      <ConfirmSheet
+        open={confirmRest}
+        onClose={() => setConfirmRest(false)}
+        title={t.checklist.markRestOk(restEligible.length)}
+        description={
+          <>
+            <span className="block">{t.checklist.markRestConfirm(restEligible.length)}</span>
+            <span className="mt-2 block font-medium text-ink">{restEligible.map((k) => t.checklist.items[k].label).join(", ")}</span>
+          </>
+        }
+        confirmLabel={t.checklist.markRestYes}
+        cancelLabel={t.common.cancel}
+        closeLabel={t.common.close}
+        variant="primary"
+        errorFallback={t.checklist.saveFailed}
+        onConfirm={() => void markRestOk()}
+      />
 
-      <BottomBar progress={progress.total ? progress.done / progress.total : 0}>
-        <p aria-live="polite" className={`text-center text-sm ${progress.complete ? "text-accent" : "text-text-muted"}`}>
-          {progress.complete ? (finished ? t.checklist.finished : t.checklist.allDone) : t.checklist.finishHint(progress.total - progress.done)}
+      <StickyBar>
+        <p aria-live="polite" className={`flex items-center justify-center gap-2 text-center text-small ${progress.complete ? "font-medium text-success-700" : "text-ink-muted"}`}>
+          {progress.complete && <CheckIcon size={16} />}
+          {progress.complete ? (finished ? t.checklist.finished : t.checklist.allDone) : t.checklist.finishHint(remaining)}
         </p>
-        <FormError message={finishError} />
-        <Button onClick={() => void onFinish()} loading={finishing} disabled={!progress.complete}>
-          {finished ? t.checklist.backToCarDone : t.checklist.finish}
-        </Button>
-      </BottomBar>
+        <FormError message={finishError ?? (!online && progress.complete ? t.checklist.finishOffline : null)} />
+        {progress.complete ? (
+          <Button onClick={() => void onFinish()} loading={finishing} disabled={!online}>
+            {finished ? t.checklist.backToCarDone : t.checklist.finish}
+            <ArrowRightIcon size={20} />
+          </Button>
+        ) : (
+          nextKey && (
+            <Button onClick={() => goTo(nextKey)}>
+              {t.checklist.next(t.checklist.items[nextKey].label)}
+              <ArrowRightIcon size={20} />
+            </Button>
+          )
+        )}
+      </StickyBar>
+    </div>
+  );
+}
+
+/** An answered item, folded to one line: what was checked and the answer. Tap to change it. */
+function FoldedRow({ itemKey, item, onOpen, onRetry }: { itemKey: ChecklistKey; item: Item; onOpen: () => void; onRetry: () => void }) {
+  const t = useT();
+  const { label } = t.checklist.items[itemKey];
+  const result = item.result!;
+  return (
+    <div className="flex items-center gap-2 pr-2">
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-expanded={false}
+        aria-label={`${label}: ${t.checklist.results[result]}. ${t.checklist.change}`}
+        className="flex min-h-14 min-w-0 flex-1 items-center gap-4 py-2 pl-4 text-left transition-colors hover:bg-canvas sm:pl-6"
+      >
+        <span className="min-w-0 flex-1">
+          <span className="block font-medium break-words">{label}</span>
+          {item.note.trim() && <span className="block truncate text-small text-ink-muted">{item.note}</span>}
+        </span>
+        <Badge tone={resultTone[result]}>{t.checklist.results[result]}</Badge>
+        <ChevronDownIcon size={18} className="shrink-0 text-ink-subtle" />
+      </button>
+      {(item.save === "error" || item.save === "waiting") && <SaveState state={item.save} onRetry={onRetry} />}
     </div>
   );
 }
@@ -169,6 +398,7 @@ function ChecklistRow({
   onNoteChange,
   onNoteBlur,
   onOpenNote,
+  onToggleHelp,
   onRetry,
 }: {
   itemKey: ChecklistKey;
@@ -177,21 +407,40 @@ function ChecklistRow({
   onNoteChange: (note: string) => void;
   onNoteBlur: () => void;
   onOpenNote: () => void;
+  onToggleHelp: () => void;
   onRetry: () => void;
 }) {
   const t = useT();
-  const { label, hint } = t.checklist.items[itemKey];
+  const { label, hint, how } = t.checklist.items[itemKey];
+  const helpId = `how-${itemKey}`;
   return (
-    <div className="flex flex-col gap-2.5">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="font-medium">{label}</p>
-          <p className="text-sm text-text-subtle">{hint}</p>
+    <div className="flex flex-col gap-4">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 flex-col gap-1">
+          <p className="font-semibold">{label}</p>
+          <p className="text-small text-ink-muted">{hint}</p>
         </div>
         <SaveState state={item.save} onRetry={onRetry} />
       </div>
-      <Segmented label={label} options={resultOptions(t)} value={item.result} onChange={onChoose} />
-      {item.noteOpen ? (
+      {item.helpOpen && (
+        <p id={helpId} className="animate-rise-in rounded-control bg-brand-50 p-4 text-small text-brand-900">
+          {how}
+        </p>
+      )}
+      <Segmented label={label} options={resultOptions(t)} value={item.result} onChange={onChoose} columns="grid-cols-2 min-[420px]:grid-cols-4" />
+      <div className="-my-2 flex flex-wrap gap-x-6">
+        {!item.noteOpen && (
+          <TextButton onClick={onOpenNote}>
+            <PlusIcon size={16} />
+            {t.checklist.addNote}
+          </TextButton>
+        )}
+        <TextButton onClick={onToggleHelp} aria-expanded={item.helpOpen} aria-controls={helpId}>
+          <HelpIcon size={16} />
+          {t.checklist.howToCheck}
+        </TextButton>
+      </div>
+      {item.noteOpen && (
         <TextAreaField
           label={t.checklist.noteLabel}
           name={`note-${itemKey}`}
@@ -201,28 +450,31 @@ function ChecklistRow({
           placeholder={t.checklist.notePlaceholder}
           maxLength={FINDING_LIMITS.noteChars}
         />
-      ) : (
-        <button type="button" onClick={onOpenNote} className="inline-flex min-h-11 items-center self-start text-sm font-semibold text-accent">
-          + {t.checklist.addNote}
-        </button>
       )}
     </div>
   );
 }
 
-function SaveState({ state, onRetry }: { state: Item["save"]; onRetry: () => void }) {
+function SaveState({ state, onRetry }: { state: SaveState; onRetry: () => void }) {
   const t = useT();
-  if (state === "saving") return <span className="shrink-0 text-xs text-text-subtle">{t.checklist.saving}</span>;
+  if (state === "saving") return <span className="shrink-0 text-caption text-ink-muted">{t.checklist.saving}</span>;
   if (state === "saved")
     return (
-      <span className="inline-flex shrink-0 items-center gap-1 text-xs text-text-subtle">
+      <span className="inline-flex shrink-0 animate-fade-in items-center gap-1 text-caption font-semibold text-success-700">
         <CheckIcon size={14} />
         {t.checklist.saved}
       </span>
     );
+  if (state === "waiting")
+    return (
+      <span className="inline-flex shrink-0 items-center gap-1 text-caption font-semibold text-ink-muted">
+        <CloudUploadIcon size={14} />
+        {t.checklist.waiting}
+      </span>
+    );
   if (state === "error")
     return (
-      <button type="button" onClick={onRetry} className="min-h-11 shrink-0 text-right text-xs font-semibold text-fail">
+      <button type="button" onClick={onRetry} className="min-h-11 shrink-0 text-right text-caption font-semibold text-danger-700">
         {t.checklist.saveFailed}
       </button>
     );

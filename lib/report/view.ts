@@ -3,11 +3,11 @@
 import { z } from "zod";
 import { isFuel, isTransmission } from "@/lib/cars";
 import { CHECKLIST_GROUPS, type ChecklistGroupKey, type ChecklistKey } from "@/lib/checklist";
-import { formatDate, formatDateTime, formatInrShort, carTitle, isPastDate } from "@/lib/format";
+import { formatDate, formatDateTime, formatInrShort, formatTimestamp, carTitle, isPastDate } from "@/lib/format";
 import { adjustedRange, type Comparable } from "@/lib/price/estimate";
 import { ANGLES, isAngleKey, type AngleKey } from "@/lib/photos/angles";
 import { conditionScore, formatScore, scoreBand, type ScoreBand } from "@/lib/score";
-import { t as english, type Strings } from "@/lib/strings";
+import { en, type Strings } from "@/lib/strings";
 import type { CarRow, ChecklistResult, FindingRow, FindingType, Severity, UserType } from "@/lib/supabase/database.types";
 import { displayName } from "@/lib/user-type";
 
@@ -42,7 +42,7 @@ export type ReportInput = {
     fromRc: boolean;
   };
   /** Photos with a working link; `thumbUrl` is the small copy when there is an up-to-date one. */
-  photos: readonly { id: string; angle_key: string; url: string; thumbUrl: string | null }[];
+  photos: readonly { id: string; angle_key: string; url: string; thumbUrl: string | null; takenAt?: string | null }[];
   findings: readonly Pick<FindingRow, "type" | "location" | "severity" | "note" | "accepted" | "photo_id">[];
   checklist: readonly { item_key: string; result: ChecklistResult; note: string | null }[];
   /** The latest market estimate (Claude + web search), or null if none was run. */
@@ -66,7 +66,7 @@ export type ReportPrice = {
 };
 
 export type DetailRow = { label: string; value: string; warn?: boolean };
-export type ReportPhoto = { key: AngleKey; label: string; url: string; thumbUrl: string };
+export type ReportPhoto = { key: AngleKey; label: string; url: string; thumbUrl: string; /** "29 Oct 2026, 2:14 pm" (upload time). */ takenAt: string | null };
 export type ReportFinding = {
   type: FindingType;
   typeLabel: string;
@@ -121,9 +121,9 @@ function checkItem(t: Strings, key: ChecklistKey, row: ReportInput["checklist"][
 /**
  * Builds the full report and then drops the hidden sections. The score always counts every accepted
  * note and checklist answer, hidden or not. Notes the dealer hasn't accepted never appear.
- * Labels are in `t`'s language: the reader's on screen, English in the PDF and link preview.
  */
-export function buildReportView(input: ReportInput, hidden: readonly ReportSection[] = [], now = new Date(), t: Strings = english): ReportView {
+/** `t` picks the language; the PDF and share image always use English. */
+export function buildReportView(input: ReportInput, hidden: readonly ReportSection[] = [], now = new Date(), t: Strings = en): ReportView {
   const { car, dealer } = input;
   // Everyone who signed up before user types existed was a dealer.
   const userType = dealer.user_type ?? "dealer";
@@ -133,7 +133,7 @@ export function buildReportView(input: ReportInput, hidden: readonly ReportSecti
   const photos: ReportPhoto[] = input.photos
     .filter((p): p is typeof p & { angle_key: AngleKey } => isAngleKey(p.angle_key))
     .sort((a, b) => ANGLE_ORDER.get(a.angle_key)! - ANGLE_ORDER.get(b.angle_key)!)
-    .map((p) => ({ key: p.angle_key, label: t.photos.angles[p.angle_key].label, url: p.url, thumbUrl: p.thumbUrl ?? p.url }));
+    .map((p) => ({ key: p.angle_key, label: t.photos.angles[p.angle_key].label, url: p.url, thumbUrl: p.thumbUrl ?? p.url, takenAt: p.takenAt ? formatTimestamp(p.takenAt) : null }));
 
   const angleByPhotoId = new Map(input.photos.map((p) => [p.id, p.angle_key]));
   const photoRank = (photoId: string | null) => ANGLE_ORDER.get(angleByPhotoId.get(photoId ?? "") ?? "") ?? ANGLES.length;
@@ -186,7 +186,7 @@ export function buildReportView(input: ReportInput, hidden: readonly ReportSecti
   const details = detailCandidates.filter((row): row is DetailRow => Boolean(row.value));
 
   const score = conditionScore({ findings: input.findings, checklist: input.checklist });
-  const price = input.price ? buildPrice(input.price, score, car.status !== "draft", t) : null;
+  const price = input.price ? buildPrice(t, input.price, score, car.status !== "draft") : null;
 
   const full: ReportView = {
     slug: input.slug,
@@ -228,24 +228,48 @@ export function applyHidden(view: ReportView, hidden: readonly ReportSection[]):
   };
 }
 
-/** Major damage and failed checks, shown above the score (brand rule). Only from sections the reader can see. */
-export function redFlags(view: ReportView): { key: string; title: string; body: string | null }[] {
+/** Every checklist answer the report shows, the document checks included. */
+export function shownChecks(view: ReportView): ReportCheckItem[] {
+  return [...(view.checklist?.groups.flatMap((g) => g.items) ?? []), ...(view.documents?.items ?? [])];
+}
+
+/** Counts across every shown answer, so a summary can never leave out a document "Problem". */
+export function checkCounts(view: ReportView): Record<ChecklistResult, number> {
+  const counts: Record<ChecklistResult, number> = { ok: 0, attention: 0, fail: 0, na: 0 };
+  for (const item of shownChecks(view)) counts[item.result]++;
+  return counts;
+}
+
+/**
+ * What a buyer must see before the score (brand rule): major damage and failed checks in red, then
+ * checks that need attention in amber. Only from sections the reader can see.
+ */
+export function redFlags(view: ReportView): { key: string; tone: "fail" | "attention"; title: string; body: string | null }[] {
   const findings = (view.findings ?? [])
     .filter((f) => f.severity === "major")
-    .map((f, i) => ({ key: `f${i}`, title: [f.typeLabel, f.location].filter(Boolean).join(" · "), body: f.note }));
-  const checks = [...(view.checklist?.groups.flatMap((g) => g.items) ?? []), ...(view.documents?.items ?? [])]
-    .filter((item) => item.result === "fail")
-    .map((item) => ({ key: `c${item.key}`, title: item.label, body: item.note }));
-  return [...findings, ...checks];
+    .map((f, i) => ({ key: `f${i}`, tone: "fail" as const, title: [f.typeLabel, f.location].filter(Boolean).join(" · "), body: f.note }));
+  const checks = shownChecks(view);
+  const flag = (result: "fail" | "attention") =>
+    checks.filter((item) => item.result === result).map((item) => ({ key: `c${item.key}`, tone: result, title: item.label, body: item.note }));
+  return [...findings, ...flag("fail"), ...flag("attention")];
+}
+
+/** The answers a buyer most needs to see, named: what needs attention and what failed. */
+export function flaggedChecks(view: ReportView): { attention: string[]; fail: string[] } {
+  const items = shownChecks(view);
+  return { attention: items.filter((i) => i.result === "attention").map((i) => i.label), fail: items.filter((i) => i.result === "fail").map((i) => i.label) };
 }
 
 /** The short summary used in the link preview and page description, e.g. ["20 photos.", "3 damage notes."]. */
-export function summaryParts(view: ReportView, t: Strings = english): string[] {
+export function summaryParts(view: ReportView, t: Strings = en): string[] {
   const s = t.publicReport.summary;
   const parts: string[] = [];
   if (view.photos?.length) parts.push(s.photos(view.photos.length));
   if (view.findings) parts.push(s.findings(view.findings.length));
-  if (view.checklist) parts.push(s.checklist(t.publicReport.checklistSummary(view.checklist.counts.ok, view.checklist.counts.attention, view.checklist.counts.fail)));
+  if (shownChecks(view).length > 0) {
+    const c = checkCounts(view);
+    parts.push(s.checklist(t.publicReport.checklistSummary(c.ok, c.attention, c.fail)));
+  }
   return parts;
 }
 
@@ -258,7 +282,7 @@ const hostOf = (url: string) => {
 };
 
 /** The estimate as shown: market range adjusted for the live condition score. */
-function buildPrice(p: NonNullable<ReportInput["price"]>, score: number, adjust: boolean, t: Strings): ReportPrice {
+function buildPrice(t: Strings, p: NonNullable<ReportInput["price"]>, score: number, adjust: boolean): ReportPrice {
   const { low, high, factor } = adjust ? adjustedRange(p.market_low_inr, p.market_high_inr, score) : { low: p.market_low_inr, high: p.market_high_inr, factor: 1 };
   const pct = Math.round((factor - 1) * 100);
   const range = (a: number, b: number) => (a === b ? formatInrShort(a) : `${formatInrShort(a)} – ${formatInrShort(b)}`);

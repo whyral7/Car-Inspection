@@ -1,16 +1,29 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
-import { Button, LinkButton, buttonClass } from "@/components/button";
-import { FormError } from "@/components/field";
-import { ChatIcon, CheckIcon, DownloadIcon } from "@/components/icons";
+import { useEffect, useRef, useState } from "react";
+import { useT } from "@/components/i18n-provider";
+import { AlertIcon, ArrowRightIcon, ChatIcon, CheckIcon, CopyIcon, DownloadIcon, ExternalIcon, RefreshIcon, SearchIcon, Spinner } from "@/components/icons";
+import { RememberStep } from "@/components/remember-step";
+import {
+  Button,
+  Card,
+  CardHeader,
+  ConfirmSheet,
+  FormError,
+  LinkButton,
+  ProgressBar,
+  StepHeader,
+  StickyBar,
+  Switch,
+  buttonClass,
+  useToast,
+} from "@/components/ui";
 import { ContactButtons, ReportView } from "@/components/report/report-view";
+import { ShareButton } from "@/components/report/share-button";
+import { PRICE } from "@/lib/config";
 import { reportPdfPath, reportPath, whatsappShareUrl } from "@/lib/report/share";
 import { REPORT_SECTIONS, applyHidden, type ReportSection, type ReportView as View } from "@/lib/report/view";
-import { PRICE } from "@/lib/config";
-import { useT } from "@/components/i18n-provider";
 import { estimatePrice, publishReport, saveHiddenSections } from "./actions";
 
 type Props = {
@@ -22,9 +35,14 @@ type Props = {
   view: View;
   initialHidden: ReportSection[];
   published: { slug: string; url: string } | null;
+  /** Price searches still allowed for this car today. */
+  searchesLeft: number;
 };
 
-export function ReportManager({ carId, ready, unreviewed, credits, view, initialHidden, published }: Props) {
+/** Seconds after which the price search shows its next step, so a minute-long wait shows progress. */
+const PRICE_STAGES = [0, 10, 25] as const;
+
+export function ReportManager({ carId, ready, unreviewed, credits, view, initialHidden, published, searchesLeft }: Props) {
   const t = useT();
   const router = useRouter();
   const [hidden, setHidden] = useState<ReportSection[]>(initialHidden);
@@ -32,12 +50,20 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
   const [publishing, setPublishing] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
   const [outOfCredits, setOutOfCredits] = useState(credits < 1);
-  const [copied, setCopied] = useState<"idle" | "done" | "error">("idle");
-  const [estimating, setEstimating] = useState(false);
+  const [confirmPublish, setConfirmPublish] = useState(false);
+  const toast = useToast();
   const [priceError, setPriceError] = useState<string | null>(null);
+  // Seconds since the price search started, or null when not searching.
+  const [searching, setSearching] = useState<number | null>(null);
   // Saves run one after another, always sending the latest choice.
   const latest = useRef(hidden);
   const chain = useRef(Promise.resolve());
+
+  useEffect(() => {
+    if (searching === null) return;
+    const id = setTimeout(() => setSearching((s) => (s === null ? null : s + 1)), 1000);
+    return () => clearTimeout(id);
+  }, [searching]);
 
   function toggle(section: ReportSection) {
     const next = hidden.includes(section) ? hidden.filter((s) => s !== section) : [...hidden, section];
@@ -66,6 +92,8 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
         setPublishError(res.error);
         return;
       }
+      window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      toast.show({ tone: "success", message: t.report.published });
       router.refresh();
     } catch {
       setPublishError(navigator.onLine ? t.report.errors.publish : t.common.offline);
@@ -76,7 +104,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
 
   async function onEstimate() {
     setPriceError(null);
-    setEstimating(true);
+    setSearching(0);
     try {
       const res = await estimatePrice(carId);
       if (res.ok) router.refresh();
@@ -84,7 +112,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
     } catch {
       setPriceError(navigator.onLine ? t.report.price.errors.failed : t.common.offline);
     } finally {
-      setEstimating(false);
+      setSearching(null);
     }
   }
 
@@ -92,178 +120,224 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
     if (!published) return;
     try {
       await navigator.clipboard.writeText(published.url);
-      setCopied("done");
+      toast.show({ tone: "success", message: t.report.copied });
     } catch {
-      setCopied("error");
+      toast.show({ tone: "error", message: t.report.errors.copy });
     }
   }
 
   const preview = applyHidden(view, hidden);
   const shareText = published ? t.report.shareMessage(view.car.title || view.car.regNumber, view.car.regNumber, view.scoreText, published.url) : "";
+  const stage = searching === null ? 0 : PRICE_STAGES.filter((s) => searching >= s).length - 1;
+  const canPublish = ready && !published;
 
+  const stepLabels = [t.car.stepPhotos, t.car.stepFindings, t.car.stepChecklist, t.car.stepReport];
   return (
-    <div className="flex flex-col gap-4">
-      <Link href={`/app/cars/${carId}`} className="-ml-1 inline-flex min-h-11 items-center self-start px-1 text-sm font-medium text-accent">
-        ← {t.report.backToCar}
-      </Link>
-
-      <header>
-        <h1 className="text-xl font-bold">{published ? t.report.publishedTitle : t.report.previewTitle}</h1>
-        <p className="text-sm text-text-muted">
-          <span className="font-mono font-medium tracking-[0.08em]">{view.car.regNumber}</span>
-          {view.car.title && ` · ${view.car.title}`}
-        </p>
-        {!published && <p className="mt-2 text-sm text-text-muted">{t.report.previewSubtitle}</p>}
-      </header>
+    <div className="flex flex-1 flex-col gap-6">
+      <RememberStep carId={carId} step="report" />
+      <StepHeader
+        step={4}
+        labels={stepLabels}
+        stepLabel={t.common.stepOf(4, 4)}
+        back={{ href: `/app/cars/${carId}`, label: t.report.backToCar }}
+        title={published ? t.report.publishedTitle : t.report.previewTitle}
+        meta={
+          <>
+            <span className="font-semibold tracking-wider text-ink tabular">{view.car.regNumber}</span>
+            {view.car.title && ` · ${view.car.title}`}
+          </>
+        }
+        description={published ? undefined : t.report.previewSubtitle}
+      />
 
       {!ready && (
-        <section className="flex flex-col gap-3 rounded-lg border border-attention bg-attention-tint p-4">
-          <p className="text-sm text-attention">{t.report.notReady}</p>
-          <LinkButton href={`/app/cars/${carId}`} variant="secondary">
-            {t.report.goToInspection}
-          </LinkButton>
-        </section>
+        <Card tone="warning" className="flex items-start gap-4">
+          <AlertIcon className="mt-0.5 text-warning-700" />
+          <p className="text-small text-warning-800">{t.report.notReady}</p>
+        </Card>
       )}
 
       {unreviewed > 0 && (
-        <section className="flex items-center gap-3 rounded-lg border border-attention bg-attention-tint p-4">
-          <p className="flex-1 text-sm text-attention">{t.report.unreviewed(unreviewed)}</p>
-          <LinkButton href={`/app/cars/${carId}/findings`} variant="secondary" className="min-h-11 shrink-0 px-3 text-sm">
+        <Card tone="warning" className="flex flex-wrap items-center gap-4">
+          <p className="min-w-0 flex-1 text-small text-warning-800">{t.report.unreviewed(unreviewed)}</p>
+          <LinkButton href={`/app/cars/${carId}/findings`} variant="secondary" size="sm" className="shrink-0">
             {t.report.reviewNotes}
           </LinkButton>
-        </section>
+        </Card>
       )}
 
       {published && (
-        <section className="flex flex-col gap-3 rounded-lg border border-accent bg-accent-tint p-4">
-          <div>
-            <h2 className="flex items-center gap-1.5 font-semibold text-accent">
-              <CheckIcon size={18} />
-              {t.report.published}
-            </h2>
-            {view.publishedOn && <p className="text-sm text-text-muted">{t.report.publishedOn(view.publishedOn)}</p>}
+        <Card as="section" className="flex animate-rise-in flex-col gap-4">
+          <div className="flex items-center gap-4">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-success-50 text-success-700">
+              <CheckIcon size={20} />
+            </span>
+            <div className="flex flex-col">
+              <h2 className="font-semibold">{t.report.published}</h2>
+              {view.publishedOn && <p className="text-small text-ink-muted">{t.report.publishedOn(view.publishedOn)}</p>}
+            </div>
           </div>
-          <label className="flex flex-col gap-1 text-sm font-medium">
-            {t.report.link}
-            <input readOnly value={published.url} onFocus={(e) => e.currentTarget.select()} className="min-h-11 rounded-sm border border-border-control bg-surface px-3 text-base font-normal" />
-          </label>
-          <a href={whatsappShareUrl(shareText)} target="_blank" rel="noopener" className={buttonClass("primary")}>
-            <ChatIcon size={18} />
-            {t.report.shareWhatsApp}
-          </a>
+          {/* What the buyer sees in WhatsApp before tapping the link. */}
+          <figure className="overflow-hidden rounded-control bg-canvas ring-1 ring-line">
+            {/* eslint-disable-next-line @next/next/no-img-element -- generated link preview image */}
+            <img src={`${reportPath(published.slug)}/og.png`} alt="" width={1200} height={630} loading="lazy" className="aspect-[1200/630] w-full bg-surface object-cover" />
+            <figcaption className="px-4 py-2 text-caption text-ink-muted">{t.report.previewCard}</figcaption>
+          </figure>
           <div className="grid grid-cols-2 gap-2">
-            <Button variant="secondary" onClick={onCopy} className="px-3 text-sm">
-              {copied === "done" ? (
-                <>
-                  <CheckIcon size={16} />
-                  {t.report.copied}
-                </>
-              ) : (
-                t.report.copyLink
-              )}
+            <ShareButton url={published.url} title={shareText} text={shareText} label={t.report.shareOther} className={buttonClass("secondary", "", false, "sm")} />
+            <Button variant="secondary" size="sm" onClick={onCopy} icon={<CopyIcon size={18} />}>
+              {t.report.copyLink}
             </Button>
-            <a href={reportPath(published.slug)} target="_blank" rel="noopener" className={buttonClass("secondary", "px-3 text-sm")}>
+            <a href={reportPath(published.slug)} target="_blank" rel="noopener" className={buttonClass("secondary", "", false, "sm")}>
+              <ExternalIcon size={18} />
               {t.report.openReport}
             </a>
+            <a href={reportPdfPath(published.slug)} className={buttonClass("secondary", "", false, "sm")}>
+              <DownloadIcon size={18} />
+              {t.report.downloadPdf}
+            </a>
           </div>
-          <a href={reportPdfPath(published.slug)} className={buttonClass("secondary", "text-sm")}>
-            <DownloadIcon size={18} />
-            {t.report.downloadPdf}
-          </a>
-          {copied === "error" && <FormError message={t.report.errors.copy} />}
-          <p className="text-xs text-text-muted">
+          <label className="flex flex-col gap-2 text-small font-medium">
+            {t.report.link}
+            <input
+              readOnly
+              value={published.url}
+              onFocus={(e) => e.currentTarget.select()}
+              className="min-h-12 rounded-control bg-sunken px-4 text-body font-normal text-ink-muted tabular focus:shadow-focus focus:outline-none"
+            />
+          </label>
+          <p className="text-caption text-ink-muted">
             {t.report.liveHint} {t.report.pdfHint}
           </p>
-        </section>
+        </Card>
       )}
 
-      <section className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4">
-        <div>
-          <h2 className="font-semibold">{t.report.price.title}</h2>
-          {view.price ? (
-            <>
-              <p className="mt-1 font-mono text-2xl font-medium">{view.price.rangeText}</p>
-              <p className="text-xs text-text-subtle">
-                {view.price.searchedOn} · {hidden.includes("price") ? t.report.price.hiddenOnReport : t.report.price.shownOnReport}
-              </p>
-            </>
-          ) : (
-            <p className="mt-1 text-sm text-text-muted">{t.report.price.intro}</p>
-          )}
-        </div>
-        {estimating ? (
-          <p role="status" className="flex items-center gap-3 text-sm text-text-muted">
-            <span className="size-5 shrink-0 animate-spin rounded-full border-2 border-accent border-t-transparent" />
-            {t.report.price.running}
-          </p>
-        ) : (
-          <Button variant={view.price ? "secondary" : "primary"} onClick={onEstimate}>
-            {view.price ? t.report.price.refresh : t.report.price.run}
-          </Button>
-        )}
-        {!view.price && !estimating && <p className="text-center text-xs text-text-subtle">{t.report.price.free(PRICE.maxPerCarPerDay)}</p>}
-        <FormError message={priceError} />
-      </section>
-
-      <section className="rounded-lg border border-border bg-surface p-4">
-        <div className="mb-2 flex items-baseline justify-between gap-3">
-          <h2 className="font-semibold">{t.report.sectionsTitle}</h2>
-          {sectionsSave === "saving" && <p className="text-xs text-text-subtle">{t.report.savingSections}</p>}
-          {sectionsSave === "saved" && <p className="text-xs text-accent">{t.report.sectionsSaved}</p>}
-        </div>
-        <ul className="divide-y divide-border">
+      <Card as="section">
+        <CardHeader
+          title={t.report.sectionsTitle}
+          aside={
+            sectionsSave === "saving" ? (
+              <span className="inline-flex items-center gap-1.5 text-caption">
+                <Spinner className="size-3.5" />
+                {t.report.savingSections}
+              </span>
+            ) : sectionsSave === "saved" ? (
+              <span className="inline-flex animate-fade-in items-center gap-1 text-caption font-medium text-success-700">
+                <CheckIcon size={14} />
+                {t.report.sectionsSaved}
+              </span>
+            ) : null
+          }
+        />
+        <ul className="-my-2 divide-y divide-line">
           {REPORT_SECTIONS.filter((section) => section !== "price" || view.price).map((section) => {
             const shown = !hidden.includes(section);
             return (
               <li key={section}>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={shown}
-                  onClick={() => toggle(section)}
-                  className="flex min-h-14 w-full items-center justify-between gap-3 py-2 text-left"
-                >
-                  <span>
-                    <span className="block font-medium">{t.report.sections[section]}</span>
-                    <span className={`block text-xs ${shown ? "text-text-subtle" : "text-attention"}`}>{shown ? t.report.shownToBuyers : t.report.hiddenFromBuyers}</span>
-                  </span>
-                  <span className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${shown ? "bg-accent" : "bg-border-control"}`}>
-                    <span className={`absolute top-0.5 size-6 rounded-full bg-surface shadow transition-transform ${shown ? "translate-x-5.5" : "translate-x-0.5"}`} />
-                  </span>
-                </button>
+                <Switch checked={shown} onChange={() => toggle(section)} label={t.report.sections[section]} description={shown ? t.report.shownToBuyers : t.report.hiddenFromBuyers} />
               </li>
             );
           })}
         </ul>
-        {sectionsSave === "error" && <FormError message={t.report.errors.sections} />}
+        {sectionsSave === "error" && (
+          <div className="mt-4">
+            <FormError message={t.report.errors.sections} />
+          </div>
+        )}
+      </Card>
+
+      <Card as="section" className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-heading">{t.report.price.title}</h2>
+          {view.price ? (
+            <>
+              <p className="text-title tabular">{view.price.rangeText}</p>
+              <p className="text-caption text-ink-muted">
+                {view.price.searchedOn} · {hidden.includes("price") ? t.report.price.hiddenOnReport : t.report.price.shownOnReport}
+              </p>
+            </>
+          ) : (
+            <p className="text-small text-ink-muted">{t.report.price.intro}</p>
+          )}
+        </div>
+        {searching !== null ? (
+          <div role="status" className="flex animate-rise-in flex-col gap-2 rounded-control bg-brand-50 p-4">
+            <p className="flex items-center gap-2 text-small font-medium text-brand-900">
+              <Spinner className="text-brand-700" />
+              {t.report.price.stages[stage]}
+            </p>
+            <ProgressBar value={Math.min(57, searching)} max={60} label={t.report.price.stages[stage]} size="sm" className="!bg-surface" />
+            <p className="text-caption text-brand-900 tabular">{t.report.price.elapsed(searching)}</p>
+          </div>
+        ) : (
+          <Button variant={view.price ? "secondary" : "primary"} onClick={onEstimate} disabled={searchesLeft < 1} icon={view.price ? <RefreshIcon size={18} /> : <SearchIcon size={18} />}>
+            {view.price ? t.report.price.refresh : t.report.price.run}
+          </Button>
+        )}
+        {searching === null && (
+          <p className="text-center text-caption text-ink-muted">
+            {searchesLeft < 1 ? t.report.price.errors.limit(PRICE.maxPerCarPerDay) : t.report.price.left(searchesLeft, PRICE.maxPerCarPerDay)}
+          </p>
+        )}
+        <FormError message={priceError} />
+      </Card>
+
+      {/* The buyer's view, set off by a dashed rule rather than another box around the report's own cards. */}
+      <section aria-label={t.report.previewLabel} className="flex flex-col gap-4 border-t-2 border-dashed border-line-strong/40 pt-4">
+        <p className="text-center text-caption font-semibold tracking-wide text-ink-muted uppercase">{t.report.previewLabel}</p>
+        <div>
+          <ReportView view={preview} t={t} pdfHref={null} />
+          <div className="mt-4">
+            <ContactButtons view={preview} t={t} preview />
+          </div>
+        </div>
       </section>
 
-      {ready && !published && (
-        <section className="flex flex-col gap-2 rounded-lg border border-border bg-surface p-4">
-          {outOfCredits ? (
+      <ConfirmSheet
+        open={confirmPublish}
+        onClose={() => setConfirmPublish(false)}
+        title={t.report.publishConfirm}
+        description={t.report.publishCost(credits)}
+        confirmLabel={t.report.publish}
+        cancelLabel={t.common.cancel}
+        closeLabel={t.common.close}
+        variant="primary"
+        errorFallback={t.report.errors.publish}
+        onConfirm={() => {
+          void onPublish();
+        }}
+      />
+
+      <StickyBar>
+        {canPublish ? (
+          outOfCredits ? (
             <>
-              <p className="text-sm font-medium text-attention">{t.report.noCredits}</p>
-              <LinkButton href={`/app/credits?next=${encodeURIComponent(`/app/cars/${carId}/report`)}`}>{t.report.buyCredits}</LinkButton>
+              <p className="text-center text-small font-medium text-warning-700">{t.report.noCredits}</p>
+              <LinkButton href={`/app/credits?next=${encodeURIComponent(`/app/cars/${carId}/report`)}`}>
+                {t.report.buyCredits}
+                <ArrowRightIcon size={20} />
+              </LinkButton>
             </>
           ) : (
             <>
-              <Button onClick={onPublish} loading={publishing}>
+              {publishError && <FormError message={publishError} />}
+              <Button onClick={() => setConfirmPublish(true)} loading={publishing}>
                 {publishing ? t.report.publishing : t.report.publish}
               </Button>
-              <p className="text-center text-sm text-text-subtle">{t.report.publishCost(credits)}</p>
+              <p className="text-center text-small text-ink-muted">{t.report.publishCost(credits)}</p>
             </>
-          )}
-          {publishError && !outOfCredits && <FormError message={publishError} />}
-        </section>
-      )}
-
-      <section aria-label={t.report.previewLabel} className="rounded-3xl border-2 border-dashed border-border-control bg-bg p-3">
-        <p className="mb-3 text-center type-overline uppercase tracking-[0.06em] text-text-subtle">{t.report.previewLabel}</p>
-        <ReportView view={preview} t={t} pdfHref={null} />
-        <div className="mt-4">
-          <ContactButtons view={preview} t={t} preview />
-        </div>
-      </section>
+          )
+        ) : published ? (
+          <a href={whatsappShareUrl(shareText)} target="_blank" rel="noopener" className={buttonClass("primary")}>
+            <ChatIcon />
+            {t.report.shareWhatsApp}
+          </a>
+        ) : (
+          <LinkButton href={`/app/cars/${carId}`} variant="secondary">
+            {t.report.goToInspection}
+          </LinkButton>
+        )}
+      </StickyBar>
     </div>
   );
 }

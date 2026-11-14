@@ -1,30 +1,28 @@
-import Link from "next/link";
+import { BackLink } from "@/components/ui";
 import { BUSINESS } from "@/lib/config";
-import { getT } from "@/lib/i18n.server";
+import { legal } from "@/lib/strings-legal";
 
 type Section = { heading: string; body: readonly string[] };
 
-export async function LegalPage({ title, intro, sections }: { title: string; intro: string; sections: readonly Section[] }) {
-  const t = await getT();
+export function LegalPage({ title, intro, sections }: { title: string; intro: string; sections: readonly Section[] }) {
   return (
-    <article className="mx-auto w-full max-w-2xl px-4 py-8">
-      <Link href="/" className="-ml-1 inline-flex min-h-11 items-center px-1 text-sm font-medium text-accent">
-        ← {t.legal.back}
-      </Link>
-      <h1 className="mt-2 type-heading-1">{title}</h1>
-      <p className="mt-1 text-sm text-text-subtle">{t.legal.updated(BUSINESS.legalUpdated)}</p>
-      <p className="mt-4 leading-relaxed text-text-muted">{intro}</p>
+    // Legal text is English only, so say so for screen readers even when the site is in Hindi.
+    <article lang="en" className="mx-auto w-full max-w-2xl px-4 py-8">
+      <BackLink href="/">{legal.back}</BackLink>
+      <h1 className="mt-2 text-title">{title}</h1>
+      <p className="mt-1 text-small text-ink-muted">{legal.updated(BUSINESS.legalUpdated)}</p>
+      <p className="mt-4 max-w-[28rem] leading-relaxed text-ink-muted">{intro}</p>
       {sections.map((section) => (
         <section key={section.heading} className="mt-6">
-          <h2 className="text-lg font-semibold">{section.heading}</h2>
+          <h2 className="text-heading">{section.heading}</h2>
           {section.body.length > 1 ? (
-            <ul className="mt-2 list-disc space-y-2 pl-5 leading-relaxed text-text-muted">
+            <ul className="mt-2 max-w-[28rem] list-disc space-y-2 pl-5 leading-relaxed text-ink-muted">
               {section.body.map((line) => (
                 <li key={line}>{line}</li>
               ))}
             </ul>
           ) : (
-            <p className="mt-2 leading-relaxed text-text-muted">{section.body[0]}</p>
+            <p className="mt-2 max-w-[28rem] leading-relaxed text-ink-muted">{section.body[0]}</p>
           )}
         </section>
       ))}

@@ -1,19 +1,10 @@
-// All user-facing copy lives here. English is the source; lib/strings.hi.ts holds the Hindi with the same
-// shape (the Strings type enforces it). Screens get the reader's language from getT() (server) or useT() (client).
-
-/** Business details filled into the legal templates (BUSINESS in lib/config.ts). */
-type LegalBusiness = { legalName: string; address: string; city: string; email: string; grievanceOfficer: string };
+// All user-facing app copy, in English. lib/strings.hi.ts has the Hindi version with the same shape;
+// lib/i18n.ts picks one by locale. Legal templates live in lib/strings-legal.ts.
 
 export const en = {
   appName: "Treadmark",
   tagline: "Every car, properly checked. Inspection reports you can share on WhatsApp.",
   disclaimer: "Visual and documented inspection. Not a mechanical certification.",
-
-  language: {
-    /** The toggle shows the language you can switch TO. */
-    switchTo: "हिंदी",
-    switchToLabel: "हिंदी में देखें",
-  },
 
   common: {
     loading: "Please wait…",
@@ -22,17 +13,43 @@ export const en = {
     back: "Back",
     somethingWrong: "That didn't work. Check your internet and try again.",
     offline: "You seem to be offline. Check your internet and try again.",
+    offlineBanner: "You're offline. Photos and checklist answers are kept on this phone and sent when you're back online.",
+    backOnline: "Back online. Sending anything that was waiting.",
+    draftRestored: "We put back what you typed earlier.",
+    serverError: "Something went wrong on our side. Please try again in a minute.",
+    retry: "Try again",
+    stepOf: (n: number, total: number) => `Step ${n} of ${total}`,
+    goHome: "Go to My cars",
+    goToSite: "Go to the home page",
+    close: "Close",
+    cancel: "Cancel",
+    language: "Language",
+    languageNames: { en: "English", hi: "हिन्दी" },
+  },
+
+  install: {
+    title: "Add Treadmark to your home screen",
+    body: "Open it in one tap, like any other app. It takes no space.",
+    action: "Add to home screen",
+  },
+
+  errorPage: {
+    title: "Something went wrong",
+    notFoundTitle: "We couldn't find that",
+    notFoundBody: "This car or page isn't in your account. It may have been deleted, or the link is wrong.",
+    pageNotFoundTitle: "Page not found",
+    pageNotFoundBody: "The link may be mistyped or the page has moved.",
   },
 
   home: {
     login: "Log in with phone",
-    metaTitle: "Treadmark: inspection reports for used-car dealers",
+    metaTitle: "Treadmark: used-car inspection reports you share on WhatsApp",
     metaDescription:
-      "Shoot 20 guided photos, get AI damage notes and share a branded used-car inspection report on WhatsApp in about 10 minutes. Start free with 3 reports.",
+      "For car owners, buyers and dealers in India. Shoot 20 guided photos, get AI damage notes and a condition score, and share the report on WhatsApp. Start free with 3 reports.",
     nav: { login: "Log in", pricing: "Pricing" },
-    eyebrow: "For used-car dealers in India",
+    eyebrow: "For car owners, buyers and dealers in India",
     headline: "Sell used cars faster with reports buyers can verify",
-    subhead: "Shoot 20 guided photos, get AI damage notes and send a branded inspection report on WhatsApp. About 10 minutes a car.",
+    subhead: "Shoot 20 guided photos, get AI damage notes and a condition score, and share a report with every photo on WhatsApp. About 15 minutes a car.",
     cta: "Start free, 3 reports",
     ctaNote: "No card needed. Log in with your mobile number.",
     sample: "See a sample report",
@@ -49,13 +66,21 @@ export const en = {
     steps: [
       { title: "Add the car", body: "Type the number plate. We fill in the RC details: make, model, year, owners and insurance." },
       { title: "Shoot 20 guided photos", body: "The app shows you each angle. AI marks visible dents, scratches and rust, and you check every note." },
-      { title: "Share on WhatsApp", body: "Send a report with your logo, a condition score, all photos and a PDF. Buyers open it with one tap." },
+      { title: "Share on WhatsApp", body: "Send a report with a condition score, all photos and a PDF. It opens with one tap, no app needed." },
     ],
-    whyTitle: "Why dealers use it",
+    whyTitle: "Who it's for",
     why: [
-      { title: "Buyers trust what they can see", body: "Every scratch is shown and named, so serious buyers call with fewer doubts." },
-      { title: "Fewer site visits wasted", body: "Buyers know the car's condition before they travel to see it." },
-      { title: "Your brand on every report", body: "Your dealership name, logo and phone number go on the link and the PDF." },
+      { title: "Selling your car", body: "Show every scratch up front. Serious buyers call with fewer doubts and fewer wasted visits." },
+      { title: "Buying a car", body: "Check a car properly before you pay, and share the report with family or your mechanic." },
+      { title: "Used-car dealers", body: "Your dealership name, logo and phone on every report and PDF. Inspect your whole stock." },
+    ],
+    faqTitle: "Questions",
+    faq: [
+      { q: "Is this a mechanical check?", a: "No. It's a visual and documented inspection: photos, visible damage and a checklist you fill in. For engine or gearbox health, have a mechanic look at the car." },
+      { q: "How do buyers open the report?", a: "With one tap on the link you send on WhatsApp. No app or login needed. They can also download a PDF." },
+      { q: "What does it cost?", a: "Your first 3 reports are free. After that, packs work out from about ₹83 a report. Inspecting is free: a credit is used only when you publish." },
+      { q: "Does it work with poor signal?", a: "Yes. Photos and checklist answers are saved on your phone and sent when you're back online." },
+      { q: "Can I use it in Hindi?", a: "Yes. Choose हिन्दी on the login screen or in your profile." },
     ],
     pricingTitle: "Simple prepaid pricing",
     pricingSubtitle: "1 credit publishes 1 report. Credits never expire. Pay with UPI, cards or net banking.",
@@ -63,10 +88,10 @@ export const en = {
     packTitle: (n: number) => `${n} reports`,
     perReport: (rupees: string) => `₹${rupees} per report`,
     bestValue: "Best value",
-    contactBody: "Message us on WhatsApp and we'll help you get your first report out.",
+    contactBody: "Questions? We're happy to help you get your first report out.",
     whatsapp: "Chat on WhatsApp",
-    whatsappMessage: "Hi, I'm a used-car dealer and I'd like to know more about Treadmark.",
-    finalTitle: "Your next car could have a report in 10 minutes",
+    whatsappMessage: "Hi, I'd like to know more about Treadmark.",
+    finalTitle: "Your next car could have a report in 15 minutes",
   },
 
   site: {
@@ -81,213 +106,24 @@ export const en = {
 
   sampleReport: {
     metaTitle: "Sample inspection report",
-    banner: "This is a sample report with made-up details. Real reports also include all 20 photos, which buyers can tap to enlarge.",
+    banner: "This is a sample report with made-up details. Drawings stand in for the 20 real photos buyers see and can zoom into.",
     cta: "Make your own: start free",
   },
 
-  // TEMPLATES. Edit these to match your business and have a lawyer review them before relying on them.
-  // [Brackets] come from BUSINESS in lib/config.ts.
-  legal: {
-    updated: (date: string) => `Last updated: ${date}`,
-    back: "Back to home",
-    privacy: {
-      title: "Privacy policy",
-      intro: (b: LegalBusiness) =>
-        `${b.legalName} ("we", "us") runs Treadmark, an app that helps used-car dealers create and share inspection reports. This policy explains what personal data we collect, why, and the choices you have. It is written to follow India's Digital Personal Data Protection Act, 2023.`,
-      sections: (b: LegalBusiness) => [
-        {
-          heading: "What we collect",
-          body: [
-            "Account: your mobile number, used to log you in with a one-time code.",
-            "Dealer profile: your name, business name, city, address and logo.",
-            "Car details: number plate, details from the vehicle registration (RC) record, odometer reading, insurance date, photos you take, damage notes and checklist answers.",
-            "Payments: order and payment IDs, amount and status. Card, UPI and bank details are collected by Razorpay, not by us.",
-            "Technical data: basic server logs and the cookies needed to keep you logged in. We do not use advertising cookies.",
-          ],
-        },
-        {
-          heading: "How we use it",
-          body: [
-            "To run the app: log you in, save your cars and photos, build reports and PDFs, and keep your credit balance.",
-            "To check photos for visible damage with AI. Photos are sent to our AI provider only for this purpose.",
-            "To process payments, prevent fraud and abuse, provide support, and meet legal and tax requirements.",
-          ],
-        },
-        {
-          heading: "Who we share it with",
-          body: [
-            "Service providers who process data for us: Supabase (database and file storage), Vercel (hosting), Anthropic (AI photo analysis), Razorpay (payments), our vehicle data (RC) provider and our SMS provider (login codes). Some of them may process data outside India.",
-            "Buyers you share a report with: a published report, including its photos, your business name, city and phone number, can be opened by anyone who has the link.",
-            "Authorities, when the law requires it.",
-            "We do not sell your personal data.",
-          ],
-        },
-        {
-          heading: "Your responsibilities for reports",
-          body: [
-            "Reports are about cars, not people. Avoid photographing faces, documents or other personal details of car owners. Number plates are shown on reports by design.",
-          ],
-        },
-        {
-          heading: "How long we keep it",
-          body: [
-            "We keep your data while your account is active. If you ask us to delete your account we delete your data within 30 days, except records we must keep by law (for example payment records, which tax law requires us to keep for up to 8 years).",
-          ],
-        },
-        {
-          heading: "Your rights",
-          body: [
-            `You can ask to see, correct or delete your personal data, withdraw consent, or nominate someone to act for you. Write to ${b.email}. We will reply within 30 days.`,
-          ],
-        },
-        {
-          heading: "Security",
-          body: [
-            "Data is encrypted in transit, access is limited by account, photos are private unless you publish a report, and report links are long random codes. No system is perfectly secure, so please keep your phone and login codes safe.",
-          ],
-        },
-        {
-          heading: "Grievance officer",
-          body: [`${b.grievanceOfficer}, ${b.legalName}, ${b.address}. Email: ${b.email}.`],
-        },
-        {
-          heading: "Changes to this policy",
-          body: ["We will post any changes on this page and update the date above. For significant changes we will tell you in the app."],
-        },
-      ],
-    },
-    terms: {
-      title: "Terms of use",
-      intro: (b: LegalBusiness) =>
-        `These terms are an agreement between you and ${b.legalName} for the use of Treadmark. By creating an account or using the app you accept them. If you do not agree, please do not use the app.`,
-      sections: (b: LegalBusiness) => [
-        {
-          heading: "The service",
-          body: [
-            "Treadmark gives used-car dealers tools to photograph a car, record its visible condition, and share an inspection report with buyers. It is meant for business use by dealers aged 18 or over.",
-          ],
-        },
-        {
-          heading: "Not a mechanical certification",
-          body: [
-            "Every report is a visual and documented inspection, not a mechanical certification. It is based only on the photos and information you provide.",
-            "AI damage notes can miss things or get them wrong. You review, edit and accept every note, and you are responsible for the report you publish. We do not inspect cars or guarantee their condition, history or value.",
-          ],
-        },
-        {
-          heading: "Your account",
-          body: [
-            "Give accurate details, keep your phone and login codes secure, and tell us if you think someone else is using your account. You are responsible for activity on your account.",
-          ],
-        },
-        {
-          heading: "Your content",
-          body: [
-            "You keep ownership of your photos and information. You allow us to store and process them (including AI analysis) to run the service, and to show published reports to anyone with the link.",
-            "You confirm you have the right to upload the content, that reports are honest, and that you will not use them to mislead buyers.",
-          ],
-        },
-        {
-          heading: "Credits and payments",
-          body: [
-            "Publishing a report uses 1 credit. Publishing an already published report again is free. New accounts get 3 free credits.",
-            "Credits are prepaid, are sold in packs at the prices shown in the app, and do not expire while the service runs. Prices are in Indian rupees [and include / exclude GST: edit this].",
-            "Payments are processed by Razorpay. Refunds follow our refund policy.",
-          ],
-        },
-        {
-          heading: "Acceptable use",
-          body: [
-            "Do not use the app for anything unlawful, upload content you have no right to, try to access other dealers' data, overload or reverse-engineer the service, or resell it without our permission.",
-          ],
-        },
-        {
-          heading: "Availability and changes",
-          body: [
-            "We work to keep the app available but cannot promise it will always be uninterrupted or error-free. We may change or improve features, and will give notice of significant changes.",
-          ],
-        },
-        {
-          heading: "Limitation of liability",
-          body: [
-            "We are not a party to any sale between you and a buyer and are not responsible for disputes about a car.",
-            "To the extent the law allows, we are not liable for indirect or consequential losses, and our total liability to you is limited to the amount you paid us in the 3 months before the claim.",
-          ],
-        },
-        {
-          heading: "Suspension and closing your account",
-          body: [
-            "You can stop using the app at any time. We may suspend or close accounts that break these terms. Unused credits on accounts closed for breaking these terms are not refunded.",
-          ],
-        },
-        {
-          heading: "Law and disputes",
-          body: [`These terms are governed by the laws of India. Courts in ${b.city} have exclusive jurisdiction.`],
-        },
-        {
-          heading: "Contact",
-          body: [`${b.legalName}, ${b.address}. Email: ${b.email}.`],
-        },
-      ],
-    },
-    refunds: {
-      title: "Refund and cancellation policy",
-      intro: (b: LegalBusiness) =>
-        `Treadmark sells prepaid report credits, a digital service from ${b.legalName}. Credits are added to your account straight after payment; nothing is shipped.`,
-      sections: (b: LegalBusiness) => [
-        {
-          heading: "Unused packs",
-          body: ["If you have not used any credit from a pack, you can ask for a full refund of that pack within 7 days of buying it."],
-        },
-        {
-          heading: "Used credits",
-          body: ["Credits already used to publish a report cannot be refunded. Free sign-up credits have no cash value."],
-        },
-        {
-          heading: "Charged but no credits",
-          body: [
-            "If money left your account but your credits did not appear within an hour, contact us with the payment ID (shown in Razorpay's confirmation). We will add the credits or refund you in full.",
-          ],
-        },
-        {
-          heading: "How refunds are paid",
-          body: [
-            `Write to ${b.email} with your registered mobile number and payment ID. Approved refunds go back to the original payment method through Razorpay, usually within 5 to 7 working days.`,
-          ],
-        },
-        {
-          heading: "Cancellation",
-          body: ["There is no subscription to cancel. You can stop using the app at any time; unused credits stay in your account."],
-        },
-      ],
-    },
-    contact: {
-      title: "Contact us",
-      intro: "We're happy to help with your account, reports or payments.",
-      business: "Business name",
-      address: "Address",
-      email: "Email",
-      whatsapp: "WhatsApp",
-      hours: "Support hours",
-      paymentHelp: "For payment questions, include your registered mobile number and the payment ID.",
-    },
-  },
 
   login: {
-    title: "Log in",
-    subtitle: "We'll send a 6-digit code to your mobile number.",
+    title: "Log in or sign up",
+    subtitle: "Enter your mobile number. We'll send a 6-digit code by SMS. New here? You get 3 free reports.",
     phoneLabel: "Mobile number",
     phonePlaceholder: "98765 43210",
     sendOtp: "Send OTP",
-    otpTitle: "Enter OTP",
+    otpTitle: "Enter the code",
     otpSentTo: (phone: string) => `We sent a code to ${phone}`,
     otpLabel: "6-digit code",
     agree: "By continuing you agree to our",
     terms: "Terms",
     and: "and",
     privacy: "Privacy policy",
-    /** Closes the agreement line; Hindi puts the verb here. */
-    agreeEnd: ".",
     verify: "Verify and continue",
     resend: "Resend OTP",
     resendIn: (seconds: number) => `Resend OTP in ${seconds}s`,
@@ -311,6 +147,13 @@ export const en = {
       buyer: "Buying a car",
       dealer: "Dealer",
     },
+    userTypeChoose: "Choose one. It changes what your reports say about you.",
+    userTypeHints: {
+      car_owner: "Inspect your own car before selling it, and share the report with buyers.",
+      buyer: "Inspect a car you're thinking of buying, and share the report with family or a mechanic.",
+      dealer: "Inspect your stock. Add your dealership name and logo to every report.",
+    },
+    previewTitle: "How it looks on your reports",
     ownerName: "Your name",
     dealerDetails: "Dealership details (optional)",
     dealerDetailsHint: "Shown on your reports instead of your name.",
@@ -341,7 +184,27 @@ export const en = {
     myCars: "My cars",
     addCar: "Add car",
     emptyTitle: "No cars yet",
-    emptyBody: "Add your first car to start an inspection. It takes about 10 minutes.",
+    emptyBody: "Add your first car to start an inspection.",
+    emptySteps: ["Type the number plate", "Take 20 guided photos", "Check the AI notes and the checklist", "Share the report on WhatsApp"],
+    noCreditsTitle: "No report credits left",
+    noCreditsBody: "You can still inspect cars. You need 1 credit to publish each report.",
+    buyMore: "Buy more",
+    search: "Search number plate or model",
+    filterLabel: "Show",
+    filterAll: "All",
+    noMatches: "No cars match.",
+    shareAgain: "Share on WhatsApp",
+    resumeTitle: "Pick up where you left off",
+    continueStep: (step: string) => `Continue: ${step}`,
+    carCount: (n: number) => (n === 1 ? "1 car" : `${n} cars`),
+    stepsDone: (n: number) => `${n} of 4 steps done`,
+    progress: {
+      photos: (done: number, total: number) => `Photos: ${done} of ${total}`,
+      checking: "Damage notes: waiting for AI checks",
+      checklist: (done: number, total: number) => `Checklist: ${done} of ${total}`,
+      ready: "Ready to publish",
+      published: (date: string) => `Published ${date}`,
+    },
     credits: "Report credits",
     creditsLeft: (n: number) => (n === 1 ? "1 report left" : `${n} reports left`),
     creditsShort: (n: number) => (n === 1 ? "1 credit" : `${n} credits`),
@@ -363,11 +226,15 @@ export const en = {
     enterManually: "Enter details myself",
     lookingUp: "Looking up RC…",
     change: "Change",
-    found: "We found these details on the RC. Check them and fix anything that's wrong.",
+    foundShort: "Found on the RC",
+    looksRight: "Looks right, save car",
+    editFound: "Something's wrong? Edit details",
+    noRc: "Lookup not finding it, or no RC handy?",
     notFound: "We couldn't find this number on record. Please enter the details below.",
     unavailable: "RC lookup isn't available right now. Please enter the details below.",
-    duplicate: "You've already added this car.",
-    openExisting: "Open it",
+    duplicate: "You've already added this car. Open it to carry on, or add it again to inspect it afresh.",
+    openExisting: "Open the car you added",
+    addAgain: "Add it again for a new inspection",
     make: "Make",
     makePlaceholder: "Maruti Suzuki",
     model: "Model",
@@ -415,6 +282,24 @@ export const en = {
 
   car: {
     backToCars: "My cars",
+    editDetails: "Edit details",
+    editTitle: "Edit car details",
+    deleteCar: "Delete this car",
+    deleteConfirm: (reg: string) => `Delete ${reg}? Its photos, damage notes, checklist and report will be deleted. This can't be undone.`,
+    deleteConfirmPublished: "Buyers who have the report link won't be able to open it any more.",
+    deleteAction: "Delete car",
+    deleteFailed: "Couldn't delete the car. Check your internet and try again.",
+    deleted: "Car deleted.",
+    saved: "Car details saved.",
+    added: "Car added. Next, the photos.",
+    stepsDone: (n: number) => `${n} of 4 steps done`,
+    nextHint: {
+      photos: "You'll take 20 guided photos (12 required). Keep the car in good light.",
+      findings: "AI checks each photo for visible damage. You confirm every note.",
+      checklist: "19 quick checks on the car. Takes about 5 minutes.",
+      report: "Preview what buyers will see, then publish and share it.",
+    },
+    scoreProvisional: (done: number, total: number) => `Provisional: ${done} of ${total} checklist items done. It changes as you go.`,
     details: "Car details",
     notSet: "Not added",
     expired: "Expired",
@@ -424,7 +309,6 @@ export const en = {
     startInspection: "Start inspection",
     continueInspection: "Continue inspection",
     photosTaken: (done: number, total: number) => `${done} of ${total} photos taken`,
-    inspectionHint: "You'll take 20 guided photos. Keep the car in good light.",
     steps: "Inspection",
     stepPhotos: "Photos",
     stepFindings: "Damage notes",
@@ -432,6 +316,8 @@ export const en = {
     findingsToReview: (n: number) => (n === 1 ? "1 note to review" : `${n} notes to review`),
     findingsAccepted: (n: number) => (n === 1 ? "1 note accepted" : `${n} notes accepted`),
     findingsNone: "No damage notes yet",
+    findingsWaiting: "Waiting for the required photos",
+    scoreWaiting: (n: number) => (n === 1 ? "The condition score appears once you review the 1 damage note waiting for you." : `The condition score appears once you review the ${n} damage notes waiting for you.`),
     checklistProgress: (done: number, total: number) => `${done} of ${total} checked`,
     score: "Condition score",
     scoreOutOf: "/10",
@@ -450,13 +336,30 @@ export const en = {
 
   findings: {
     title: "Damage notes",
-    subtitle: "AI checked each photo for visible damage. Accept, edit or delete every note before it goes on the report.",
+    subtitle: "AI checked each photo for visible damage. Accept, edit or delete each note: only accepted notes go on the report.",
     backToCar: "Back to car",
     analysing: (done: number, total: number) => `Checking photos… ${done} of ${total}`,
     analysisDone: "All photos checked.",
+    analysingHint: "You can review notes as they appear. About 10 seconds a photo.",
+    sections: {
+      attention: (n: number) => (n === 1 ? "Needs your review (1 photo)" : `Needs your review (${n} photos)`),
+      accepted: "Accepted notes",
+      quiet: (n: number) => (n === 1 ? "No damage seen (1 photo)" : `No damage seen or still checking (${n} photos)`),
+      quietHint: "Tap to see these photos or add a note the AI missed.",
+    },
+    aiSuggestion: "AI suggestion",
+    enlargePhoto: "show bigger",
+    shrinkPhoto: "show smaller",
+    deleted: "Note deleted.",
+    noteSaved: "Note saved.",
+    undo: "Undo",
+    continueWithoutWaiting: "Continue without waiting",
+    acceptAllContinue: (n: number) => (n === 1 ? "Accept 1 note and continue" : `Accept all ${n} and continue`),
+    continueWithout: (n: number) => (n === 1 ? "Leave this note off the report" : `Leave these ${n} notes off the report`),
     someFailed: (n: number) => (n === 1 ? "1 photo couldn't be checked." : `${n} photos couldn't be checked.`),
     retryFailed: "Try again",
     noPhotos: "No photos yet. Take the photos first, then come back here.",
+    noPhotosTitle: "No photos yet",
     takePhotos: "Take photos",
     photoStatus: {
       pending: "Checking…",
@@ -464,7 +367,7 @@ export const en = {
       done: "Checked",
       noDamage: "No damage seen",
       unclear: "Photo unclear: retake it for a better check",
-      failed: "Couldn't check this photo",
+      failed: "Couldn't check this photo. Check your internet and try again, or retake it if it's dark or blurry.",
       limit: "Too many tries today. Retake the photo or add notes yourself.",
     },
     retakePhoto: "Retake photo",
@@ -473,16 +376,13 @@ export const en = {
     generalHint: "Damage not shown in any one photo.",
     toReview: (n: number) => (n === 1 ? "1 note to review" : `${n} notes to review`),
     allReviewed: "All notes reviewed.",
-    acceptAll: (n: number) => (n === 1 ? "Accept 1 note" : `Accept all ${n} notes`),
+    acceptedCount: (n: number) => (n === 1 ? "1 note accepted." : `${n} notes accepted.`),
     needsReview: "Needs review",
     accepted: "Accepted",
-    fromAi: "AI",
-    fromDealer: "Added by you",
     accept: "Accept",
-    unaccept: "Undo",
+    unaccept: "Undo accept",
     edit: "Edit",
     delete: "Delete",
-    confirmDelete: "Delete this note?",
     cancel: "Cancel",
     save: "Save",
     saving: "Saving…",
@@ -535,29 +435,41 @@ export const en = {
 
   checklist: {
     title: "Checklist",
-    subtitle: "Check each item on the car. Use N/A if it doesn't apply.",
+    subtitle: "Check each item on the car. Choose \"Doesn't apply\" if it isn't relevant.",
+    legend: "Needs attention: works, but needs a look or a repair soon. Problem: doesn't work, or isn't safe.",
     backToCar: "Back to car",
     progress: (done: number, total: number) => `${done}/${total} checked`,
     results: {
       ok: "OK",
-      attention: "Attention",
-      fail: "Fail",
-      na: "N/A",
+      attention: "Needs attention",
+      fail: "Problem",
+      na: "Doesn't apply",
     },
     addNote: "Add note",
     noteLabel: "Note (optional)",
     notePlaceholder: "What did you notice?",
+    howToCheck: "How to check",
     saved: "Saved",
     saving: "Saving…",
     saveFailed: "Not saved. Tap to try again.",
-    finish: "Finish inspection",
+    waiting: "On this phone",
+    waitingCount: (n: number) => (n === 1 ? "1 answer is saved on this phone and will be sent when you're back online." : `${n} answers are saved on this phone and will be sent when you're back online.`),
+    finishOffline: "You're offline. Your answers are safe on this phone. Finish once you're back online.",
+    markRestOk: (n: number) => (n === 1 ? "Mark the last item OK" : `Mark the other ${n} OK`),
+    markRestConfirm: (n: number) =>
+      n === 1 ? "Mark the 1 unchecked item as OK? Only do this if you've checked it." : `Mark the ${n} unchecked items as OK? Only do this if you've checked them.`,
+    markRestYes: "Yes, mark OK",
+    finish: "Finish and see the report",
     allDone: "All items checked.",
     finishHint: (n: number) => (n === 1 ? "1 item left to check." : `${n} items left to check.`),
+    next: (label: string) => `Next: ${label}`,
+    change: "Change",
+    markRestHint: "Brakes, steering, flood and accident signs, RC and insurance always need a real answer.",
     finished: "Inspection finished. Your report is next.",
-    backToCarDone: "Back to car",
+    backToCarDone: "Go to the report",
     errors: {
       note: "Keep the note under 300 characters.",
-      incomplete: "Check every item first (N/A is fine).",
+      incomplete: "Check every item first (\"Doesn't apply\" is fine).",
     },
     groups: {
       engine: "Engine and driving",
@@ -566,25 +478,25 @@ export const en = {
       history: "Flood and accident signs",
     },
     items: {
-      engine_start: { label: "Engine starts easily", hint: "Starts first time, cold if possible, without long cranking." },
-      engine_noise: { label: "Engine sounds normal", hint: "No knocking, ticking or rattling at idle and when revved." },
-      exhaust_smoke: { label: "No exhaust smoke", hint: "No blue, black or thick white smoke once warm." },
-      clutch_gearbox: { label: "Clutch and gearbox", hint: "Gears go in smoothly, clutch doesn't slip. For automatics: smooth shifts." },
-      brakes: { label: "Brakes", hint: "Stops straight, no grinding or pulling, pedal feels firm." },
-      steering: { label: "Steering", hint: "No play, noise or pulling to one side." },
-      suspension_noise: { label: "No suspension noise", hint: "No knocks or clunks over bumps." },
-      ac_cooling: { label: "AC cools well", hint: "Cold air within a few minutes, all fan speeds work." },
-      power_windows: { label: "Power windows", hint: "Every window goes fully up and down." },
-      lights: { label: "Lights", hint: "Headlights (high and low), indicators, brake, reverse and fog lights." },
-      horn: { label: "Horn", hint: "Works and sounds normal." },
-      battery: { label: "Battery", hint: "No corrosion on terminals, starts without hesitation." },
-      rc_original: { label: "Original RC", hint: "Original RC seen and matches the number plate and chassis number." },
-      insurance_valid: { label: "Insurance valid", hint: "Policy is current and in the owner's name." },
-      puc_valid: { label: "PUC valid", hint: "Pollution certificate is current." },
-      service_history: { label: "Service history", hint: "Service book or records available." },
-      spare_key: { label: "Spare key", hint: "A second key is available and works." },
-      flood_signs: { label: "No flood signs", hint: "No silt, water lines, rust under seats or damp smell." },
-      accident_signs: { label: "No accident signs", hint: "No uneven panel gaps, overspray, welding or replaced pillars." },
+      engine_start: { label: "Engine starts easily", hint: "Starts first time, cold if possible, without long cranking.", how: "Ask for the engine not to be started before you arrive. Turn the key or press start once and count: it should start within 2 seconds. Long cranking or several tries means Needs attention." },
+      engine_noise: { label: "Engine sounds normal", hint: "No knocking, ticking or rattling at idle and when revved.", how: "With the bonnet open and the engine idling, listen for 30 seconds, then ask someone to rev it to about 3,000 rpm. A steady hum is OK; knocking, ticking or rattling is a Problem." },
+      exhaust_smoke: { label: "No exhaust smoke", hint: "No blue, black or thick white smoke once warm.", how: "After the engine is warm, stand behind the car while someone revs it. A little water or thin white vapour is normal. Blue smoke (oil), black smoke (fuel) or thick white smoke is a Problem." },
+      clutch_gearbox: { label: "Clutch and gearbox", hint: "Gears go in smoothly, clutch doesn't slip. For automatics: smooth shifts.", how: "On a short drive, change through every gear, including reverse. The clutch should not slip (revs rising without the car speeding up) and gears should not grind. For automatics, shifts should be smooth with no jerks." },
+      brakes: { label: "Brakes", hint: "Stops straight, no grinding or pulling, pedal feels firm.", how: "At about 30 km/h on an empty road, brake firmly. The car should stop straight, without grinding, squealing or a soft, sinking pedal." },
+      steering: { label: "Steering", hint: "No play, noise or pulling to one side.", how: "Drive straight and loosen your grip for a moment: the car shouldn't pull to one side. Turn full left and right while parked and listen for clicks or groans." },
+      suspension_noise: { label: "No suspension noise", hint: "No knocks or clunks over bumps.", how: "Drive slowly over a speed breaker or rough patch with the windows down. Knocks or clunks are a Problem. Push down hard on each corner: it should bounce back once, not keep bouncing." },
+      ac_cooling: { label: "AC cools well", hint: "Cold air within a few minutes, all fan speeds work.", how: "Turn the AC on at the coldest setting and full fan. Within 3 minutes the air from the vents should feel clearly cold. Try every fan speed." },
+      power_windows: { label: "Power windows", hint: "Every window goes fully up and down.", how: "Run every window fully down and up from the driver's switches and from each door's own switch. Slow, noisy or stuck windows need attention." },
+      lights: { label: "Lights", hint: "Headlights (high and low), indicators, brake, reverse and fog lights.", how: "Ask someone to stand outside while you switch on headlights (low and high), indicators, hazards, brake lights, reverse light and fog lights." },
+      horn: { label: "Horn", hint: "Works and sounds normal.", how: "Press the horn. It should sound straight away and clearly." },
+      battery: { label: "Battery", hint: "No corrosion on terminals, starts without hesitation.", how: "Look at the battery terminals for white or green crust. Check the date sticker: batteries older than about 3 years may need replacing soon. A slow start is a warning sign." },
+      rc_original: { label: "Original RC", hint: "The original registration certificate (RC) is seen and matches the number plate and chassis number.", how: "Ask for the original RC (smart card or book). Check the number plate, chassis number and engine number match the car. A photocopy only, or numbers that don't match, is a Problem." },
+      insurance_valid: { label: "Insurance valid", hint: "Policy is current and in the owner's name.", how: "Check the policy document or the insurer's app: the end date should be in the future and the owner's name should match the RC." },
+      puc_valid: { label: "PUC valid", hint: "The Pollution Under Control (PUC) certificate is current.", how: "Look at the Pollution Under Control certificate: the validity date should be in the future." },
+      service_history: { label: "Service history", hint: "Service book or records available.", how: "Ask for the service book or invoices. Regular service at the right kilometres is OK. No records at all needs attention." },
+      spare_key: { label: "Spare key", hint: "A second key is available and works.", how: "Ask for the second key and try it: it should open the car and start the engine." },
+      flood_signs: { label: "No flood signs", hint: "No silt, water lines, rust under seats or damp smell.", how: "Lift the floor mats and look under the seats for silt, rust or water lines. A damp or musty smell inside is a warning sign." },
+      accident_signs: { label: "No accident signs", hint: "No uneven panel gaps, overspray, welding or replaced pillars.", how: "Walk around the car in good light. Look for uneven gaps between panels, paint that doesn't quite match, overspray on rubber seals, or weld marks inside the door frames and boot." },
     },
   },
 
@@ -599,11 +511,12 @@ export const en = {
       title: "Price estimate",
       intro: "Find what similar cars are selling for right now. We search current listings online and adjust the range for this car's condition score.",
       run: "Estimate market price",
-      running: "Searching current listings… this takes up to a minute.",
+      stages: ["Searching current listings for similar cars…", "Reading prices from car sites…", "Comparing them with this car's condition…"],
+      elapsed: (s: number) => `${s}s · usually under a minute. You can stay on this screen.`,
+      left: (n: number, max: number) => `Free. ${n} of ${max} searches left today for this car.`,
       refresh: "Search again",
       shownOnReport: "Shown on the report. You can hide it below.",
       hiddenOnReport: "Hidden from the report. Turn it on below to share it.",
-      free: (n: number) => `Free. Up to ${n} searches per car a day.`,
       errors: {
         needsDetails: "Add the make, model and year on the car page first, so we can find similar cars.",
         limit: (n: number) => `You've searched ${n} times today for this car. Try again tomorrow.`,
@@ -629,7 +542,8 @@ export const en = {
     reviewNotes: "Review notes",
     previewLabel: "Preview",
     publish: "Publish report",
-    publishCost: (credits: number) => `Uses 1 credit. You have ${credits === 1 ? "1 credit" : `${credits} credits`}.`,
+    publishCost: (credits: number) => `Uses 1 of your ${credits === 1 ? "1 credit" : `${credits} credits`}. Edits after publishing are free.`,
+    publishConfirm: "Publish this report?",
     publishing: "Publishing…",
     noCredits: "You have no credits left. Buy credits to publish this report.",
     buyCredits: "Buy credits",
@@ -641,6 +555,8 @@ export const en = {
     copied: "Link copied",
     openReport: "Open report",
     shareWhatsApp: "Share on WhatsApp",
+    shareOther: "Other apps",
+    previewCard: "This is the card buyers see in WhatsApp.",
     downloadPdf: "Download PDF",
     pdfHint: "The PDF can take a few seconds the first time.",
     shareMessage: (title: string, reg: string, score: string, url: string) =>
@@ -665,6 +581,7 @@ export const en = {
       below_average: "Below average",
       poor: "Poor",
     },
+    flagsTitle: (n: number) => (n === 1 ? "1 thing to check before you buy" : `${n} things to check before you buy`),
     details: "Car details",
     regNumber: "Number plate",
     photos: "Photos",
@@ -673,11 +590,11 @@ export const en = {
     findings: "Damage notes",
     findingCount: (n: number) => (n === 1 ? "1 note" : `${n} notes`),
     noFindings: "No visible damage was noted.",
-    flagsTitle: (n: number) => (n === 1 ? "1 thing to check before you buy" : `${n} things to check before you buy`),
     seenIn: (angle: string) => `Photo: ${angle}`,
     checklist: "Checklist",
     checklistSummary: (ok: number, attention: number, fail: number) =>
-      [`${ok} OK`, attention ? `${attention} attention` : "", fail ? `${fail} fail` : ""].filter(Boolean).join(" · "),
+      [`${ok} OK`, attention ? `${attention} need${attention === 1 ? "s" : ""} attention` : "", fail ? `${fail} problem${fail === 1 ? "" : "s"}` : ""].filter(Boolean).join(" · "),
+    flagged: { attention: (items: string) => `Needs attention: ${items}`, fail: (items: string) => `Problem: ${items}` },
     documents: "Documents",
     price: "Estimated market price",
     priceAdjusted: (market: string, adjustment: string | null, score: string) =>
@@ -708,8 +625,21 @@ export const en = {
     publishedOn: (date: string) => `Report date: ${date}`,
     madeWith: "Made with Treadmark",
     notFoundTitle: "Report not available",
+    seeSample: "See a sample report",
     notFoundBody: "This link doesn't open a report. It may have been mistyped or removed. Ask the person who sent it to share it again.",
     photoViewer: "Photo viewer",
+    photoTaken: (at: string) => `Taken ${at}`,
+    zoomIn: "Zoom in",
+    zoomOut: "Zoom out",
+    share: "Share",
+    shareLong: "Share this report",
+    contactBar: "Contact",
+    callShort: "Call",
+    whatsappShort: "WhatsApp",
+    inspectedOn: (date: string) => `Inspected ${date}`,
+    scoreHowTitle: "How the score works",
+    scoreHow:
+      "Every car starts at 10. Each accepted damage note takes off 0.3 (minor), 0.8 (moderate) or 1.5 (major). Each checklist item that needs attention takes off 0.3, and each problem 1.0. 8 and above is good condition, 6 to 7.9 fair, below 6 needs work.",
     close: "Close",
     previous: "Previous photo",
     next: "Next photo",
@@ -752,10 +682,12 @@ export const en = {
     tryAgain: "Try again",
     backToReport: "Back to your report",
     backHome: "Back to My cars",
+    getHelp: "Message us for help",
     history: "Credit history",
     back: "Back",
     errors: {
       start: "Couldn't start the payment. Check your internet and try again.",
+      server: "The payment couldn't start on our side. Please try again in a minute. No money was taken.",
       script: "Couldn't load the payment window. Check your internet and try again.",
       tooMany: "Too many payment attempts. Please wait a while and try again.",
     },
@@ -763,7 +695,9 @@ export const en = {
 
   profile: {
     title: "Profile",
+    logoutConfirm: "Log out of Treadmark on this phone? You'll need a new OTP to log in again.",
     edit: "Edit profile",
+    saved: "Profile saved.",
     userType: "I am a",
     owner: "Owner",
     phone: "Mobile",
@@ -782,6 +716,9 @@ export const en = {
     },
     paymentId: (id: string) => `Payment ID ${id}`,
     help: "Questions about a payment? Contact us with the payment ID.",
+    deleteAccount: "Ask us to delete my account",
+    deleteAccountHint: "We delete your data within 30 days, except payment records the law asks us to keep.",
+    deleteAccountMessage: (phone: string) => `Please delete my Treadmark account${phone ? ` (${phone})` : ""} and its data.`,
   },
 
   photos: {
@@ -810,9 +747,23 @@ export const en = {
       uploading: "Uploading…",
       retrying: (attempt: number, max: number) => `Connection is slow. Retrying (${attempt}/${max})…`,
       failed: "Not uploaded",
+      waiting: "Waiting for internet",
+      waitingLong: "Saved on this phone. It uploads by itself when you're back online.",
+      review: "Check this photo",
     },
+    issues: {
+      dark: "This photo looks too dark.",
+      bright: "This photo looks washed out.",
+      blurry: "This photo looks blurry.",
+    },
+    issueHint: "A clear photo gives better damage notes. Retake it, or keep it if it looks fine to you.",
+    useAnyway: "Keep this photo",
+    justSaved: (label: string) => `${label} saved`,
+    waitingCount: (n: number) => (n === 1 ? "1 photo is saved on this phone and will upload when you're back online." : `${n} photos are saved on this phone and will upload when you're back online.`),
+    optionalNext: (label: string) => `Add optional photos (next: ${label})`,
+    skipForNow: "Skip for now",
     tryAgain: "Try again",
-    leaveWarning: "Photos are still uploading. If you leave now they will be lost.",
+    leaveWarning: "A photo is still being prepared. If you leave now it will be lost.",
     errors: {
       notImage: "That file isn't a photo. Please choose an image.",
       unreadable: "Couldn't read that photo. Try taking it again or choose a different one.",
@@ -844,19 +795,6 @@ export const en = {
       tyre_rr: { label: "Rear-right tyre", tip: "Crouch beside the rear-right tyre and show the tread across its full width." },
     },
   },
-} as const;
+};
 
-/** The shape every language must fill: the English object with its literal strings widened to string. */
-type Widen<T> = T extends string
-  ? string
-  : T extends (...args: infer A) => infer R
-    ? (...args: A) => Widen<R>
-    : T extends readonly (infer U)[]
-      ? readonly Widen<U>[]
-      : T extends object
-        ? { readonly [K in keyof T]: Widen<T[K]> }
-        : T;
-export type Strings = Widen<typeof en>;
-
-/** English. Use getT() / useT() in screens so readers get their own language; this stays for tests, the PDF and legal text. */
-export const t = en;
+export type Strings = typeof en;

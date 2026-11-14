@@ -2,7 +2,8 @@
 
 import { z } from "zod";
 import { getCurrentProfile } from "@/lib/profile";
-import { getT, getTranslateMessage } from "@/lib/i18n.server";
+import { errorText } from "@/lib/i18n";
+import { getT } from "@/lib/i18n.server";
 import type { FindingRow } from "@/lib/supabase/database.types";
 import { findingInputSchema, odometerSchema, type FindingField } from "@/lib/validation/finding";
 
@@ -42,14 +43,13 @@ export type SaveFindingResult =
  */
 export async function saveFinding(input: FindingFormInput & { carId: string; photoId: string | null; findingId?: string }): Promise<SaveFindingResult> {
   const t = await getT();
-  const tr = await getTranslateMessage();
   const ids = z.object({ carId: id, photoId: id.nullable(), findingId: id.optional() }).safeParse(input);
   if (!ids.success) return { ok: false, error: t.common.somethingWrong };
 
   const parsed = findingInputSchema.safeParse(input);
   if (!parsed.success) {
     const fieldErrors: Partial<Record<FindingField, string>> = {};
-    for (const issue of parsed.error.issues) fieldErrors[issue.path[0] as FindingField] ??= tr(issue.message);
+    for (const issue of parsed.error.issues) fieldErrors[issue.path[0] as FindingField] ??= errorText(t, issue.message);
     return { ok: false, fieldErrors };
   }
 

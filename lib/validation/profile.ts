@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { t } from "@/lib/strings";
 import { USER_TYPES } from "@/lib/user-type";
+
+// Error messages are keys into lib/strings.ts ("cars.errors.make"); show them with errorText() from lib/i18n.
 
 const text = (min: number, max: number, message: string) =>
   z.string().trim().min(min, message).max(max, message);
@@ -21,12 +22,12 @@ export function logoPathPattern(profileId: string) {
 export function onboardingSchema(profileId: string) {
   return z
     .object({
-      user_type: z.enum(USER_TYPES, t.onboarding.errors.userType),
-      owner_name: text(2, 80, t.onboarding.errors.ownerName),
-      city: text(2, 60, t.onboarding.errors.city),
-      business_name: optional(text(2, 100, t.onboarding.errors.businessName)),
-      address: optional(text(5, 300, t.onboarding.errors.address)),
-      logo_path: optional(z.string().regex(logoPathPattern(profileId), t.onboarding.errors.logoPath)),
+      user_type: z.enum(USER_TYPES, "onboarding.errors.userType"),
+      owner_name: text(2, 80, "onboarding.errors.ownerName"),
+      city: text(2, 60, "onboarding.errors.city"),
+      business_name: optional(text(2, 100, "onboarding.errors.businessName")),
+      address: optional(text(5, 300, "onboarding.errors.address")),
+      logo_path: optional(z.string().regex(logoPathPattern(profileId), "onboarding.errors.logoPath")),
     })
     .transform((d) => (d.user_type === "dealer" ? d : { ...d, business_name: null, address: null, logo_path: null }));
 }

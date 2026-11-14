@@ -1,9 +1,6 @@
 export const APP_NAME = "Treadmark";
-/** Browser and PWA chrome: Paper, so the status bar matches the page (the olive lives in the app icon). Brand style guide, section 3. */
-export const THEME_COLOR = "#F6F4EF";
-export const BACKGROUND_COLOR = "#F6F4EF";
-/** Olive Khaki, for third-party surfaces that take one accent colour (Razorpay Checkout). */
-export const ACCENT_COLOR = "#556B1F";
+export const THEME_COLOR = "#0f5e58";
+export const BACKGROUND_COLOR = "#ffffff";
 
 export const FREE_CREDITS = 3;
 
@@ -65,7 +62,9 @@ export const REPORT = {
   /** PDF download links. /r/<slug>/pdf makes a fresh one on every tap. */
   pdfUrlSeconds: 5 * 60,
   /** Bump when the PDF layout changes, so stored PDFs are rebuilt on the next download. */
-  pdfVersion: 2,
+  pdfVersion: 5,
+  /** Bump when the link preview image's layout changes, so WhatsApp fetches a fresh one. */
+  ogVersion: 3,
 } as const;
 
 /** Prepaid report credit packs. Prices in paise (Rs 999 = 99900). */

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { ogArt, ogFonts } from "@/lib/report/brand-assets";
 import { C } from "@/lib/report/colors";
-import { t } from "@/lib/strings";
+import { en as t } from "@/lib/strings";
 
 // Link preview for the landing and other public pages (WhatsApp, Facebook, X). Built once at build time.
 // Treadmark brand: Paper ground, primary lockup, ink headline, one olive button, the seal.

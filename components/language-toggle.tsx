@@ -3,29 +3,41 @@
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { useLocale, useT } from "@/components/i18n-provider";
-import { LOCALE_COOKIE, LOCALE_COOKIE_MAX_AGE, type Locale } from "@/lib/i18n";
+import { GlobeIcon } from "@/components/icons";
+import { setLocale } from "@/lib/i18n.actions";
+import { LOCALES, type Locale } from "@/lib/i18n";
 
-/** हिंदी / English switch. Saves the choice in a cookie and re-renders the page in that language. */
+/** English / हिन्दी switch. Saves a cookie and re-renders the page in the new language. */
 export function LanguageToggle({ className = "" }: { className?: string }) {
   const t = useT();
-  const locale = useLocale();
+  const current = useLocale();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const next: Locale = locale === "hi" ? "en" : "hi";
+
+  function choose(locale: Locale) {
+    if (locale === current) return;
+    startTransition(async () => {
+      await setLocale(locale);
+      router.refresh();
+    });
+  }
 
   return (
-    <button
-      type="button"
-      lang={next}
-      aria-label={t.language.switchToLabel}
-      disabled={pending}
-      onClick={() => {
-        document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}; samesite=lax`;
-        startTransition(() => router.refresh());
-      }}
-      className={`inline-flex min-h-11 items-center rounded-md border border-border-control bg-surface px-3 type-label text-accent disabled:opacity-60 ${className}`}
-    >
-      {t.language.switchTo}
-    </button>
+    <div role="radiogroup" aria-label={t.common.language} aria-busy={pending} className={`inline-flex items-center gap-1 rounded-full bg-sunken p-1 transition-opacity ${pending ? "opacity-60" : ""} ${className}`}>
+      <GlobeIcon size={16} className="mx-1.5 text-ink-muted" />
+      {LOCALES.map((locale) => (
+        <button
+          key={locale}
+          type="button"
+          role="radio"
+          aria-checked={locale === current}
+          lang={locale}
+          onClick={() => choose(locale)}
+          className={`min-h-11 rounded-full px-4 text-small font-semibold transition-colors duration-150 ${locale === current ? "bg-surface text-ink shadow-card" : "text-ink-muted hover:text-ink"}`}
+        >
+          {t.common.languageNames[locale]}
+        </button>
+      ))}
+    </div>
   );
 }

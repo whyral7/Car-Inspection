@@ -1,11 +1,24 @@
 import { BUSINESS } from "@/lib/config";
 import { whatsappChatUrl } from "@/lib/report/share";
-import { t } from "@/lib/strings";
+import { en as t } from "@/lib/strings";
 
 /** "Chat on WhatsApp" target: a chat with BUSINESS.whatsapp, or the contact page until a number is set. */
 /** Pass the reader's own `whatsappMessage` so the chat opens in their language. */
 export function supportWhatsappHref(message: string = t.home.whatsappMessage) {
   return whatsappChatUrl(BUSINESS.whatsapp, message) ?? "/contact";
+}
+
+/**
+ * "Delete my account" request: WhatsApp support if a number is set, else an email to support, else the
+ * contact page. Deletion is handled by hand within 30 days (see the privacy policy).
+ */
+export function accountDeletionHref(message: string) {
+  const chat = whatsappChatUrl(BUSINESS.whatsapp, message);
+  if (chat) return chat;
+  if (BUSINESS.email.includes("@") && !BUSINESS.email.startsWith("[")) {
+    return `mailto:${BUSINESS.email}?subject=${encodeURIComponent("Delete my Treadmark account")}&body=${encodeURIComponent(message)}`;
+  }
+  return "/contact";
 }
 
 /**

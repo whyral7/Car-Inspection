@@ -1,18 +1,16 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { buttonClass } from "@/components/button";
+import { BackLink, buttonClass } from "@/components/ui";
 import { ChatIcon } from "@/components/icons";
 import { BUSINESS } from "@/lib/config";
 import { formatPhone, whatsappChatUrl } from "@/lib/report/share";
-import { getT } from "@/lib/i18n.server";
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getT();
-  return { title: t.legal.contact.title, alternates: { canonical: "/contact" } };
-}
+import { en as t } from "@/lib/strings";
+import { legal } from "@/lib/strings-legal";
 
-export default async function ContactPage() {
-  const t = await getT();
-  const copy = t.legal.contact;
+const copy = legal.contact;
+
+export const metadata: Metadata = { title: copy.title, alternates: { canonical: "/contact" } };
+
+export default function ContactPage() {
   const chat = whatsappChatUrl(BUSINESS.whatsapp, t.home.whatsappMessage);
   const rows = [
     { label: copy.business, value: BUSINESS.legalName },
@@ -23,19 +21,18 @@ export default async function ContactPage() {
   ];
 
   return (
-    <article className="mx-auto w-full max-w-2xl px-4 py-8">
-      <Link href="/" className="-ml-1 inline-flex min-h-11 items-center px-1 text-sm font-medium text-accent">
-        ← {t.legal.back}
-      </Link>
-      <h1 className="mt-2 type-heading-1">{copy.title}</h1>
-      <p className="mt-2 text-text-muted">{copy.intro}</p>
-      <dl className="mt-6 divide-y divide-border rounded-lg border border-border bg-surface">
+    // Legal text is English only, so say so for screen readers even when the site is in Hindi.
+    <article lang="en" className="mx-auto w-full max-w-2xl px-4 py-8">
+      <BackLink href="/">{legal.back}</BackLink>
+      <h1 className="mt-2 text-title">{copy.title}</h1>
+      <p className="mt-2 text-ink-muted">{copy.intro}</p>
+      <dl className="mt-6 divide-y divide-line overflow-hidden rounded-card bg-surface shadow-card">
         {rows.map((row) => (
-          <div key={row.label} className="flex flex-col gap-0.5 p-4">
-            <dt className="text-sm text-text-subtle">{row.label}</dt>
+          <div key={row.label} className="flex flex-col gap-1 p-4 sm:px-6">
+            <dt className="text-small text-ink-muted">{row.label}</dt>
             <dd className="font-medium break-words">
               {row.href ? (
-                <a href={row.href} className="text-accent underline" {...(row.href.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}>
+                <a href={row.href} className="text-brand-700 underline" {...(row.href.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}>
                   {row.value}
                 </a>
               ) : (
@@ -47,11 +44,11 @@ export default async function ContactPage() {
       </dl>
       {chat && (
         <a href={chat} target="_blank" rel="noopener" className={buttonClass("primary", "mt-6 w-full")}>
-          <ChatIcon size={18} />
+          <ChatIcon />
           {t.home.whatsapp}
         </a>
       )}
-      <p className="mt-6 text-sm text-text-subtle">{copy.paymentHelp}</p>
+      <p className="mt-6 text-small text-ink-muted">{copy.paymentHelp}</p>
     </article>
   );
 }

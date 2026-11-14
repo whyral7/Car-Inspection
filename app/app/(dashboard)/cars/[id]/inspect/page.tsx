@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { z } from "zod";
 import { PHOTO, STORAGE_BUCKETS } from "@/lib/config";
 import { carTitle } from "@/lib/format";
-import { ANGLES, isAngleKey } from "@/lib/photos/angles";
+import { ANGLES, isAngleKey, smallPhotoPath } from "@/lib/photos/angles";
 import { getCurrentProfile } from "@/lib/profile";
 import { getT } from "@/lib/i18n.server";
 import { PhotoCapture, type InitialPhoto } from "./photo-capture";
@@ -30,17 +30,20 @@ export default async function InspectPage({ params, searchParams }: PageProps<"/
   if (photosError) throw photosError;
   const photos = rows.flatMap((r) => (isAngleKey(r.angle_key) ? [{ angleKey: r.angle_key, path: r.storage_path }] : []));
 
-  // The bucket is private, so thumbnails go through short-lived signed URLs.
+  // The bucket is private, so photos go through short-lived signed URLs. Tiles use the small copy
+  // (about 60 KB instead of 300+ KB); the guide screen shows the full photo.
   const urlByPath = new Map<string, string>();
   if (photos.length > 0) {
-    const { data: signed, error: signError } = await supabase.storage.from(STORAGE_BUCKETS.inspectionPhotos).createSignedUrls(
-      photos.map((p) => p.path),
-      PHOTO.signedUrlSeconds,
-    );
+    const paths = photos.flatMap((p) => [p.path, smallPhotoPath(id, p.angleKey)]);
+    const { data: signed, error: signError } = await supabase.storage.from(STORAGE_BUCKETS.inspectionPhotos).createSignedUrls(paths, PHOTO.signedUrlSeconds);
     if (signError) throw signError;
-    for (const s of signed) if (s.path && s.signedUrl) urlByPath.set(s.path, s.signedUrl);
+    for (const s of signed) if (s.path && s.signedUrl && !s.error) urlByPath.set(s.path, s.signedUrl);
   }
-  const initialPhotos: InitialPhoto[] = photos.map((p) => ({ angleKey: p.angleKey, url: urlByPath.get(p.path) ?? null }));
+  const initialPhotos: InitialPhoto[] = photos.map((p) => ({
+    angleKey: p.angleKey,
+    url: urlByPath.get(p.path) ?? null,
+    thumbUrl: urlByPath.get(smallPhotoPath(id, p.angleKey)) ?? null,
+  }));
 
   return <PhotoCapture carId={car.id} regNumber={car.reg_number} carTitle={carTitle(car)} initialPhotos={initialPhotos} startAt={startAt} />;
 }

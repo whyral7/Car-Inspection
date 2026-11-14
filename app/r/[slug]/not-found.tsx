@@ -1,13 +1,31 @@
+import Link from "next/link";
+import { LinkButton } from "@/components/ui";
+import { SearchIcon } from "@/components/icons";
+import { StatusPage } from "@/components/status-page";
+import { SAMPLE_REPORT_PATH } from "@/lib/config";
 import { getT } from "@/lib/i18n.server";
 
 export default async function ReportNotFound() {
   const t = await getT();
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-3 px-4 py-10 text-center">
-      {/* eslint-disable-next-line @next/next/no-img-element -- static brand SVG */}
-      <img src="/brand/treadmark-mark-small-color.svg" alt="" width={56} height={56} className="mx-auto size-14" />
-      <h1 className="type-heading-1">{t.publicReport.notFoundTitle}</h1>
-      <p className="text-text-muted">{t.publicReport.notFoundBody}</p>
+    <main className="flex flex-1 flex-col">
+      {/* A buyer may land here from a WhatsApp link: show whose site this is. */}
+      <header className="mx-auto flex w-full max-w-md px-4 pt-[calc(1rem+env(safe-area-inset-top))]">
+        <Link href="/" className="flex min-h-11 items-center gap-2 text-heading text-brand-700">
+          <span aria-hidden className="flex size-8 items-center justify-center rounded-chip bg-brand-700 text-small text-white">
+            {t.appName.charAt(0)}
+          </span>
+          {t.appName}
+        </Link>
+      </header>
+      <StatusPage icon={<SearchIcon size={28} />} title={t.publicReport.notFoundTitle} body={t.publicReport.notFoundBody}>
+        <LinkButton href={SAMPLE_REPORT_PATH} variant="secondary">
+          {t.publicReport.seeSample}
+        </LinkButton>
+        <LinkButton href="/" variant="ghost">
+          {t.common.goToSite}
+        </LinkButton>
+      </StatusPage>
     </main>
   );
 }

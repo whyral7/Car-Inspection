@@ -12,6 +12,7 @@ import { generateSlug } from "@/lib/report/slug";
 import { hiddenSectionsSchema } from "@/lib/report/view";
 import { conditionScore } from "@/lib/score";
 import { getT } from "@/lib/i18n.server";
+import { priceSearchesUsed } from "@/lib/price/usage";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { appBaseUrl } from "@/lib/url";
 
@@ -112,16 +113,9 @@ export async function estimatePrice(carId: string): Promise<PriceResult> {
   if (!car.make || !car.model || !car.year) return { ok: false, error: t.report.price.errors.needsDetails, code: "needs_details" };
 
   const admin = createAdminClient();
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const { count, error: countError } = await admin
-    .from("ai_usage")
-    .select("id", { count: "exact", head: true })
-    .eq("car_id", carId)
-    .eq("purpose", "price_estimate")
-    .eq("attempt", 1)
-    .gte("created_at", since);
-  if (countError) return { ok: false, error: t.report.price.errors.failed };
-  if ((count ?? 0) >= PRICE.maxPerCarPerDay) return { ok: false, error: t.report.price.errors.limit(PRICE.maxPerCarPerDay), code: "limit" };
+  const used = await priceSearchesUsed(carId);
+  if (used === null) return { ok: false, error: t.report.price.errors.failed };
+  if (used >= PRICE.maxPerCarPerDay) return { ok: false, error: t.report.price.errors.limit(PRICE.maxPerCarPerDay), code: "limit" };
 
   const outcome = await estimateMarketPrice({
     make: car.make,

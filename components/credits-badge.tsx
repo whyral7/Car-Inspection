@@ -1,16 +1,11 @@
-import { getT } from "@/lib/i18n.server";
+import { CreditIcon } from "@/components/icons";
+import { Badge } from "@/components/ui";
+import type { Strings } from "@/lib/strings";
 
-export async function CreditsBadge({ credits }: { credits: number }) {
-  const t = await getT();
-  const low = credits <= 1;
+export function CreditsBadge({ credits, t }: { credits: number; t: Strings }) {
   return (
-    <span
-      aria-label={t.dashboard.creditsLeft(credits)}
-      className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-sm px-2 py-1 font-mono text-xs font-medium ${
-        low ? "bg-attention-tint text-attention" : "bg-accent-tint text-accent"
-      }`}
-    >
+    <Badge tone={credits <= 1 ? "warning" : "brand"} icon={<CreditIcon size={14} />} label={t.dashboard.creditsLeft(credits)} className="tabular">
       {t.dashboard.creditsShort(credits)}
-    </span>
+    </Badge>
   );
 }

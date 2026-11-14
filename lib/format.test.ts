@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { t } from "@/lib/strings";
+import { en as t } from "@/lib/strings";
 import { carTitle, formatDate, formatInrShort, formatRupees, isPastDate } from "./format";
 
 describe("format", () => {

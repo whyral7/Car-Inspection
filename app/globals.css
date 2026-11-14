@@ -1,20 +1,84 @@
 @import "tailwindcss";
-/* Treadmark brand: tokens (primitive -> semantic -> component), base type, and the Tailwind theme that maps
-   utilities onto them. Rules live in .claude/skills/treadmark-brand/SKILL.md. Never add raw colours here. */
-@import "../brand/tokens/treadmark-tokens.css";
-@import "../brand/tokens/treadmark-base.css";
-@import "../brand/tokens/treadmark-tailwind-v4.css";
+@import "./tokens.css";
 
 :root {
-  /* Light only for now: <html data-theme="light"> in app/layout.tsx. Remove that attribute to let dark mode
-     follow the phone once every screen has been checked in dark. */
   color-scheme: light;
 }
 
 html {
   -webkit-tap-highlight-color: transparent;
+  text-size-adjust: 100%;
+  /* Keep focused or scrolled-to items clear of the sticky header and bottom action bar. */
+  scroll-padding-top: 5rem;
+  scroll-padding-bottom: calc(var(--sticky-bar-height, 0px) + 1.5rem);
 }
 
 body {
-  @apply bg-bg text-text antialiased;
+  @apply bg-canvas font-sans text-body text-ink antialiased;
+}
+
+/*
+ * No one-word last lines in running text, and headings that break into even lines. In the base
+ * layer, so a `text-balance` utility on a short line (the disclaimer) still wins.
+ */
+@layer base {
+  p,
+  li,
+  dd,
+  figcaption,
+  summary {
+    text-wrap: pretty;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+}
+
+/* Numbers that change or line up (scores, counts, prices) don't jiggle. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: var(--color-brand-100);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand-700);
+  outline-offset: 2px;
+}
+
+dialog::backdrop {
+  background: rgb(11 18 32 / 0.48);
+}
+dialog[open]::backdrop {
+  animation: var(--animate-fade-in);
+}
+
+/*
+ * Reduced motion keeps the feedback and drops the movement: sheets, toasts and new cards fade in
+ * instead of sliding or popping, presses don't shrink, and nothing pulses or scrolls smoothly.
+ * Colour and opacity changes stay, so state changes are still visible. The spinner keeps turning:
+ * it is the only sign that something is still happening.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-sheet-in,
+  .animate-rise-in,
+  .animate-pop {
+    animation: var(--animate-fade-in);
+  }
+  .animate-pulse {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-property: color, background-color, border-color, outline-color, opacity, box-shadow !important;
+    scale: none !important;
+  }
 }
