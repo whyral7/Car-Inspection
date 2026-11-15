@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { LinkButton } from "@/components/ui";
 import { ReportView } from "@/components/report/report-view";
+import { FREE_CREDITS } from "@/lib/config";
+import { ANGLES } from "@/lib/photos/angles";
 import { sampleReportView } from "@/lib/report/sample";
 import { getT } from "@/lib/i18n.server";
 import { en } from "@/lib/strings";
 
 export const metadata: Metadata = {
   title: en.sampleReport.metaTitle,
-  description: en.home.metaDescription,
+  description: en.home.metaDescription(ANGLES.length, FREE_CREDITS),
   alternates: { canonical: "/sample-report" },
 };
 

@@ -1,4 +1,7 @@
 import { ImageResponse } from "next/og";
+import { CHECKLIST_KEYS } from "@/lib/checklist";
+import { FREE_CREDITS } from "@/lib/config";
+import { ANGLES } from "@/lib/photos/angles";
 import { ogArt, ogFonts } from "@/lib/report/brand-assets";
 import { C } from "@/lib/report/colors";
 import { en as t } from "@/lib/strings";
@@ -19,12 +22,12 @@ export default async function Image() {
         <div style={{ display: "flex", alignItems: "center", gap: 48 }}>
           <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 20 }}>
             <div style={{ fontSize: 62, fontWeight: 800, lineHeight: 1.08, letterSpacing: -0.6 }}>{t.home.headline}</div>
-            <div style={{ fontSize: 30, color: C.muted, lineHeight: 1.35 }}>{t.home.subhead}</div>
+            <div style={{ fontSize: 30, color: C.muted, lineHeight: 1.35 }}>{t.home.subhead(ANGLES.length, CHECKLIST_KEYS.length)}</div>
           </div>
           <img src={art.seal} alt="" width={200} height={200} />
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 20, fontSize: 28, fontWeight: 700 }}>
-          <div style={{ background: C.olive, color: C.white, padding: "14px 28px", borderRadius: 12, display: "flex" }}>{t.home.cta}</div>
+          <div style={{ background: C.olive, color: C.white, padding: "14px 28px", borderRadius: 12, display: "flex" }}>{t.home.cta(FREE_CREDITS)}</div>
           <div style={{ color: C.subtle, fontWeight: 400, display: "flex" }}>{t.home.eyebrow}</div>
         </div>
       </div>

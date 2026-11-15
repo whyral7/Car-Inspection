@@ -47,13 +47,15 @@ export const en = {
   home: {
     login: "Log in with phone",
     metaTitle: "Treadmark: used-car inspection reports you share on WhatsApp",
-    metaDescription:
-      "For car owners, buyers and dealers in India. Shoot 20 guided photos, get AI damage notes and a condition score, and share the report on WhatsApp. Start free with 3 reports.",
+    // Counts come from the app's own config (photo angles, checklist items), never typed in.
+    metaDescription: (photos: number, free: number) =>
+      `For dealers and people selling their own car in India. Shoot ${photos} guided photos, confirm the damage notes, and share a scored inspection report on WhatsApp. First ${free} reports free.`,
     nav: { login: "Log in", pricing: "Pricing" },
-    eyebrow: "For car owners, buyers and dealers in India",
+    eyebrow: "For dealers and people selling their own car",
     headline: "Sell used cars faster with reports buyers can verify",
-    subhead: "Shoot 20 guided photos, get AI damage notes and a condition score, and share a report with every photo on WhatsApp. About 15 minutes a car.",
-    cta: "Start free, 3 reports",
+    subhead: (photos: number, checks: number) =>
+      `${photos} guided photos and a ${checks}-point checklist. Every finding comes with its photo. The buyer opens the report on WhatsApp, about 15 minutes after you start.`,
+    cta: (free: number) => `Start free, ${free} reports`,
     ctaNote: "No card needed. Log in with your mobile number.",
     sample: "See a sample report",
     preview: {
@@ -63,19 +65,20 @@ export const en = {
       car: "2019 Maruti Suzuki Swift VXi",
       score: "8.4",
       outOf: "/10",
-      lines: ["2 minor scratches", "19-point checklist", "RC details verified"],
+      grade: "Very good",
+      lines: (photos: number, checks: number) => [`${photos} photos, each one enlargeable`, `${checks}-point checklist`, "RC details matched"],
     },
     stepsTitle: "How it works",
-    steps: [
-      { title: "Add the car", body: "Type the number plate. We fill in the RC details: make, model, year, owners and insurance." },
-      { title: "Shoot 20 guided photos", body: "The app shows you each angle. AI marks visible dents, scratches and rust, and you check every note." },
-      { title: "Share on WhatsApp", body: "Send a report with a condition score, all photos and a PDF. It opens with one tap, no app needed." },
+    steps: (photos: number) => [
+      { title: "Add the car", body: "Type the number plate. The RC details fill in: make, model, year, owners and insurance." },
+      { title: `Shoot ${photos} guided photos`, body: "The app shows each angle. AI marks visible dents, scratches and rust. You confirm, edit or delete every note." },
+      { title: "Share on WhatsApp", body: "Send a report with a score out of 10, every photo and a PDF. It opens with one tap. No app needed." },
     ],
     whyTitle: "Who it's for",
     why: [
-      { title: "Selling your car", body: "Show every scratch up front. Serious buyers call with fewer doubts and fewer wasted visits." },
-      { title: "Buying a car", body: "Check a car properly before you pay, and share the report with family or your mechanic." },
       { title: "Used-car dealers", body: "Your dealership name, logo and phone on every report and PDF. Inspect your whole stock." },
+      { title: "Selling your own car", body: "Show every scratch up front. Buyers see the photos and the score before they call." },
+      { title: "Buying a car", body: "Inspect a car before you pay. Share the report with family or your mechanic." },
     ],
     faqTitle: "Questions",
     faq: [
@@ -83,18 +86,18 @@ export const en = {
       { q: "How do buyers open the report?", a: "With one tap on the link you send on WhatsApp. No app or login needed. They can also download a PDF." },
       { q: "What does it cost?", a: "Your first 3 reports are free. After that, packs work out from about ₹83 a report. Inspecting is free: a credit is used only when you publish." },
       { q: "Does it work with poor signal?", a: "Yes. Photos and checklist answers are saved on your phone and sent when you're back online." },
-      { q: "Can I use it in Hindi?", a: "Yes. Choose हिन्दी on the login screen or in your profile." },
+      { q: "Can I use it in Hindi?", a: "Yes. Tap हिंदी at the top of any screen." },
     ],
-    pricingTitle: "Simple prepaid pricing",
+    pricingTitle: "Prepaid pricing",
     pricingSubtitle: "1 credit publishes 1 report. Credits never expire. Pay with UPI, cards or net banking.",
     free: { title: "Free", price: "₹0", body: (n: number) => `${n} reports when you sign up` },
     packTitle: (n: number) => `${n} reports`,
     perReport: (rupees: string) => `₹${rupees} per report`,
     bestValue: "Best value",
-    contactBody: "Questions? We're happy to help you get your first report out.",
+    contactBody: "Ask us on WhatsApp. We'll help you get your first report out.",
     whatsapp: "Chat on WhatsApp",
     whatsappMessage: "Hi, I'd like to know more about Treadmark.",
-    finalTitle: "Your next car could have a report in 15 minutes",
+    finalTitle: "Every car, properly checked.",
   },
 
   site: {

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useOnline } from "@/components/connection-banner";
 import { useT } from "@/components/i18n-provider";
-import { AlertIcon, ArrowRightIcon, CheckIcon, ChevronDownIcon, CloudUploadIcon, CrossCircleIcon, HelpIcon, PlusIcon } from "@/components/icons";
+import { ArrowRightIcon, CheckIcon, ChevronDownIcon, CloudUploadIcon, HelpIcon, PlusIcon } from "@/components/icons";
 import { RememberStep } from "@/components/remember-step";
 import { Badge, Button, Card, ConfirmSheet, FormError, ProgressBar, Segmented, StepHeader, StickyBar, TextAreaField, TextButton, useToast, type BadgeTone, type SegmentOption } from "@/components/ui";
 import { CHECKLIST_GROUPS, CHECKLIST_KEYS, checklistProgress, isMustAnswer, type ChecklistKey } from "@/lib/checklist";
