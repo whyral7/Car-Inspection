@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Button, Card, Field, FormError, TextButton, focusFirstError } from "@/components/ui";
-import { OTP_RESEND_SECONDS } from "@/lib/config";
+import { FREE_CREDITS, OTP_RESEND_SECONDS } from "@/lib/config";
 import { useT } from "@/components/i18n-provider";
 import { errorText } from "@/lib/i18n";
 import type { Strings } from "@/lib/strings";
@@ -128,7 +128,7 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
       <form onSubmit={onPhoneSubmit} className="flex animate-fade-in flex-col gap-6" noValidate>
         <div className="flex flex-col gap-2">
           <h1 className="type-heading-1">{t.login.title}</h1>
-          <p className="text-text-muted">{t.login.subtitle}</p>
+          <p className="text-text-muted">{t.login.subtitle(FREE_CREDITS)}</p>
         </div>
         <Card className="flex flex-col gap-6">
           <Field
