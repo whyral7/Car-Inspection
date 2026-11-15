@@ -71,7 +71,7 @@ export function InstallPrompt({ eligible }: { eligible: boolean }) {
           {t.install.action}
         </Button>
       </div>
-      <button type="button" onClick={dismiss} aria-label={t.common.close} className="-m-2 flex size-11 shrink-0 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-surface-sunken">
+      <button type="button" onClick={dismiss} aria-label={t.common.close} className="-m-2 flex size-11 shrink-0 items-center justify-center rounded-md text-text-muted transition-colors hover:bg-surface-sunken">
         <XIcon size={18} />
       </button>
     </section>

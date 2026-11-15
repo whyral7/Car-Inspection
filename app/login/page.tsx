@@ -19,13 +19,13 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-8 px-4 pt-2 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
       <BrandHeader plain homeLabel={`${t.appName}: ${t.common.goToSite}`} />
       <LoginForm nextPath={nextPath} />
-      <p className="-mt-4 text-center type-body-sm text-text-muted">
+      <p className="-mt-4 text-center type-body-sm text-text-muted [line-height:2.75rem]">
         {t.login.agree}{" "}
-        <Link href="/terms" className="inline-flex min-h-11 items-center type-label text-accent underline underline-offset-4">
+        <Link href="/terms" className="py-3 type-label text-accent underline underline-offset-4">
           {t.login.terms}
         </Link>{" "}
         {t.login.and}{" "}
-        <Link href="/privacy" className="inline-flex min-h-11 items-center type-label text-accent underline underline-offset-4">
+        <Link href="/privacy" className="py-3 type-label text-accent underline underline-offset-4">
           {t.login.privacy}
         </Link>
         .

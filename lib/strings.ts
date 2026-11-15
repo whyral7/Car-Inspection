@@ -594,6 +594,7 @@ export const en = {
         ? "No red or amber flags"
         : [red ? `${red} red flag${red === 1 ? "" : "s"}` : "no red flags", amber ? `${amber} amber flag${amber === 1 ? "" : "s"}` : "no amber flags"].join(", "),
     reportId: (id: string) => `Report ${id}`,
+    flagRated: (rating: string) => `Rated ${rating} in the checklist. Ask the seller about it.`,
     details: "Car details",
     regNumber: "Number plate",
     photos: "Photos",

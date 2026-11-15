@@ -5,7 +5,6 @@
 // its photo), the header card (who made it, which car, the score, the ratings), and only then price and details.
 import type { ReactNode } from "react";
 import { ChatIcon, ChevronDownIcon, DownloadIcon, InfoIcon, PhoneIcon, ShieldCheckIcon } from "@/components/icons";
-import { Logo } from "@/components/logo";
 import { Plate } from "@/components/plate";
 import { RedFlag } from "@/components/red-flag";
 import { PhotoGallery, PhotoHero } from "@/components/report/photo-gallery";
@@ -155,7 +154,7 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
                   )
                 }
               >
-                {flag.body}
+                {flag.body ?? (flag.rated ? t.publicReport.flagRated(flag.rated) : null)}
               </RedFlag>
             );
           })}
@@ -169,13 +168,14 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
             // eslint-disable-next-line @next/next/no-img-element -- small public logo, no need for the image optimiser
             <img src={view.dealer.logoUrl} alt={view.dealer.name} className="h-[var(--logo-height-header)] w-auto max-w-32 object-contain" />
           ) : (
-            <Logo />
+            // The page header already carries the Treadmark lockup, so the issuer is named in type here.
+            <p className="min-w-0 truncate type-title-sm">{view.dealer.name}</p>
           )}
           {view.slug && <p className="type-code-sm text-report-id">{t.publicReport.reportId(view.slug)}</p>}
         </div>
         <div className="grid gap-[var(--report-padding)] p-[var(--report-padding)]">
           <div>
-            <p className="type-caption text-report-facts">{[issuer, t.publicReport.heading].filter(Boolean).join(" · ")}</p>
+            <p className="type-caption text-report-facts">{[view.dealer.logoUrl ? issuer : view.dealer.city, t.publicReport.heading].filter(Boolean).join(" · ")}</p>
             <h1 className="mt-1 type-heading-2 break-words">{view.car.title || view.car.regNumber}</h1>
             <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-2 type-caption text-report-facts">
               <Plate reg={view.car.regNumber} size="sm" />

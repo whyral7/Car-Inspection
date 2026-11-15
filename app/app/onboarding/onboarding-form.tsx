@@ -252,7 +252,7 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
         <div>
           <Label htmlFor="logo_file">{t.onboarding.logo}</Label>
           <div className="flex items-center gap-4">
-            <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-md bg-bg ring-1 ring-border">
+            <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-bg">
               {preview ? (
                 // eslint-disable-next-line @next/next/no-img-element -- blob: previews can't go through next/image
                 <img src={preview} alt="" className="size-full animate-fade-in object-contain" />
@@ -302,7 +302,7 @@ function ReportHeaderPreview({ logo, name, city }: { logo: string | null; name: 
       <div className="flex items-center gap-4 rounded-md bg-bg p-4">
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element -- blob: preview
-          <img src={logo} alt="" className="size-12 shrink-0 rounded-md bg-surface object-contain ring-1 ring-border" />
+          <img src={logo} alt="" className="size-12 shrink-0 rounded-md border border-border bg-surface object-contain" />
         ) : (
           <span className="flex size-12 shrink-0 items-center justify-center rounded-md bg-surface-sunken type-title-sm text-text">{name.trim().charAt(0).toUpperCase() || "?"}</span>
         )}

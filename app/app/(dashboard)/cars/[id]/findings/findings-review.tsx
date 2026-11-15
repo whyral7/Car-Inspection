@@ -455,8 +455,8 @@ function OdometerCard({ carId, initialKm, photo }: { carId: string; initialKm: n
     return (
       <Card as="section" className="flex items-center justify-between gap-4">
         <div className="flex min-w-0 flex-col gap-1">
-          <h2 className="type-body-sm text-text-muted">{t.findings.odometer.title}</h2>
-          <p className="flex items-center gap-2 type-title-sm tabular">
+          <h2 className="type-caption text-text-muted">{t.findings.odometer.title}</h2>
+          <p className="flex items-center gap-2 type-reading">
             <CheckIcon size={18} />
             {t.findings.odometer.confirmed(kmFormat.format(confirmed))}
           </p>
@@ -477,7 +477,7 @@ function OdometerCard({ carId, initialKm, photo }: { carId: string; initialKm: n
         : t.findings.odometer.notDetected;
 
   return (
-    <form onSubmit={onSubmit} className={`${cardClass("warning")} flex flex-col gap-4`} noValidate>
+    <form onSubmit={onSubmit} className={`${cardClass()} flex flex-col gap-4`} noValidate>
       <div className="flex flex-col gap-1">
         <h2 className="type-title-sm">{t.findings.odometer.title}</h2>
         <p className="flex items-center gap-2 type-body-sm text-text-muted">
@@ -499,10 +499,12 @@ function OdometerCard({ carId, initialKm, photo }: { carId: string; initialKm: n
           autoComplete="off"
           enterKeyHint="done"
           maxLength={11}
+          unit="km"
           error={error ?? undefined}
           className="min-w-0 flex-1"
         />
-        <Button type="submit" loading={saving} disabled={!value.trim()} className={`shrink-0 ${error ? "mb-8" : ""}`}>
+        {/* Secondary: the screen's one primary action is in the bottom bar. */}
+        <Button type="submit" variant="secondary" loading={saving} disabled={!value.trim()} className={`min-h-[var(--input-height)] shrink-0 ${error ? "mb-7" : ""}`}>
           {t.findings.odometer.confirm}
         </Button>
       </div>
@@ -659,15 +661,15 @@ function FindingCard({ finding, onAccept, onEdit, onDelete }: { finding: Finding
 
   return (
     <article
-      className={`rounded-md p-4 ring-inset ${
-        finding.accepted ? "bg-surface ring-1 ring-border" : "bg-surface ring-2 ring-attention/30"
+      className={`rounded-md border p-4 ${
+        finding.accepted ? "border-border bg-surface" : "border-border-control bg-surface"
       }`}
     >
       <div className="flex flex-wrap items-center gap-2">
         <span className="type-title-sm">{t.findings.types[finding.type]}</span>
         <SeverityBadge severity={finding.severity} label={t.findings.severities[finding.severity]} />
         {finding.source === "ai" && (
-          <Badge icon={<SparklesIcon size={12} />} className="!bg-surface ring-1 ring-border ring-inset">
+          <Badge icon={<SparklesIcon size={12} />} className="border border-border !bg-surface">
             {t.findings.aiSuggestion}
           </Badge>
         )}

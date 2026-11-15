@@ -259,15 +259,24 @@ export function checkCounts(view: ReportView): Record<ChecklistResult, number> {
  * What a buyer must see before the score (brand rule): major damage and failed checks in red, then
  * checks that need attention in amber. Only from sections the reader can see.
  */
-export type ReportFlag = { key: string; tone: "fail" | "attention"; title: string; body: string | null; /** Evidence: the photo the damage was seen in. */ photoKey: AngleKey | null };
+export type ReportFlag = {
+  key: string;
+  tone: "fail" | "attention";
+  title: string;
+  body: string | null;
+  /** Evidence: the photo the damage was seen in. */
+  photoKey: AngleKey | null;
+  /** For a checklist flag with no note: the rating word, so the flag still states a fact. */
+  rated: string | null;
+};
 
 export function redFlags(view: ReportView): ReportFlag[] {
   const findings = (view.findings ?? [])
     .filter((f) => f.severity === "major")
-    .map((f, i) => ({ key: `f${i}`, tone: "fail" as const, title: [f.typeLabel, f.location].filter(Boolean).join(" · "), body: f.note, photoKey: f.photoKey }));
+    .map((f, i) => ({ key: `f${i}`, tone: "fail" as const, title: [f.typeLabel, f.location].filter(Boolean).join(" · "), body: f.note, photoKey: f.photoKey, rated: null }));
   const checks = shownChecks(view);
   const flag = (result: "fail" | "attention") =>
-    checks.filter((item) => item.result === result).map((item) => ({ key: `c${item.key}`, tone: result, title: item.label, body: item.note, photoKey: null }));
+    checks.filter((item) => item.result === result).map((item) => ({ key: `c${item.key}`, tone: result, title: item.label, body: item.note, photoKey: null, rated: item.resultLabel }));
   return [...findings, ...flag("fail"), ...flag("attention")];
 }
 

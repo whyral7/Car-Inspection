@@ -79,7 +79,7 @@ export default async function ProfilePage() {
         <div className="flex items-center gap-4">
           {logo ? (
             // eslint-disable-next-line @next/next/no-img-element -- small public logo, no need for the image optimiser
-            <img src={logo} alt="" className="size-16 shrink-0 rounded-lg bg-surface object-contain shadow-card ring-1 ring-border" />
+            <img src={logo} alt="" className="size-16 shrink-0 rounded-lg border border-border bg-surface object-contain" />
           ) : (
             <span className="flex size-16 shrink-0 items-center justify-center rounded-lg bg-surface-sunken type-heading-1 text-text">{name.charAt(0).toUpperCase()}</span>
           )}

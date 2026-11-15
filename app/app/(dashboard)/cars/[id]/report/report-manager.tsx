@@ -178,32 +178,32 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
             </div>
           </div>
           {/* What the buyer sees in WhatsApp before tapping the link. */}
-          <figure className="overflow-hidden rounded-md bg-bg ring-1 ring-border">
+          <figure className="overflow-hidden rounded-md border border-border bg-bg">
             {/* eslint-disable-next-line @next/next/no-img-element -- generated link preview image */}
             <img src={`${reportPath(published.slug)}/og.png`} alt="" width={1200} height={630} loading="lazy" className="aspect-[1200/630] w-full bg-surface object-cover" />
             <figcaption className="px-4 py-2 type-caption text-text-muted">{t.report.previewCard}</figcaption>
           </figure>
           <div className="grid grid-cols-2 gap-2">
-            <ShareButton url={published.url} title={shareText} text={shareText} label={t.report.shareOther} className={buttonClass("secondary", "", false, "sm")} />
-            <Button variant="secondary" size="sm" onClick={onCopy} icon={<CopyIcon size={18} />}>
+            <ShareButton url={published.url} title={shareText} text={shareText} label={t.report.shareOther} className={buttonClass("secondary", "!px-2", false, "sm")} />
+            <Button variant="secondary" size="sm" onClick={onCopy} icon={<CopyIcon size={18} />} className="!px-2">
               {t.report.copyLink}
             </Button>
-            <a href={reportPath(published.slug)} target="_blank" rel="noopener" className={buttonClass("secondary", "", false, "sm")}>
+            <a href={reportPath(published.slug)} target="_blank" rel="noopener" className={buttonClass("secondary", "!px-2", false, "sm")}>
               <ExternalIcon size={18} />
               {t.report.openReport}
             </a>
-            <a href={reportPdfPath(published.slug)} className={buttonClass("secondary", "", false, "sm")}>
+            <a href={reportPdfPath(published.slug)} className={buttonClass("secondary", "!px-2", false, "sm")}>
               <DownloadIcon size={18} />
               {t.report.downloadPdf}
             </a>
           </div>
-          <label className="flex flex-col gap-2 type-label ">
+          <label className="flex flex-col gap-[var(--field-gap)] type-label">
             {t.report.link}
             <input
               readOnly
               value={published.url}
               onFocus={(e) => e.currentTarget.select()}
-              className="min-h-12 rounded-md bg-surface-sunken px-4 type-body font-normal text-text-muted tabular  focus:outline-none"
+              className="min-h-[var(--input-height)] rounded-md border border-input-border bg-input-disabled-bg px-[var(--input-padding-x)] type-code text-text-muted"
             />
           </label>
           <p className="type-caption text-text-muted">
