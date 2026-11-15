@@ -144,7 +144,7 @@ export default async function ProfilePage() {
                   </>
                 }
                 trailing={
-                  <span className={`shrink-0 type-title-sm tabular ${entry.change > 0 ? "text-pass" : "text-text-muted"}`}>
+                  <span className={`shrink-0 type-code-strong ${entry.change > 0 ? "text-text" : "text-text-muted"}`}>
                     {entry.change > 0 ? `+${entry.change}` : entry.change}
                   </span>
                 }

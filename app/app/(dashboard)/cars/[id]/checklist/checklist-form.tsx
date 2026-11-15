@@ -34,9 +34,9 @@ const NOTE_SAVE_MS = 1_200;
 
 // Answers are tinted, not filled, so the one solid colour on screen stays the teal next action.
 const resultOptions = (t: Strings): readonly SegmentOption<ChecklistResult>[] => [
-  { value: "ok", label: t.checklist.results.ok, icon: <CheckIcon size={16} />, verdict: "pass" },
-  { value: "attention", label: t.checklist.results.attention, icon: <AlertIcon size={16} />, verdict: "attention" },
-  { value: "fail", label: t.checklist.results.fail, icon: <CrossCircleIcon size={16} />, verdict: "fail" },
+  { value: "ok", label: t.checklist.results.ok, verdict: "pass" },
+  { value: "attention", label: t.checklist.results.attention, verdict: "attention" },
+  { value: "fail", label: t.checklist.results.fail, verdict: "fail" },
   { value: "na", label: t.checklist.results.na, verdict: "na" },
 ];
 
@@ -278,7 +278,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
               <h2 id={`group-${group.key}`} className="type-heading-2">
                 {t.checklist.groups[group.key]}
               </h2>
-              <span className={`tabular ${groupDone === group.items.length ? "type-label text-pass" : "type-body-sm text-text-muted"}`}>
+              <span className={`tabular ${groupDone === group.items.length ? "type-label text-text" : "type-body-sm text-text-muted"}`}>
                 {groupDone}/{group.items.length}
               </span>
             </div>
@@ -342,7 +342,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
       />
 
       <StickyBar>
-        <p aria-live="polite" className={`flex items-center justify-center gap-2 text-center ${progress.complete ? "type-label text-pass" : "type-body-sm text-text-muted"}`}>
+        <p aria-live="polite" className={`flex items-center justify-center gap-2 text-center ${progress.complete ? "type-label text-text" : "type-body-sm text-text-muted"}`}>
           {progress.complete && <CheckIcon size={16} />}
           {progress.complete ? (finished ? t.checklist.finished : t.checklist.allDone) : t.checklist.finishHint(remaining)}
         </p>
@@ -460,7 +460,7 @@ function SaveState({ state, onRetry }: { state: SaveState; onRetry: () => void }
   if (state === "saving") return <span className="shrink-0 type-caption text-text-muted">{t.checklist.saving}</span>;
   if (state === "saved")
     return (
-      <span className="inline-flex shrink-0 animate-fade-in items-center gap-1 type-caption-strong text-pass">
+      <span className="inline-flex shrink-0 animate-fade-in items-center gap-1 type-caption-strong text-text-muted">
         <CheckIcon size={14} />
         {t.checklist.saved}
       </span>

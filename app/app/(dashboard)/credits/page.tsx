@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRightIcon, CreditIcon } from "@/components/icons";
-import { PageHeader } from "@/components/ui";
+import { Card, PageHeader } from "@/components/ui";
 import { supportWhatsappHref } from "@/lib/site";
 import { CREDIT_PACKS } from "@/lib/config";
 import { pricePerReportPaise } from "@/lib/credits/packs";
@@ -35,24 +35,24 @@ export default async function CreditsPage({ searchParams }: PageProps<"/app/cred
   return (
     <div className="flex flex-1 flex-col gap-6">
       <PageHeader back={{ href: nextPath ?? "/app", label: t.credits.back }} title={t.credits.title} description={t.credits.subtitle} />
-      {/* The balance, like a wallet card. */}
-      <section aria-label={t.dashboard.credits} className="flex items-start justify-between gap-4 rounded-lg bg-accent-hover p-6 text-white shadow-bar">
+      {/* The balance: a white card with the count as a reading. Olive is kept for the Pay button. */}
+      <Card as="section" aria-label={t.dashboard.credits} className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <p className="type-overline tracking-wide text-accent-tint uppercase">{t.dashboard.credits}</p>
-          <p className="type-display-lg tabular">{profile.credits}</p>
-          <p className="type-body-sm text-accent-tint">{t.dashboard.creditsHint}</p>
+          <p className="caps type-overline text-text-subtle">{t.dashboard.credits}</p>
+          <p className="font-mono type-display-lg">{profile.credits}</p>
+          <p className="type-caption text-text-muted">{t.dashboard.creditsHint}</p>
           <Link
             href="/app/profile#history"
-            className="-mx-2 mt-2 inline-flex min-h-11 items-center gap-2 self-start rounded-sm px-2 type-label text-white transition-colors hover:bg-white/10"
+            className="-mx-2 mt-1 inline-flex min-h-11 items-center gap-2 self-start rounded-sm px-2 type-label text-button-ghost-fg transition-colors hover:bg-button-ghost-bg-hover"
           >
             {t.credits.history}
             <ArrowRightIcon size={16} />
           </Link>
         </div>
-        <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-white/10">
+        <span className="flex size-12 shrink-0 items-center justify-center rounded-md bg-surface-sunken text-text">
           <CreditIcon size={24} />
         </span>
-      </section>
+      </Card>
       <BuyCredits packs={packs} next={nextPath} supportHref={supportWhatsappHref()} />
     </div>
   );

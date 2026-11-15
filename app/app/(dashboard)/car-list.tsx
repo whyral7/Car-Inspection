@@ -102,7 +102,7 @@ export function CarList({ cars }: { cars: CarCard[] }) {
                     {car.score && <ScoreChip score={car.score.value} scoreText={car.score.text} outOf={t.car.scoreOutOf} label={`${t.car.score} ${car.score.text}${t.car.scoreOutOf}`} />}
                   </div>
                   {car.title && <p className="line-clamp-2 type-title-sm break-words">{car.title}</p>}
-                  <p className={car.attention ? "type-label text-attention" : "type-body-sm text-text-muted"}>{car.progress}</p>
+                  <p className={car.attention ? "type-label text-text" : "type-body-sm text-text-muted"}>{car.progress}</p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <span className="hidden min-[420px]:inline-flex">

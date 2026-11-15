@@ -151,15 +151,15 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
       />
 
       {!ready && (
-        <Card tone="warning" className="flex items-start gap-4">
-          <AlertIcon className="mt-0.5 text-attention" />
-          <p className="type-body-sm text-attention">{t.report.notReady}</p>
+        <Card tone="brand" className="flex items-start gap-4">
+          <AlertIcon className="mt-0.5" />
+          <p className="type-body-sm">{t.report.notReady}</p>
         </Card>
       )}
 
       {unreviewed > 0 && (
-        <Card tone="warning" className="flex flex-wrap items-center gap-4">
-          <p className="min-w-0 flex-1 type-body-sm text-attention">{t.report.unreviewed(unreviewed)}</p>
+        <Card tone="brand" className="flex flex-wrap items-center gap-4">
+          <p className="min-w-0 flex-1 type-body-sm">{t.report.unreviewed(unreviewed)}</p>
           <LinkButton href={`/app/cars/${carId}/findings`} variant="secondary" size="sm" className="shrink-0">
             {t.report.reviewNotes}
           </LinkButton>
@@ -169,7 +169,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
       {published && (
         <Card as="section" className="flex animate-rise-in flex-col gap-4">
           <div className="flex items-center gap-4">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-pass-tint text-pass">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-surface-sunken text-text">
               <CheckIcon size={20} />
             </span>
             <div className="flex flex-col">
@@ -222,7 +222,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
                 {t.report.savingSections}
               </span>
             ) : sectionsSave === "saved" ? (
-              <span className="inline-flex animate-fade-in items-center gap-1 type-caption-strong text-pass">
+              <span className="inline-flex animate-fade-in items-center gap-1 type-caption-strong text-text-muted">
                 <CheckIcon size={14} />
                 {t.report.sectionsSaved}
               </span>
@@ -312,7 +312,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
         {canPublish ? (
           outOfCredits ? (
             <>
-              <p className="text-center type-label text-attention">{t.report.noCredits}</p>
+              <p className="text-center type-label">{t.report.noCredits}</p>
               <LinkButton href={`/app/credits?next=${encodeURIComponent(`/app/cars/${carId}/report`)}`}>
                 {t.report.buyCredits}
                 <ArrowRightIcon size={20} />

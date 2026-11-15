@@ -16,7 +16,7 @@ export default async function SampleReportPage() {
   const view = sampleReportView(t);
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 py-6">
-      <p className="rounded-lg bg-attention-tint p-4 type-body-sm text-attention">{t.sampleReport.banner}</p>
+      <p className="rounded-lg bg-accent-tint p-4 type-body-sm text-text">{t.sampleReport.banner}</p>
       <ReportView view={view} t={t} />
       <LinkButton href="/login">{t.sampleReport.cta}</LinkButton>
     </div>

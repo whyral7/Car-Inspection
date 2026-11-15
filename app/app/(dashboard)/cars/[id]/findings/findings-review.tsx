@@ -369,7 +369,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
           </LinkButton>
         ) : (
           <>
-            <p className={`flex items-center justify-center gap-2 type-label ${failed.length ? "text-fail" : "text-pass"}`}>
+            <p className={`flex items-center justify-center gap-2 type-label ${failed.length ? "text-fail" : "text-text"}`}>
               {!failed.length && <CheckIcon size={16} />}
               {failed.length ? t.findings.someFailed(failed.length) : t.findings.allReviewed}
             </p>
@@ -409,8 +409,8 @@ function AnalysisProgress({ total, active, failed, onRetry }: { total: number; a
           </Button>
         </div>
       ) : (
-        <p className="flex items-center gap-2 type-title-sm text-pass">
-          <span className="flex size-6 items-center justify-center rounded-full bg-pass-tint">
+        <p className="flex items-center gap-2 type-title-sm">
+          <span className="flex size-6 items-center justify-center rounded-sm bg-surface-sunken">
             <CheckIcon size={16} />
           </span>
           {t.findings.analysisDone}
@@ -457,7 +457,7 @@ function OdometerCard({ carId, initialKm, photo }: { carId: string; initialKm: n
         <div className="flex min-w-0 flex-col gap-1">
           <h2 className="type-body-sm text-text-muted">{t.findings.odometer.title}</h2>
           <p className="flex items-center gap-2 type-title-sm tabular">
-            <CheckIcon size={18} className="text-pass" />
+            <CheckIcon size={18} />
             {t.findings.odometer.confirmed(kmFormat.format(confirmed))}
           </p>
         </div>
@@ -596,7 +596,7 @@ function PhotoStatus({ photo, findingCount, carId, onRetry }: { photo: PhotoStat
   if (photo.aiStatus === "unclear")
     return (
       <div>
-        <p className="type-label text-attention">{s.unclear}</p>
+        <p className="type-label">{s.unclear}</p>
         {retake}
       </div>
     );
@@ -671,7 +671,7 @@ function FindingCard({ finding, onAccept, onEdit, onDelete }: { finding: Finding
             {t.findings.aiSuggestion}
           </Badge>
         )}
-        <span className={`ml-auto inline-flex items-center gap-1 type-caption-strong ${finding.accepted ? "text-pass" : "text-attention"}`}>
+        <span className={`ml-auto inline-flex items-center gap-1 type-caption-strong ${finding.accepted ? "text-text" : "text-text-muted"}`}>
           {finding.accepted && <CheckIcon size={14} />}
           {finding.accepted ? t.findings.accepted : t.findings.needsReview}
         </span>

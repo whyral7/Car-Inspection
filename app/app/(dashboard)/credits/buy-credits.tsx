@@ -119,8 +119,8 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
     const success = phase.kind === "success";
     return (
       <div className="flex flex-1 flex-col gap-6">
-        <Card role="status" tone={success ? "success" : "warning"} className="flex animate-rise-in items-start gap-4">
-          <span aria-hidden className={`flex size-10 shrink-0 animate-pop items-center justify-center rounded-full text-white ${success ? "bg-pass" : "bg-attention"}`}>
+        <Card role="status" tone="brand" className="flex animate-rise-in items-start gap-4">
+          <span aria-hidden className="flex size-10 shrink-0 animate-pop items-center justify-center rounded-md bg-surface text-text">
             {success ? <CheckIcon size={22} /> : <ClockIcon size={22} />}
           </span>
           <div className="flex flex-col gap-1">
@@ -144,7 +144,7 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
   return (
     <div className="flex flex-1 flex-col gap-4">
       {phase.kind === "failed" && (
-        <Card role="alert" tone="danger" className="flex animate-rise-in flex-col gap-1 type-body-sm text-fail">
+        <Card role="alert" tone="danger" className="flex animate-rise-in flex-col gap-1 type-body-sm">
           <p className="type-title-sm">{t.credits.failedTitle}</p>
           <p>{t.credits.failedBody(phase.reason)}</p>
         </Card>
@@ -173,21 +173,21 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
               aria-checked={active}
               disabled={phase.kind === "opening"}
               onClick={() => setSelected(pack.key)}
-              className={`flex items-center gap-4 rounded-lg bg-surface p-4 text-left shadow-card transition-[box-shadow,transform] duration-150 active:scale-[0.99] sm:p-6 ${
-                active ? "ring-2 ring-accent" : "ring-1 ring-border"
+              className={`flex items-center gap-4 rounded-lg border bg-surface p-4 text-left transition-[background-color,border-color] sm:p-6 ${
+                active ? "border-accent bg-accent-tint" : "border-border-control"
               }`}
             >
-              <span aria-hidden className={`flex size-6 shrink-0 items-center justify-center rounded-full ring-2 ring-inset ${active ? "bg-accent ring-accent" : "ring-border-control"}`}>
-                {active && <span className="size-2 rounded-full bg-surface" />}
+              <span aria-hidden className={`flex size-6 shrink-0 items-center justify-center rounded-full border-2 ${active ? "border-accent" : "border-border-control"}`}>
+                {active && <span className="size-3 rounded-full bg-accent" />}
               </span>
               <span className="flex min-w-0 flex-1 flex-col gap-1">
                 <span className="flex flex-wrap items-center gap-2">
                   <span className="type-heading-2">{t.credits.pack(pack.credits)}</span>
-                  {pack.best && <Badge tone="brand">{t.credits.bestValue}</Badge>}
+                  {pack.best && <Badge tone="highlight">{t.credits.bestValue}</Badge>}
                 </span>
-                <span className="type-body-sm text-text-muted">{t.credits.perReport(formatRupees(pack.perReportPaise))}</span>
+                <span className="type-caption text-text-muted">{t.credits.perReport(formatRupees(pack.perReportPaise))}</span>
               </span>
-              <span className="shrink-0 type-heading-2 tabular">₹{formatRupees(pack.pricePaise)}</span>
+              <span className="shrink-0 font-mono type-heading-2">₹{formatRupees(pack.pricePaise)}</span>
             </button>
           );
         })}
