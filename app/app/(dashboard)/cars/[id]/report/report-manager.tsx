@@ -17,6 +17,7 @@ import {
   StickyBar,
   Switch,
   buttonClass,
+  inputClass,
   useToast,
 } from "@/components/ui";
 import { ContactButtons, ReportView } from "@/components/report/report-view";
@@ -203,7 +204,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
               readOnly
               value={published.url}
               onFocus={(e) => e.currentTarget.select()}
-              className="min-h-[var(--input-height)] rounded-md border border-input-border bg-input-disabled-bg px-[var(--input-padding-x)] type-code text-text-muted"
+              className={`${inputClass} bg-input-disabled-bg font-mono text-text-muted`}
             />
           </label>
           <p className="type-caption text-text-muted">
@@ -286,7 +287,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
       <section aria-label={t.report.previewLabel} className="flex flex-col gap-4 border-t-2 border-dashed border-border-control/40 pt-4">
         <p className="text-center type-overline tracking-wide text-text-muted uppercase">{t.report.previewLabel}</p>
         <div>
-          <ReportView view={preview} t={t} pdfHref={null} />
+          <ReportView view={preview} t={t} pdfHref={null} titleAs="h2" />
           <div className="mt-4">
             <ContactButtons view={preview} t={t} preview />
           </div>

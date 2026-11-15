@@ -116,9 +116,11 @@ type ReportViewProps = {
   pdfHref?: string | null;
   /** The public link, for the buyer's Share button. Not shown in the sharer's preview. */
   shareUrl?: string | null;
+  /** The car's name is the page title on the public report; inside the owner's preview it is a section heading. */
+  titleAs?: "h1" | "h2";
 };
 
-export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
+export function ReportView({ view, t, pdfHref, shareUrl, titleAs: Title = "h1" }: ReportViewProps) {
   const phone = formatPhone(view.dealer.phone);
   const place = [view.dealer.address, view.dealer.city].filter(Boolean).join(", ");
   const takenOn = view.photos?.find((p) => p.takenAt)?.takenAt?.split(",")[0] ?? null;
@@ -176,7 +178,7 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
         <div className="grid gap-[var(--report-padding)] p-[var(--report-padding)]">
           <div>
             <p className="type-caption text-report-facts">{[view.dealer.logoUrl ? issuer : view.dealer.city, t.publicReport.heading].filter(Boolean).join(" · ")}</p>
-            <h1 className="mt-1 type-heading-2 break-words">{view.car.title || view.car.regNumber}</h1>
+            <Title className="mt-1 type-heading-2 break-words">{view.car.title || view.car.regNumber}</Title>
             <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-2 type-caption text-report-facts">
               <Plate reg={view.car.regNumber} size="sm" />
               {view.car.facts.map((fact) => (fact.reading ? <b key={fact.text} className="type-code-strong text-text">{fact.text}</b> : <span key={fact.text}>{fact.text}</span>))}

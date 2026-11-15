@@ -81,6 +81,17 @@ body {
   }
 }
 
+/*
+ * Overlines are Latin only (brand book, type scale): Devanagari has no capitals and must not be
+ * letter-spaced, so in Hindi an overline reads as a small strong caption instead.
+ */
+:lang(hi) .caps {
+  font: var(--type-caption-strong);
+  line-height: 1.6;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 ::selection {
   background: var(--accent-tint);
 }
