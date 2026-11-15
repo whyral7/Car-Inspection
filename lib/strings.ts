@@ -585,6 +585,12 @@ export const en = {
       poor: "Poor",
     },
     flagsTitle: (n: number) => (n === 1 ? "1 thing to check before you buy" : `${n} things to check before you buy`),
+    /** The line under the grade: "1 red flag, 2 amber flags". */
+    flagsSub: (red: number, amber: number) =>
+      red + amber === 0
+        ? "No red or amber flags"
+        : [red ? `${red} red flag${red === 1 ? "" : "s"}` : "no red flags", amber ? `${amber} amber flag${amber === 1 ? "" : "s"}` : "no amber flags"].join(", "),
+    reportId: (id: string) => `Report ${id}`,
     details: "Car details",
     regNumber: "Number plate",
     photos: "Photos",

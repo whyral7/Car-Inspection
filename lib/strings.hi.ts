@@ -644,6 +644,8 @@ export const hi: Strings = {
       poor: "ख़राब",
     },
     flagsTitle: (n: number) => (n === 1 ? "ख़रीदने से पहले 1 बात जाँचें" : `ख़रीदने से पहले ${n} बातें जाँचें`),
+    flagsSub: (red: number, amber: number) => (red + amber === 0 ? "कोई लाल या पीला संकेत नहीं" : [red ? `${red} लाल संकेत` : "कोई लाल संकेत नहीं", amber ? `${amber} पीले संकेत` : "कोई पीला संकेत नहीं"].join(", ")),
+    reportId: (id: string) => `रिपोर्ट ${id}`,
     details: "कार की जानकारी",
     regNumber: "नंबर प्लेट",
     photos: "फ़ोटो",

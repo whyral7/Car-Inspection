@@ -6,7 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { contentVersion, loadReport } from "./load";
 import { ReportPdf, type PdfImage } from "./pdf";
 import { reportUrl } from "./share";
-import { buildReportView, parseHiddenSections } from "./view";
+import { buildReportView, forPublic, parseHiddenSections } from "./view";
 
 async function download(bucket: string, path: string): Promise<PdfImage | null> {
   const { data, error } = await createAdminClient().storage.from(bucket).download(path);
@@ -26,7 +26,8 @@ export async function ensureReportPdf(carId: string, baseUrl: string, { force = 
   const loaded = await loadReport(admin, carId, { signUrls: false });
   if (!loaded?.report?.published_at) return null;
 
-  const view = buildReportView(loaded.input, parseHiddenSections(loaded.report.hidden_sections));
+  // The PDF travels with the link, so it shows what the public page shows: the plate masked.
+  const view = forPublic(buildReportView(loaded.input, parseHiddenSections(loaded.report.hidden_sections)));
   const url = reportUrl(baseUrl, loaded.report.slug);
   const version = contentVersion({
     pdf: REPORT.pdfVersion,
@@ -36,7 +37,7 @@ export async function ensureReportPdf(carId: string, baseUrl: string, { force = 
     logo: loaded.logoPath,
   });
   const path = `${carId}/${version}.pdf`;
-  const filename = `${view.car.regNumber}-inspection-report.pdf`;
+  const filename = `treadmark-report-${loaded.report.slug}.pdf`;
   if (!force && loaded.report.pdf_path === path) return { path, filename };
 
   const shown = new Set<string>(view.photos?.map((p) => p.key) ?? []);

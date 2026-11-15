@@ -7,6 +7,6 @@ describe("sample report", () => {
     expect(view.scoreText).toBe("8.4");
     expect(view.findings).toHaveLength(2);
     expect(view.photos).toHaveLength(20);
-    expect(view.car.regNumber).toBe("MH12AB1234");
+    expect(view.car.regNumber).toBe("MH12AB••34");
   });
 });

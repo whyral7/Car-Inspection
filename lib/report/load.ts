@@ -7,7 +7,7 @@ import { isAngleKey, smallPhotoPath } from "@/lib/photos/angles";
 import { logoUrl } from "@/lib/storage";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { CarRow, Database, ReportRow } from "@/lib/supabase/database.types";
-import { buildReportView, parseHiddenSections, type ReportInput, type ReportView } from "./view";
+import { buildReportView, forPublic, parseHiddenSections, type ReportInput, type ReportView } from "./view";
 import { comparablesSchema, type Comparable } from "@/lib/price/estimate";
 import { isValidSlug } from "./slug";
 
@@ -114,7 +114,7 @@ export const getPublishedReport = cache(async (slug: string, signUrls: boolean =
 
   const loaded = await loadReport(admin, report.car_id, { signUrls });
   if (!loaded?.report) return null;
-  return { loaded, view: buildReportView(loaded.input, parseHiddenSections(loaded.report.hidden_sections)) };
+  return { loaded, view: forPublic(buildReportView(loaded.input, parseHiddenSections(loaded.report.hidden_sections))) };
 });
 
 /** Short hash of what a report shows, for cache-busting the PDF and the link preview image. */

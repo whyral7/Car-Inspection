@@ -75,6 +75,8 @@ export type ReportFinding = {
   location: string | null;
   note: string | null;
   photoLabel: string | null;
+  /** The photo the damage was seen in, so a red flag can show its evidence. */
+  photoKey: AngleKey | null;
 };
 export type ReportCheckItem = { key: ChecklistKey; label: string; result: ChecklistResult; resultLabel: string; note: string | null };
 export type ReportCheckGroup = { key: ChecklistGroupKey; label: string; items: ReportCheckItem[] };
@@ -96,7 +98,13 @@ export type ReportView = {
     phone: string | null;
     logoUrl: string | null;
   };
-  car: { regNumber: string; title: string; details: DetailRow[] };
+  car: {
+    regNumber: string;
+    title: string;
+    details: DetailRow[];
+    /** The one-line facts under the car's name: fuel, transmission, odometer (a reading, set in mono), owners. */
+    facts: { text: string; reading?: boolean }[];
+  };
   score: number;
   /** Always one decimal, e.g. "8.0". */
   scoreText: string;
@@ -150,6 +158,7 @@ export function buildReportView(input: ReportInput, hidden: readonly ReportSecti
         location: f.location || null,
         note: f.note || null,
         photoLabel: angle && isAngleKey(angle) ? t.photos.angles[angle].label : null,
+        photoKey: angle && isAngleKey(angle) ? angle : null,
       };
     });
 
@@ -184,6 +193,12 @@ export function buildReportView(input: ReportInput, hidden: readonly ReportSecti
     { label: t.car.odometer, value: car.odometer_km !== null ? t.car.km(car.odometer_km) : null },
   ];
   const details = detailCandidates.filter((row): row is DetailRow => Boolean(row.value));
+  const facts = [
+    { text: isFuel(car.fuel) ? t.cars.fuels[car.fuel] : car.fuel },
+    { text: isTransmission(car.transmission) ? t.cars.transmissions[car.transmission] : car.transmission },
+    { text: car.odometer_km !== null ? t.car.km(car.odometer_km) : null, reading: true },
+    { text: car.owners ? t.cars.ownerOrdinal(car.owners) : null },
+  ].filter((f): f is { text: string; reading?: boolean } => Boolean(f.text));
 
   const score = conditionScore({ findings: input.findings, checklist: input.checklist });
   const price = input.price ? buildPrice(t, input.price, score, car.status !== "draft") : null;
@@ -200,7 +215,7 @@ export function buildReportView(input: ReportInput, hidden: readonly ReportSecti
       phone: dealer.phone,
       logoUrl: isDealer ? dealer.logoUrl : null,
     },
-    car: { regNumber: car.reg_number, title: carTitle(car), details },
+    car: { regNumber: car.reg_number, title: carTitle(car), details, facts },
     score,
     scoreText: formatScore(score),
     band: scoreBand(score),
@@ -244,14 +259,29 @@ export function checkCounts(view: ReportView): Record<ChecklistResult, number> {
  * What a buyer must see before the score (brand rule): major damage and failed checks in red, then
  * checks that need attention in amber. Only from sections the reader can see.
  */
-export function redFlags(view: ReportView): { key: string; tone: "fail" | "attention"; title: string; body: string | null }[] {
+export type ReportFlag = { key: string; tone: "fail" | "attention"; title: string; body: string | null; /** Evidence: the photo the damage was seen in. */ photoKey: AngleKey | null };
+
+export function redFlags(view: ReportView): ReportFlag[] {
   const findings = (view.findings ?? [])
     .filter((f) => f.severity === "major")
-    .map((f, i) => ({ key: `f${i}`, tone: "fail" as const, title: [f.typeLabel, f.location].filter(Boolean).join(" · "), body: f.note }));
+    .map((f, i) => ({ key: `f${i}`, tone: "fail" as const, title: [f.typeLabel, f.location].filter(Boolean).join(" · "), body: f.note, photoKey: f.photoKey }));
   const checks = shownChecks(view);
   const flag = (result: "fail" | "attention") =>
-    checks.filter((item) => item.result === result).map((item) => ({ key: `c${item.key}`, tone: result, title: item.label, body: item.note }));
+    checks.filter((item) => item.result === result).map((item) => ({ key: `c${item.key}`, tone: result, title: item.label, body: item.note, photoKey: null }));
   return [...findings, ...flag("fail"), ...flag("attention")];
+}
+
+/**
+ * Hides the middle of a registration number for anyone but the owner: MH12AB1234 -> MH12AB••34
+ * (brand book, ReportHeader). Enough is left to tell cars apart; the full number stays with the owner.
+ */
+export function maskReg(reg: string) {
+  return reg.length >= 6 ? `${reg.slice(0, -4)}••${reg.slice(-2)}` : reg;
+}
+
+/** The report as anyone with the link sees it: the public page, the PDF and the link preview. */
+export function forPublic(view: ReportView): ReportView {
+  return { ...view, car: { ...view.car, regNumber: maskReg(view.car.regNumber) } };
 }
 
 /** The answers a buyer most needs to see, named: what needs attention and what failed. */

@@ -1,7 +1,7 @@
 import { CHECKLIST_KEYS, type ChecklistKey } from "@/lib/checklist";
 import { ANGLE_KEYS } from "@/lib/photos/angles";
 import { en, type Strings } from "@/lib/strings";
-import { buildReportView, type ReportInput } from "./view";
+import { buildReportView, forPublic, type ReportInput } from "./view";
 
 // Made-up report for the landing page's "See a sample report". Built through the same buildReportView
 // as real reports, so it always matches what buyers get. The sample has no real car, so line drawings
@@ -53,5 +53,5 @@ const sampleInput: ReportInput = {
 };
 
 export function sampleReportView(t: Strings = en) {
-  return buildReportView(sampleInput, [], undefined, t);
+  return forPublic(buildReportView(sampleInput, [], undefined, t));
 }

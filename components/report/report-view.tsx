@@ -1,18 +1,21 @@
 // The report body shared by the public page (/r/[slug]), the sample report and the sharer's preview.
 // No hooks, so it renders on the server for buyers and in the browser for the live preview.
 //
-// Order follows what a buyer wants first: the car's photos, then one summary card (plate, score,
-// what was found, when), then price and the details.
+// Order follows the brand's "proof before promise": the car's photos, the red and amber flags (each with
+// its photo), the header card (who made it, which car, the score, the ratings), and only then price and details.
 import type { ReactNode } from "react";
-import { AlertIcon, ChatIcon, ChevronDownIcon, DownloadIcon, InfoIcon, PhoneIcon, ShieldCheckIcon, XIcon } from "@/components/icons";
+import { ChatIcon, ChevronDownIcon, DownloadIcon, InfoIcon, PhoneIcon, ShieldCheckIcon } from "@/components/icons";
+import { Logo } from "@/components/logo";
 import { Plate } from "@/components/plate";
+import { RedFlag } from "@/components/red-flag";
 import { PhotoGallery, PhotoHero } from "@/components/report/photo-gallery";
 import { ShareButton } from "@/components/report/share-button";
 import { ScoreMeter } from "@/components/score-meter";
 import { SeverityBadge } from "@/components/severity";
+import { VerdictBadge } from "@/components/verdict-badge";
 import { Badge, buttonClass, cardClass, type BadgeTone } from "@/components/ui";
 import { formatPhone, telHref, whatsappChatUrl } from "@/lib/report/share";
-import { checkCounts, flaggedChecks, shownChecks, type DetailRow, type ReportCheckItem, type ReportView as View } from "@/lib/report/view";
+import { checkCounts, redFlags, shownChecks, type DetailRow, type ReportCheckItem, type ReportView as View } from "@/lib/report/view";
 import type { Strings } from "@/lib/strings";
 import type { ChecklistResult } from "@/lib/supabase/database.types";
 
@@ -108,39 +111,6 @@ export function ContactButtons({ view, t, preview = false }: { view: View; t: St
   );
 }
 
-/** Names the answers that need attention or failed, right under the score, so nothing bad hides further down. */
-function Flagged({ view, t }: { view: View; t: Strings }) {
-  const { attention, fail } = flaggedChecks(view);
-  if (attention.length + fail.length === 0) return null;
-  return (
-    <ul className="mt-2 flex flex-col gap-1 type-body-sm">
-      {fail.length > 0 && (
-        <li className="flex items-start gap-2 text-fail">
-          <XIcon size={16} className="mt-0.5" />
-          <span>{t.publicReport.flagged.fail(fail.join(", "))}</span>
-        </li>
-      )}
-      {attention.length > 0 && (
-        <li className="flex items-start gap-2 text-attention">
-          <AlertIcon size={16} className="mt-0.5" />
-          <span>{t.publicReport.flagged.attention(attention.join(", "))}</span>
-        </li>
-      )}
-    </ul>
-  );
-}
-
-/** One line on what was found, for the summary card: "3 damage notes · 15 OK, 2 need attention, 1 problem". */
-function summaryLine(view: View, t: Strings) {
-  const parts: string[] = [];
-  if (view.findings) parts.push(t.publicReport.summary.findings(view.findings.length).replace(/[.।]$/, ""));
-  if (shownChecks(view).length > 0) {
-    const c = checkCounts(view);
-    parts.push(t.publicReport.checklistSummary(c.ok, c.attention, c.fail));
-  }
-  return parts.join(" · ");
-}
-
 type ReportViewProps = {
   view: View;
   t: Strings;
@@ -154,59 +124,96 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
   const place = [view.dealer.address, view.dealer.city].filter(Boolean).join(", ");
   const takenOn = view.photos?.find((p) => p.takenAt)?.takenAt?.split(",")[0] ?? null;
   const inspectedOn = view.publishedOn ?? takenOn;
-  const summary = summaryLine(view, t);
   const shareTitle = t.publicReport.ogTitle(view.car.title || view.car.regNumber, view.scoreText);
+  const flags = redFlags(view);
+  const red = flags.filter((f) => f.tone === "fail").length;
+  const counts = shownChecks(view).length > 0 ? checkCounts(view) : null;
+  const photoByKey = new Map(view.photos?.map((p) => [p.key, p]) ?? []);
+  const issuer = [view.dealer.name, view.dealer.city].filter(Boolean).join(" · ");
 
   return (
-    <div className="flex flex-col gap-4">
-      <header className="flex items-center gap-4">
-        {view.dealer.logoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element -- small public logo, no need for the image optimiser
-          <img src={view.dealer.logoUrl} alt="" width={48} height={48} className="size-12 shrink-0 rounded-md bg-surface object-contain ring-1 ring-border" />
-        ) : (
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-md bg-surface-sunken type-heading-2 text-text">{view.dealer.name.charAt(0).toUpperCase()}</span>
-        )}
-        <div className="min-w-0 flex-1">
-          <p className="type-heading-2 break-words">{view.dealer.name}</p>
-          <p className="type-body-sm text-text-muted">{[view.dealer.city, t.publicReport.heading].filter(Boolean).join(" · ")}</p>
-        </div>
-        {shareUrl && <ShareButton url={shareUrl} title={shareTitle} className={buttonClass("ghost", "-mr-2 shrink-0 !px-2", false, "sm")} />}
-      </header>
-
+    <div className="flex flex-col gap-6">
+      {/* Proof before promise: the car itself, then what to check, then the score. The price comes later. */}
       {view.photos && view.photos.length > 0 && <PhotoHero photos={view.photos} />}
 
-      <section className={cardClass()}>
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <Plate reg={view.car.regNumber} className="self-start" />
-            <h1 className="type-heading-1">{view.car.title}</h1>
-          </div>
-          <ScoreBadge view={view} t={t} />
+      {flags.length > 0 && (
+        <section aria-labelledby="flags-title" className="flex flex-col gap-2">
+          <h2 id="flags-title" className="caps type-overline text-text-muted">
+            {t.publicReport.flagsTitle(flags.length)}
+          </h2>
+          {flags.map((flag) => {
+            const photo = flag.photoKey ? photoByKey.get(flag.photoKey) : undefined;
+            return (
+              <RedFlag
+                key={flag.key}
+                tone={flag.tone}
+                title={flag.title}
+                photo={
+                  photo && (
+                    // eslint-disable-next-line @next/next/no-img-element -- signed URL of the small copy, not optimisable
+                    <img src={photo.thumbUrl} alt={photo.label} width={56} height={56} loading="lazy" decoding="async" className="size-14 shrink-0 rounded-md bg-photo-fallback object-cover" />
+                  )
+                }
+              >
+                {flag.body}
+              </RedFlag>
+            );
+          })}
+        </section>
+      )}
+
+      {/* Brand ReportHeader: who made it, which car, the score, the headline ratings. */}
+      <section className="overflow-hidden rounded-lg bg-report-bg shadow-card">
+        <div className="flex min-h-14 items-center justify-between gap-4 border-b border-report-divider px-[var(--report-padding)] py-3">
+          {view.dealer.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element -- small public logo, no need for the image optimiser
+            <img src={view.dealer.logoUrl} alt={view.dealer.name} className="h-[var(--logo-height-header)] w-auto max-w-32 object-contain" />
+          ) : (
+            <Logo />
+          )}
+          {view.slug && <p className="type-code-sm text-report-id">{t.publicReport.reportId(view.slug)}</p>}
         </div>
-        {summary && <p className="mt-4 type-title-sm text-balance">{summary}</p>}
-        <Flagged view={view} t={t} />
-        {inspectedOn && (
-          <p className="mt-1 flex items-center gap-2 type-body-sm text-text-muted">
-            <ShieldCheckIcon size={16} className="text-accent" />
-            {t.publicReport.inspectedOn(inspectedOn)}
-          </p>
-        )}
-        <p className="mt-4 flex items-start gap-2 type-caption text-balance text-text-muted">
-          <InfoIcon size={14} className="mt-px" />
-          {t.disclaimer}
-        </p>
-        <details className="group mt-2">
-          <summary className="-mx-2 inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm px-2 type-label text-accent transition-colors hover:bg-accent-tint [&::-webkit-details-marker]:hidden">
-            {t.publicReport.scoreHowTitle}
-            <ChevronDownIcon size={16} className="transition-transform duration-200 group-open:rotate-180" />
-          </summary>
-          <p className="mt-2 animate-rise-in rounded-md bg-bg p-4 type-body-sm">{t.publicReport.scoreHow}</p>
-        </details>
-        {view.car.details.length > 0 && (
-          <div className="mt-2">
-            <Details rows={view.car.details} />
+        <div className="grid gap-[var(--report-padding)] p-[var(--report-padding)]">
+          <div>
+            <p className="type-caption text-report-facts">{[issuer, t.publicReport.heading].filter(Boolean).join(" · ")}</p>
+            <h1 className="mt-1 type-heading-2 break-words">{view.car.title || view.car.regNumber}</h1>
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-2 type-caption text-report-facts">
+              <Plate reg={view.car.regNumber} size="sm" />
+              {view.car.facts.map((fact) => (fact.reading ? <b key={fact.text} className="type-code-strong text-text">{fact.text}</b> : <span key={fact.text}>{fact.text}</span>))}
+            </div>
           </div>
-        )}
+
+          <ScoreBadge view={view} t={t} sub={flags.length > 0 || counts ? t.publicReport.flagsSub(red, flags.length - red) : undefined} />
+
+          {counts && (
+            // At most three rating badges; the details are further down.
+            <div className="flex flex-wrap gap-2">
+              <VerdictBadge verdict="pass">{`${counts.ok} ${t.checklist.results.ok}`}</VerdictBadge>
+              {counts.attention > 0 && <VerdictBadge verdict="attention">{`${counts.attention} ${t.checklist.results.attention}`}</VerdictBadge>}
+              {counts.fail > 0 && <VerdictBadge verdict="fail">{`${counts.fail} ${t.checklist.results.fail}`}</VerdictBadge>}
+            </div>
+          )}
+
+          <div className="flex flex-col gap-1 border-t border-report-divider pt-3">
+            {inspectedOn && (
+              <p className="flex items-center gap-2 type-caption text-report-facts">
+                <ShieldCheckIcon size={16} />
+                {t.publicReport.inspectedOn(inspectedOn)}
+              </p>
+            )}
+            <p className="flex items-start gap-2 type-caption text-balance text-report-facts">
+              <InfoIcon size={16} className="mt-px" />
+              {t.disclaimer}
+            </p>
+            <details className="group">
+              <summary className="-mx-2 inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-sm px-2 type-label text-button-ghost-fg transition-colors hover:bg-button-ghost-bg-hover [&::-webkit-details-marker]:hidden">
+                {t.publicReport.scoreHowTitle}
+                <ChevronDownIcon size={16} className="transition-transform group-open:rotate-180" />
+              </summary>
+              <p className="mt-1 animate-rise-in rounded-md bg-surface-sunken p-4 type-body-sm">{t.publicReport.scoreHow}</p>
+            </details>
+          </div>
+        </div>
       </section>
 
       {view.findings && (
@@ -218,7 +225,7 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
               {view.findings.map((f, i) => (
                 <li
                   key={i}
-                  className="rounded-md p-4 ring-1 ring-border ring-inset"
+                  className="rounded-md border border-border p-4"
                 >
                   <div className="flex flex-wrap items-start gap-2">
                     <SeverityBadge severity={f.severity} label={f.severityLabel} className="mt-px" />
@@ -238,7 +245,7 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
 
       {view.price && (
         <Section title={t.publicReport.price}>
-          <p className="type-heading-1 tabular">{view.price.rangeText}</p>
+          <p className="font-mono type-heading-2">{view.price.rangeText}</p>
           <p className="mt-1 type-body-sm text-text-muted">
             {view.price.adjusted
               ? t.publicReport.priceAdjusted(view.price.marketRangeText, view.price.adjustmentText, view.scoreText)
@@ -250,12 +257,12 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
             <ul className="mt-1 flex flex-col">
               {view.price.comparables.map((c) => (
                 <li key={c.url}>
-                  <a href={c.url} target="_blank" rel="noopener noreferrer nofollow" className="-mx-2 flex min-h-12 items-center justify-between gap-4 rounded-sm px-2 py-1 type-body-sm transition-colors hover:bg-bg">
+                  <a href={c.url} target="_blank" rel="noopener noreferrer nofollow" className="-mx-2 flex min-h-12 items-center justify-between gap-4 rounded-sm px-2 py-1 type-body-sm transition-colors hover:bg-surface-sunken">
                     <span className="min-w-0">
-                      <span className="block truncate type-title-sm text-accent underline">{c.title}</span>
+                      <span className="block truncate type-label text-accent underline underline-offset-4">{c.title}</span>
                       <span className="block type-caption text-text-muted">{[c.host, c.detail].filter(Boolean).join(" · ")}</span>
                     </span>
-                    {c.priceText && <span className="shrink-0 type-title-sm">{c.priceText}</span>}
+                    {c.priceText && <span className="shrink-0 type-code-strong">{c.priceText}</span>}
                   </a>
                 </li>
               ))}
@@ -280,7 +287,7 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
           <div className="flex flex-col gap-4">
             {view.checklist.groups.map((g) => (
               <div key={g.key}>
-                <h3 className="type-overline tracking-wide text-text-muted uppercase">{g.label}</h3>
+                <h3 className="caps type-overline text-text-muted">{g.label}</h3>
                 <CheckList items={g.items} />
               </div>
             ))}
@@ -295,7 +302,7 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
         </Section>
       )}
 
-      <p className="flex items-start justify-center gap-2 rounded-lg bg-surface-sunken p-4 text-center type-label ">
+      <p className="flex items-start justify-center gap-2 rounded-lg bg-surface-sunken p-4 text-center type-label">
         <InfoIcon size={18} className="mt-px text-text-muted" />
         {t.disclaimer}
       </p>

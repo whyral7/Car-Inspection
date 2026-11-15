@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { BrandHeader } from "@/components/brand-header";
 import { ContactButtons, ReportView } from "@/components/report/report-view";
+import { ShareButton } from "@/components/report/share-button";
+import { buttonClass } from "@/components/ui";
 import { APP_NAME } from "@/lib/config";
 import { contentVersion, getPublishedReport } from "@/lib/report/load";
 import { reportPdfPath, reportUrl, telHref } from "@/lib/report/share";
 import { REPORT } from "@/lib/config";
-import { buildReportView, parseHiddenSections, summaryParts } from "@/lib/report/view";
+import { buildReportView, forPublic, parseHiddenSections, summaryParts } from "@/lib/report/view";
 import { en } from "@/lib/strings";
 import { getT } from "@/lib/i18n.server";
 import { appBaseUrl } from "@/lib/url";
@@ -47,17 +50,22 @@ export default async function PublicReportPage({ params }: PageProps<"/r/[slug]"
   const { slug } = await params;
   const found = await getPublishedReport(slug);
   if (!found) notFound();
-  const view = t === en ? found.view : buildReportView(found.loaded.input, parseHiddenSections(found.loaded.report?.hidden_sections), undefined, t);
+  const view = t === en ? found.view : forPublic(buildReportView(found.loaded.input, parseHiddenSections(found.loaded.report?.hidden_sections), undefined, t));
   const canContact = Boolean(telHref(view.dealer.phone));
+
+  const url = reportUrl(await appBaseUrl(), slug);
 
   return (
     <>
-      <main className={`mx-auto w-full max-w-2xl flex-1 px-4 pt-[calc(1.5rem+env(safe-area-inset-top))] ${canContact ? "pb-32" : "pb-8"}`}>
-        <ReportView view={view} t={t} pdfHref={reportPdfPath(slug)} shareUrl={reportUrl(await appBaseUrl(), slug)} />
+      <BrandHeader homeLabel={`${t.appName}: ${t.common.goToSite}`}>
+        <ShareButton url={url} title={t.publicReport.ogTitle(view.car.title || view.car.regNumber, view.scoreText)} className={buttonClass("ghost", "shrink-0 !px-3", false, "sm")} />
+      </BrandHeader>
+      <main className={`mx-auto w-full max-w-2xl flex-1 px-4 pt-4 ${canContact ? "pb-32" : "pb-8"}`}>
+        <ReportView view={view} t={t} pdfHref={reportPdfPath(slug)} shareUrl={url} />
       </main>
       {canContact && (
         // Always in reach while the buyer scrolls through the photos.
-        <aside aria-label={t.publicReport.contactBar} className="fixed inset-x-0 bottom-0 z-10 bg-surface shadow-bar">
+        <aside aria-label={t.publicReport.contactBar} className="fixed inset-x-0 bottom-0 z-10 border-t border-bottombar-border bg-bottombar-bg shadow-bar">
           <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
             <ContactButtons view={view} t={t} />
           </div>

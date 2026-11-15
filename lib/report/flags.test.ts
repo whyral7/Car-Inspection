@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { hi } from "@/lib/strings.hi";
 import { sampleReportView } from "./sample";
-import { applyHidden, redFlags } from "./view";
+import { applyHidden, forPublic, maskReg, redFlags } from "./view";
 
 describe("red flags", () => {
   it("lists failed checks and major damage above the score", () => {
@@ -17,5 +17,17 @@ describe("red flags", () => {
 
   it("uses the reader's language", () => {
     expect(redFlags(sampleReportView(hi)).map((f) => f.title)).toContain("दूसरी चाबी");
+  });
+});
+
+describe("plate masking", () => {
+  it("hides the middle of the number on anything public", () => {
+    expect(maskReg("MH12AB1234")).toBe("MH12AB••34");
+    expect(maskReg("DL3CAB1234")).toBe("DL3CAB••34");
+    expect(forPublic(sampleReportView()).car.regNumber).not.toMatch(/1234/);
+  });
+
+  it("leaves very short numbers alone", () => {
+    expect(maskReg("AB12")).toBe("AB12");
   });
 });
