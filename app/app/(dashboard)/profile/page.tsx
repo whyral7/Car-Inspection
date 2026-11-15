@@ -81,7 +81,7 @@ export default async function ProfilePage() {
             // eslint-disable-next-line @next/next/no-img-element -- small public logo, no need for the image optimiser
             <img src={logo} alt="" className="size-16 shrink-0 rounded-lg bg-surface object-contain shadow-card ring-1 ring-border" />
           ) : (
-            <span className="flex size-16 shrink-0 items-center justify-center rounded-lg bg-accent type-heading-1 text-white">{name.charAt(0).toUpperCase()}</span>
+            <span className="flex size-16 shrink-0 items-center justify-center rounded-lg bg-surface-sunken type-heading-1 text-text">{name.charAt(0).toUpperCase()}</span>
           )}
           <div className="flex min-w-0 flex-col gap-1">
             <h1 className="type-heading-1 break-words">{name}</h1>
@@ -104,7 +104,7 @@ export default async function ProfilePage() {
 
       <Card as="section" className="flex flex-col gap-4">
         <div className="flex items-center gap-4">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-accent-tint text-accent">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-md bg-surface-sunken text-text">
             <CreditIcon />
           </span>
           <div className="flex flex-col">

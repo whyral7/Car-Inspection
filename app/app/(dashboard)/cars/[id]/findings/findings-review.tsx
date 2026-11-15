@@ -540,7 +540,7 @@ function PhotoGroup({ photo, findings, onRetry, ...actions }: { photo: PhotoStat
             {/* eslint-disable-next-line @next/next/no-img-element -- private signed URL, not optimisable */}
             <img src={photo.url} alt="" loading="lazy" decoding="async" className={`size-full ${expanded ? "object-contain" : "object-cover"}`} />
             {!expanded && (
-              <span className="absolute right-1 bottom-1 flex size-7 items-center justify-center rounded-full bg-text/70 text-white">
+              <span className="absolute right-1 bottom-1 flex size-7 items-center justify-center rounded-sm bg-photo-scrim-bottom text-on-photo">
                 <ZoomInIcon size={16} />
               </span>
             )}

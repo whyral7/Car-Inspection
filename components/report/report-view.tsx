@@ -164,7 +164,7 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
           // eslint-disable-next-line @next/next/no-img-element -- small public logo, no need for the image optimiser
           <img src={view.dealer.logoUrl} alt="" width={48} height={48} className="size-12 shrink-0 rounded-md bg-surface object-contain ring-1 ring-border" />
         ) : (
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-md bg-accent type-heading-2 text-white">{view.dealer.name.charAt(0).toUpperCase()}</span>
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-md bg-surface-sunken type-heading-2 text-text">{view.dealer.name.charAt(0).toUpperCase()}</span>
         )}
         <div className="min-w-0 flex-1">
           <p className="type-heading-2 break-words">{view.dealer.name}</p>

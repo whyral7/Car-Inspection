@@ -44,7 +44,7 @@ function PhotoViewer({ photos, viewer }: { photos: ReportPhoto[]; viewer: Return
     <dialog
       ref={dialog}
       aria-label={t.publicReport.photoViewer}
-      className="m-0 h-dvh max-h-none w-screen max-w-none bg-black p-0 text-white backdrop:bg-black"
+      className="m-0 h-dvh max-h-none w-screen max-w-none bg-black p-0 text-on-photo backdrop:bg-black"
       onClick={(e) => e.target === e.currentTarget && dialog.current?.close()}
       onKeyDown={(e) => {
         if (e.key === "ArrowRight") step(1);
@@ -57,9 +57,9 @@ function PhotoViewer({ photos, viewer }: { photos: ReportPhoto[]; viewer: Return
             <div className="min-w-0 type-body-sm">
               <p className="truncate">
                 <span className="font-semibold">{photo.label}</span>
-                <span className="text-white/75"> · {t.publicReport.photoPosition(index + 1, photos.length)}</span>
+                <span className="text-on-photo/75"> · {t.publicReport.photoPosition(index + 1, photos.length)}</span>
               </p>
-              {photo.takenAt && <p className="type-caption text-white/75">{t.publicReport.photoTaken(photo.takenAt)}</p>}
+              {photo.takenAt && <p className="type-caption text-on-photo/75">{t.publicReport.photoTaken(photo.takenAt)}</p>}
             </div>
             <button type="button" onClick={() => dialog.current?.close()} className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-sm px-3 type-label active:bg-surface/10">
               <XIcon size={18} />
@@ -155,7 +155,7 @@ export function PhotoHero({ photos }: { photos: ReportPhoto[] }) {
           </li>
         ))}
       </ul>
-      <p className="pointer-events-none absolute right-3 bottom-3 rounded-full bg-text/80 px-3 py-1 type-label text-white">
+      <p className="pointer-events-none absolute right-3 bottom-3 rounded-sm bg-photo-scrim-bottom px-2.5 py-1 type-caption-strong text-on-photo">
         {photos[current]?.label} · {t.publicReport.photoPosition(current + 1, photos.length)}
       </p>
       <PhotoViewer photos={photos} viewer={viewer} />

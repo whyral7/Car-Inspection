@@ -264,7 +264,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
       </Card>
 
       {waiting > 0 && (
-        <p role="status" className="flex animate-rise-in items-start gap-2 rounded-md bg-accent-tint px-4 py-3 type-body-sm text-accent-hover">
+        <p role="status" className="flex animate-rise-in items-start gap-2 rounded-md bg-accent-tint px-4 py-3 type-body-sm text-text">
           <CloudUploadIcon size={18} className="mt-px text-accent" />
           {t.checklist.waitingCount(waiting)}
         </p>
@@ -423,7 +423,7 @@ function ChecklistRow({
         <SaveState state={item.save} onRetry={onRetry} />
       </div>
       {item.helpOpen && (
-        <p id={helpId} className="animate-rise-in rounded-md bg-accent-tint p-4 type-body-sm text-accent-hover">
+        <p id={helpId} className="animate-rise-in rounded-md bg-accent-tint p-4 type-body-sm text-text">
           {how}
         </p>
       )}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BrandHeader } from "@/components/brand-header";
 import { SignOut } from "@/components/sign-out";
 import { getCurrentProfile, isProfileComplete } from "@/lib/profile";
 import { logoUrl } from "@/lib/storage";
@@ -16,15 +17,11 @@ export default async function OnboardingPage() {
   const editing = isProfileComplete(profile);
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-4 pt-[calc(1.5rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
-      <div className="flex items-center justify-between gap-4">
-        <p className="flex items-center gap-2 font-semibold text-accent">
-          <span className="flex size-8 items-center justify-center rounded-sm bg-accent type-body-sm text-white">{t.appName.charAt(0)}</span>
-          {t.appName}
-        </p>
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-4 pt-2 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+      <BrandHeader plain href={editing ? "/app" : "/"} homeLabel={t.appName}>
         {/* Signed in with the wrong number? Way out before the profile is set up. */}
         {!editing && <SignOut compact />}
-      </div>
+      </BrandHeader>
       <header className="flex flex-col gap-1">
         <h1 className="type-heading-1">{editing ? t.onboarding.editTitle : t.onboarding.title}</h1>
         <p className="text-text-muted">{t.onboarding.subtitle}</p>

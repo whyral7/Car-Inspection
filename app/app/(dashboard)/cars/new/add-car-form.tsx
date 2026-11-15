@@ -5,7 +5,7 @@ import { CarFields, carFormValues } from "@/components/car-fields";
 import { useT } from "@/components/i18n-provider";
 import { CheckIcon, InfoIcon, PencilIcon, SearchIcon } from "@/components/icons";
 import { Plate } from "@/components/plate";
-import { Button, Card, FieldMessage, FormError, LinkButton, StickyBar, TextButton, focusFirstError, useToast } from "@/components/ui";
+import { Button, Card, FieldMessage, FormError, LinkButton, StickyBar, TextButton, focusFirstError, inputClass, plateInputClass, useToast } from "@/components/ui";
 import { clearDraft, useFormDraft } from "@/lib/draft";
 import { isFuel, isTransmission } from "@/lib/cars";
 import { formatDate } from "@/lib/format";
@@ -26,7 +26,7 @@ const notices = (t: Strings): Record<Lookup["status"], string | null> => ({
 /** Amber note with an icon: something to know, not an error. */
 function Notice({ children }: { children: ReactNode }) {
   return (
-    <p className="flex animate-rise-in items-start gap-2 rounded-md bg-attention-tint px-4 py-3 type-body-sm text-attention">
+    <p className="flex animate-rise-in items-start gap-2 rounded-md bg-accent-tint px-4 py-3 type-body-sm text-text">
       <InfoIcon size={18} className="mt-px" />
       <span>{children}</span>
     </p>
@@ -70,7 +70,7 @@ export function AddCarForm() {
   return (
     <form onSubmit={onRegSubmit} className="flex flex-1 flex-col gap-6" noValidate>
       <Card className="flex flex-col gap-4">
-        <label htmlFor="reg_number" className="type-label ">
+        <label htmlFor="reg_number" className="type-label text-input-label">
           {t.cars.regNumber}
         </label>
         {/* Styled like a number plate, so it's obvious what to type. */}
@@ -93,7 +93,7 @@ export function AddCarForm() {
           // Room for pasted spaces and hyphens; they're stripped as the user types.
           maxLength={20}
           autoFocus
-          className="block min-h-16 w-full rounded-md bg-surface px-4 text-center type-heading-1 tracking-[0.12em] text-text uppercase ring-2 ring-text transition-shadow ring-inset placeholder:font-semibold placeholder:tracking-[0.12em] placeholder:text-border-control  focus:outline-none aria-invalid:ring-fail"
+          className={`${inputClass} ${plateInputClass} min-h-14 text-center`}
         />
         <div className="-mt-2">
           {regError ? <FieldMessage id={errorId} error={regError} /> : <FieldMessage hint={<span id="reg_number-hint">{t.cars.regHint}</span>} />}
@@ -164,7 +164,7 @@ function CarDetailsStep({ lookup, onChangeReg }: { lookup: Lookup; onChangeReg: 
     <div className="flex flex-1 flex-col gap-6">
       <Card className="flex items-center justify-between gap-4">
         <div className="flex min-w-0 flex-col gap-2">
-          <p className="type-body-sm text-text-muted">{t.cars.regNumber}</p>
+          <p className="type-caption text-text-muted">{t.cars.regNumber}</p>
           <Plate reg={lookup.regNumber} />
         </div>
         <Button variant="secondary" size="sm" onClick={onChangeReg} disabled={isPending} className="shrink-0">
@@ -235,14 +235,14 @@ function RcSummary({
   return (
     <>
       <Card className="flex animate-rise-in flex-col gap-4">
-        <p className="flex items-center gap-2 type-label text-pass">
-          <span className="flex size-6 items-center justify-center rounded-full bg-pass-tint">
+        <p className="flex items-center gap-2 type-label text-text-muted">
+          <span className="flex size-6 items-center justify-center rounded-sm bg-surface-sunken text-text">
             <CheckIcon size={16} />
           </span>
           {t.cars.foundShort}
         </p>
         <div className="flex flex-col gap-1">
-          <p className="type-heading-1">{title}</p>
+          <p className="type-heading-2">{title}</p>
           {facts.length > 0 && <p className="text-text-muted">{facts.join(" · ")}</p>}
           {values.insurance_valid_upto && (
             <p className="type-body-sm text-text-muted">

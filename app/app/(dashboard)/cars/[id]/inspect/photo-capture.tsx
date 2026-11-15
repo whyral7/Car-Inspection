@@ -355,7 +355,7 @@ function ProgressCard({ progress }: { progress: ReturnType<typeof photoProgress>
 function WaitingNote({ count }: { count: number }) {
   const t = useT();
   return (
-    <p role="status" className="flex animate-rise-in items-start gap-2 rounded-md bg-accent-tint px-4 py-3 type-body-sm text-accent-hover">
+    <p role="status" className="flex animate-rise-in items-start gap-2 rounded-md bg-accent-tint px-4 py-3 type-body-sm text-text">
       <CloudUploadIcon size={18} className="mt-px text-accent" />
       {t.photos.waitingCount(count)}
     </p>
@@ -397,7 +397,7 @@ function Tile({ angle, slot, onOpen }: { angle: Angle; slot: Slot | undefined; o
           // Said in words, not just colour: which photos still have to be taken.
           <span className="absolute bottom-2 left-2 rounded-full bg-attention-tint px-2 py-0.5 type-caption-strong text-attention">{t.photos.required}</span>
         )}
-        <span className="absolute top-2 left-2 flex size-6 items-center justify-center rounded-full bg-text/70 type-caption-strong text-white tabular">{angle.number}</span>
+        <span className="absolute top-2 left-2 flex size-6 items-center justify-center rounded-sm bg-photo-scrim-bottom type-code-strong text-on-photo">{angle.number}</span>
         <TileBadge status={status} />
       </div>
       <p className="line-clamp-2 min-h-12 px-2 py-2 type-caption-strong text-text">{label}</p>
@@ -407,7 +407,7 @@ function Tile({ angle, slot, onOpen }: { angle: Angle; slot: Slot | undefined; o
 
 function TileBadge({ status }: { status: SlotStatus | undefined }) {
   if (!status) return null;
-  const base = "absolute top-2 right-2 flex size-6 animate-pop items-center justify-center rounded-full text-white shadow-card";
+  const base = "absolute top-2 right-2 flex size-6 animate-pop items-center justify-center rounded-full text-on-photo";
   if (status === "saved")
     return (
       <span className={`${base} bg-pass`}>
@@ -422,12 +422,12 @@ function TileBadge({ status }: { status: SlotStatus | undefined }) {
     );
   if (status === "waiting")
     return (
-      <span className={`${base} bg-text-muted`}>
+      <span className={`${base} bg-photo-scrim-bottom`}>
         <CloudUploadIcon size={14} />
       </span>
     );
   return (
-    <span className={`${base} bg-text/75`}>
+    <span className={`${base} bg-photo-scrim-bottom`}>
       <Spinner className="size-3.5" />
     </span>
   );

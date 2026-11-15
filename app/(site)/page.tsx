@@ -39,7 +39,7 @@ function ReportPreview({ h }: { h: Home }) {
   return (
     <div aria-hidden className="mx-auto w-full max-w-xs rotate-1 rounded-lg bg-surface p-4 shadow-bar ring-1 ring-border/60">
       <div className="flex items-center gap-2">
-        <span className="flex size-9 items-center justify-center rounded-sm bg-accent type-label text-white">{p.dealer.charAt(0)}</span>
+        <span className="flex size-9 items-center justify-center rounded-sm bg-surface-sunken type-label text-text">{p.dealer.charAt(0)}</span>
         <div className="min-w-0">
           <p className="truncate type-label ">{p.dealer}</p>
           <p className="type-caption text-text-muted">{p.city}</p>
@@ -117,7 +117,7 @@ export default async function HomePage() {
         <ol className="mt-6 grid gap-4 md:grid-cols-3">
           {h.steps.map((step, i) => (
             <li key={step.title} className={cardClass("default", "md", "flex gap-4 md:flex-col")}>
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent-tint type-heading-2 text-accent">{i + 1}</span>
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-surface-sunken type-reading text-text">{i + 1}</span>
               <div>
                 <h3 className="font-semibold">{step.title}</h3>
                 <p className="mt-1 text-balance text-text-muted">{step.body}</p>

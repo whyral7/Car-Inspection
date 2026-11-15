@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useT } from "@/components/i18n-provider";
-import { ArrowRightIcon, CarIcon, ChatIcon, ChevronRightIcon, SearchIcon } from "@/components/icons";
+import { ArrowRightIcon, CarIcon, ChatIcon, ChevronRightIcon, PlusIcon, SearchIcon } from "@/components/icons";
 import { Plate } from "@/components/plate";
 import { ScoreChip } from "@/components/score-meter";
 import { StatusBadge } from "@/components/status-badge";
-import { Card, LinkButton, ProgressBar } from "@/components/ui";
+import { Card, LinkButton, ProgressBar, StickyBar, inputClass } from "@/components/ui";
 import { stepHref, type InspectionStep } from "@/lib/inspection";
 import { whatsappShareUrl } from "@/lib/report/share";
 import { useLastStep } from "@/lib/resume";
@@ -47,10 +47,11 @@ export function CarList({ cars }: { cars: CarCard[] }) {
     (c) => (filter === "all" || c.status === filter) && (!q || c.reg.includes(q) || c.title.toUpperCase().replace(/\s+/g, "").includes(q)),
   );
   const filters: Filter[] = ["all", "draft", "inspected", "published"];
+  const resume = useResume(cars);
 
   return (
-    <div className="flex flex-col gap-6">
-      <Resume cars={cars} />
+    <div className="flex flex-1 flex-col gap-6">
+      {resume && <Resume resume={resume} />}
 
       {cars.length >= SEARCH_FROM && (
         <div className="flex flex-col gap-4">
@@ -65,7 +66,7 @@ export function CarList({ cars }: { cars: CarCard[] }) {
               autoCapitalize="characters"
               autoComplete="off"
               enterKeyHint="search"
-              className="block min-h-12 w-full rounded-md bg-surface pr-4 pl-12 type-body shadow-card ring-1 ring-border transition-shadow ring-inset placeholder:text-text-subtle  focus:ring-accent focus:outline-none"
+              className={`${inputClass} pl-12`}
             />
           </label>
           <div role="radiogroup" aria-label={t.dashboard.filterLabel} className="-mx-4 flex gap-2 overflow-x-auto px-4">
@@ -76,8 +77,8 @@ export function CarList({ cars }: { cars: CarCard[] }) {
                 role="radio"
                 aria-checked={filter === f}
                 onClick={() => setFilter(f)}
-                className={`min-h-11 shrink-0 rounded-full px-4 type-label transition-colors ${
-                  filter === f ? "bg-text text-white" : "bg-surface text-text-muted shadow-card hover:text-text"
+                className={`min-h-11 shrink-0 rounded-md border px-4 type-label transition-colors ${
+                  filter === f ? "border-accent bg-accent-tint text-text" : "border-border-control bg-surface text-text-muted hover:text-text"
                 }`}
               >
                 {f === "all" ? t.dashboard.filterAll : t.dashboard.status[f]}
@@ -93,14 +94,14 @@ export function CarList({ cars }: { cars: CarCard[] }) {
         <ul className="flex flex-col gap-4">
           {shown.map((car) => (
             <li key={car.id} className="overflow-hidden rounded-lg bg-surface shadow-card">
-              <Link href={`/app/cars/${car.id}`} className="flex items-center gap-4 p-4 transition-colors hover:bg-bg active:bg-surface-sunken">
+              <Link href={`/app/cars/${car.id}`} className="flex items-center gap-4 p-4 transition-colors hover:bg-surface-sunken active:bg-surface-sunken">
                 <Thumb url={car.thumbUrl} />
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <Plate reg={car.reg} size="sm" />
                     {car.score && <ScoreChip score={car.score.value} scoreText={car.score.text} outOf={t.car.scoreOutOf} label={`${t.car.score} ${car.score.text}${t.car.scoreOutOf}`} />}
                   </div>
-                  {car.title && <p className="line-clamp-2 font-medium break-words">{car.title}</p>}
+                  {car.title && <p className="line-clamp-2 type-title-sm break-words">{car.title}</p>}
                   <p className={car.attention ? "type-label text-attention" : "type-body-sm text-text-muted"}>{car.progress}</p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
@@ -115,7 +116,7 @@ export function CarList({ cars }: { cars: CarCard[] }) {
                   href={whatsappShareUrl(car.share.message)}
                   target="_blank"
                   rel="noopener"
-                  className="flex min-h-12 items-center justify-center gap-2 border-t border-border type-label text-accent transition-colors hover:bg-accent-tint"
+                  className="flex min-h-12 items-center justify-center gap-2 border-t border-border type-label text-button-ghost-fg transition-colors hover:bg-button-ghost-bg-hover"
                 >
                   <ChatIcon size={18} />
                   {t.dashboard.shareAgain}
@@ -125,18 +126,32 @@ export function CarList({ cars }: { cars: CarCard[] }) {
           ))}
         </ul>
       )}
+
+      {/* One primary action: carry on with the open inspection if there is one, otherwise add a car. */}
+      <StickyBar className="flex-row">
+        {resume ? (
+          <>
+            <LinkButton href="/app/cars/new" variant="secondary" icon={<PlusIcon />} aria-label={t.dashboard.addCar} className="shrink-0 !px-4">
+              <span className="max-[380px]:sr-only">{t.dashboard.addCar}</span>
+            </LinkButton>
+            <LinkButton href={resume.href} className="min-w-0 flex-1">
+              <span className="truncate">{t.dashboard.continueStep(stepLabel(t, resume.step))}</span>
+              <ArrowRightIcon size={18} />
+            </LinkButton>
+          </>
+        ) : (
+          <LinkButton href="/app/cars/new" icon={<PlusIcon />} className="flex-1">
+            {t.dashboard.addCar}
+          </LinkButton>
+        )}
+      </StickyBar>
     </div>
   );
 }
 
-/**
- * "Pick up where you left off": the inspection last opened on this phone (or, failing that, the
- * newest unfinished car), with one button straight back to that screen.
- */
-function Resume({ cars }: { cars: CarCard[] }) {
-  const t = useT();
+/** The inspection to pick up again: the one last opened on this phone, else the newest unfinished car. */
+function useResume(cars: CarCard[]) {
   const last = useLastStep();
-
   const open = cars.filter((c) => c.next);
   const remembered = last ? open.find((c) => c.id === last.carId) : undefined;
   const car = remembered ?? open[0];
@@ -144,32 +159,34 @@ function Resume({ cars }: { cars: CarCard[] }) {
   // Resume the remembered screen, unless the car has since moved past it.
   const order: InspectionStep[] = ["photos", "findings", "checklist", "report"];
   const step = remembered && last && order.indexOf(last.step) >= order.indexOf(car.next.step) ? last.step : car.next.step;
+  return { car, next: car.next, step, href: stepHref(car.id, step) };
+}
 
+/** "Pick up where you left off": a plain card that opens the inspection where it stopped. The button is in the bottom bar. */
+function Resume({ resume }: { resume: NonNullable<ReturnType<typeof useResume>> }) {
+  const t = useT();
+  const { car, next, href } = resume;
   return (
-    <section aria-labelledby="resume-title" className="flex animate-rise-in flex-col gap-4 rounded-lg bg-accent-hover p-4 text-white shadow-bar sm:p-6">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex min-w-0 flex-col gap-1">
-          <h2 id="resume-title" className="type-overline tracking-wide text-accent-tint uppercase">
-            {t.dashboard.resumeTitle}
-          </h2>
-          <p className="type-heading-2 break-words">
-            <span className="tabular tracking-wider">{car.reg}</span>
-            {car.title && <span className="font-normal text-accent-tint"> · {car.title}</span>}
-          </p>
+    <section aria-labelledby="resume-title" className="animate-rise-in overflow-hidden rounded-lg bg-surface shadow-card">
+      <Link href={href} className="flex flex-col gap-3 p-4 transition-colors hover:bg-surface-sunken sm:p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex min-w-0 flex-col gap-2">
+            <h2 id="resume-title" className="caps type-overline text-text-subtle">
+              {t.dashboard.resumeTitle}
+            </h2>
+            <Plate reg={car.reg} size="sm" className="self-start" />
+            {car.title && <p className="type-title-sm break-words">{car.title}</p>}
+          </div>
+          <Thumb url={car.thumbUrl} size="sm" />
         </div>
-        <Thumb url={car.thumbUrl} size="sm" />
-      </div>
-      <div className="flex flex-col gap-2">
-        <div className="flex justify-between gap-4 type-body-sm text-accent-tint">
-          <span>{car.progress}</span>
-          <span className="tabular">{t.dashboard.stepsDone(car.next.stepsDone)}</span>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex justify-between gap-4 type-caption text-text-muted">
+            <span>{car.progress}</span>
+            <span className="tabular">{t.dashboard.stepsDone(next.stepsDone)}</span>
+          </div>
+          <ProgressBar value={next.stepsDone} max={4} size="sm" label={t.dashboard.stepsDone(next.stepsDone)} />
         </div>
-        <ProgressBar value={car.next.stepsDone} max={4} label={t.dashboard.stepsDone(car.next.stepsDone)} className="!bg-white/15 [&>div]:!bg-surface" />
-      </div>
-      <LinkButton href={stepHref(car.id, step)} variant="secondary" className="!bg-surface !text-accent-hover !ring-0">
-        {t.dashboard.continueStep(stepLabel(t, step))}
-        <ArrowRightIcon size={18} />
-      </LinkButton>
+      </Link>
     </section>
   );
 }

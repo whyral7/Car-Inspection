@@ -29,7 +29,9 @@ export const hi: Strings = {
     close: "बंद करें",
     cancel: "रद्द करें",
     language: "भाषा",
-    languageNames: { en: "English", hi: "हिन्दी" },
+    languageNames: { en: "English", hi: "हिंदी" },
+    switchTo: "English",
+    switchToLabel: "View in English",
   },
 
   install: {

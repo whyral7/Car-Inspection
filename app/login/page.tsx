@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LanguageToggle } from "@/components/language-toggle";
+import { BrandHeader } from "@/components/brand-header";
 import { getT } from "@/lib/i18n.server";
 import { safeNextPath } from "@/lib/validation/auth";
 import { LoginForm } from "./login-form";
@@ -16,24 +16,16 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const nextPath = safeNextPath(typeof next === "string" ? next : null);
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-8 px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <Link href="/" className="flex min-h-11 items-center gap-2 type-heading-2 text-accent" aria-label={`${t.appName}: ${t.common.goToSite}`}>
-          <span aria-hidden className="flex size-8 items-center justify-center rounded-sm bg-accent type-body-sm text-white">
-            T
-          </span>
-          {t.appName}
-        </Link>
-        <LanguageToggle />
-      </div>
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-8 px-4 pt-2 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+      <BrandHeader plain homeLabel={`${t.appName}: ${t.common.goToSite}`} />
       <LoginForm nextPath={nextPath} />
-      <p className="-mt-4 text-center type-body-sm leading-10 text-text-muted">
+      <p className="-mt-4 text-center type-body-sm text-text-muted">
         {t.login.agree}{" "}
-        <Link href="/terms" className="py-2.5 font-semibold text-accent underline">
+        <Link href="/terms" className="inline-flex min-h-11 items-center type-label text-accent underline underline-offset-4">
           {t.login.terms}
         </Link>{" "}
         {t.login.and}{" "}
-        <Link href="/privacy" className="py-2.5 font-semibold text-accent underline">
+        <Link href="/privacy" className="inline-flex min-h-11 items-center type-label text-accent underline underline-offset-4">
           {t.login.privacy}
         </Link>
         .

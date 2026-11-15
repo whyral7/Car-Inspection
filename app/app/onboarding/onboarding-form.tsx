@@ -304,7 +304,7 @@ function ReportHeaderPreview({ logo, name, city }: { logo: string | null; name: 
           // eslint-disable-next-line @next/next/no-img-element -- blob: preview
           <img src={logo} alt="" className="size-12 shrink-0 rounded-md bg-surface object-contain ring-1 ring-border" />
         ) : (
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-md bg-accent font-semibold text-white">{name.trim().charAt(0).toUpperCase() || "?"}</span>
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-md bg-surface-sunken type-title-sm text-text">{name.trim().charAt(0).toUpperCase() || "?"}</span>
         )}
         <div className="min-w-0">
           <p className="font-semibold break-words">{name}</p>

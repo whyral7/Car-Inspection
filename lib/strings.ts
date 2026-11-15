@@ -24,7 +24,10 @@ export const en = {
     close: "Close",
     cancel: "Cancel",
     language: "Language",
-    languageNames: { en: "English", hi: "हिन्दी" },
+    languageNames: { en: "English", hi: "हिंदी" },
+    /** The toggle shows the language you can switch TO, written in that language. */
+    switchTo: "हिंदी",
+    switchToLabel: "हिंदी में देखें",
   },
 
   install: {

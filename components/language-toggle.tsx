@@ -3,41 +3,36 @@
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { useLocale, useT } from "@/components/i18n-provider";
-import { GlobeIcon } from "@/components/icons";
 import { setLocale } from "@/lib/i18n.actions";
-import { LOCALES, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 
-/** English / हिन्दी switch. Saves a cookie and re-renders the page in the new language. */
+/**
+ * हिंदी / English switch, on every screen beside the logo (brand book: bilingual by default).
+ * It names the language you switch TO, in that language. Saves the choice and re-renders the page.
+ */
 export function LanguageToggle({ className = "" }: { className?: string }) {
   const t = useT();
-  const current = useLocale();
+  const locale = useLocale();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-
-  function choose(locale: Locale) {
-    if (locale === current) return;
-    startTransition(async () => {
-      await setLocale(locale);
-      router.refresh();
-    });
-  }
+  const next: Locale = locale === "hi" ? "en" : "hi";
 
   return (
-    <div role="radiogroup" aria-label={t.common.language} aria-busy={pending} className={`inline-flex items-center gap-1 rounded-full bg-surface-sunken p-1 transition-opacity ${pending ? "opacity-60" : ""} ${className}`}>
-      <GlobeIcon size={16} className="mx-1.5 text-text-muted" />
-      {LOCALES.map((locale) => (
-        <button
-          key={locale}
-          type="button"
-          role="radio"
-          aria-checked={locale === current}
-          lang={locale}
-          onClick={() => choose(locale)}
-          className={`min-h-11 rounded-full px-4 type-label transition-colors duration-150 ${locale === current ? "bg-surface text-text shadow-card" : "text-text-muted hover:text-text"}`}
-        >
-          {t.common.languageNames[locale]}
-        </button>
-      ))}
-    </div>
+    <button
+      type="button"
+      lang={next}
+      aria-label={t.common.switchToLabel}
+      aria-busy={pending || undefined}
+      disabled={pending}
+      onClick={() =>
+        startTransition(async () => {
+          await setLocale(next);
+          router.refresh();
+        })
+      }
+      className={`inline-flex min-h-11 shrink-0 items-center rounded-md border border-button-secondary-border bg-button-secondary-bg px-3 type-label text-button-ghost-fg transition-colors hover:bg-button-secondary-bg-hover disabled:opacity-[var(--button-disabled-opacity)] ${className}`}
+    >
+      {t.common.switchTo}
+    </button>
   );
 }

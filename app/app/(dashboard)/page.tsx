@@ -99,12 +99,12 @@ export default async function AppHome() {
       <PageHeader title={t.dashboard.myCars} meta={cards.length > 0 ? t.dashboard.carCount(cards.length) : undefined} />
 
       {noCredits && (
-        <Card tone="warning" className="flex flex-col gap-4">
+        <Card tone="brand" className="flex flex-col gap-4">
           <div>
-            <p className="font-semibold text-attention">{t.dashboard.noCreditsTitle}</p>
-            <p className="mt-1 type-body-sm text-attention">{t.dashboard.noCreditsBody}</p>
+            <p className="type-title-sm">{t.dashboard.noCreditsTitle}</p>
+            <p className="mt-1 type-body-sm text-text-muted">{t.dashboard.noCreditsBody}</p>
           </div>
-          <LinkButton href="/app/credits" size="sm" className="self-start">
+          <LinkButton href="/app/credits" variant="secondary" size="sm" className="self-start">
             {t.profile.buy}
           </LinkButton>
         </Card>
@@ -113,25 +113,26 @@ export default async function AppHome() {
       <InstallPrompt eligible={anyPublished} />
 
       {cards.length === 0 ? (
-        <EmptyState icon={<CarIcon size={24} />} title={t.dashboard.emptyTitle} body={t.dashboard.emptyBody}>
-          <ol className="flex flex-col gap-2 text-left">
-            {t.dashboard.emptySteps.map((step, i) => (
-              <li key={step} className="flex items-center gap-4 rounded-md bg-bg px-4 py-2 type-body-sm">
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent type-caption-strong text-white">{i + 1}</span>
-                {step}
-              </li>
-            ))}
-          </ol>
-        </EmptyState>
+        <>
+          <EmptyState icon={<CarIcon size={24} />} title={t.dashboard.emptyTitle} body={t.dashboard.emptyBody}>
+            <ol className="flex flex-col gap-2 text-left">
+              {t.dashboard.emptySteps.map((step, i) => (
+                <li key={step} className="flex items-center gap-3 rounded-md bg-surface-sunken px-3 py-2 type-body-sm">
+                  <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-surface type-code-strong text-text">{i + 1}</span>
+                  {step}
+                </li>
+              ))}
+            </ol>
+          </EmptyState>
+          <StickyBar>
+            <LinkButton href="/app/cars/new" icon={<PlusIcon />}>
+              {t.dashboard.addCar}
+            </LinkButton>
+          </StickyBar>
+        </>
       ) : (
         <CarList cars={cards} />
       )}
-
-      <StickyBar>
-        <LinkButton href="/app/cars/new" icon={<PlusIcon />}>
-          {t.dashboard.addCar}
-        </LinkButton>
-      </StickyBar>
     </div>
   );
 }

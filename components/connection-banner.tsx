@@ -40,7 +40,7 @@ export function ConnectionBanner() {
 
   if (online) return null;
   return (
-    <div role="status" className="flex animate-fade-in items-center justify-center gap-2 bg-text px-4 py-2 type-label text-white">
+    <div role="status" className="flex animate-fade-in items-center justify-center gap-2 bg-text px-4 py-2 type-label text-bg">
       <WifiOffIcon size={16} />
       {t.common.offlineBanner}
     </div>

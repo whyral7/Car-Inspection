@@ -152,15 +152,16 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
                 highlight={current}
                 leading={
                   <span
-                    className={`flex size-8 shrink-0 items-center justify-center rounded-full type-label ${
-                      step.done ? "bg-accent text-white" : step.warn ? "bg-attention-tint text-attention" : current ? "text-accent-hover ring-2 ring-accent ring-inset" : "bg-surface-sunken text-text-muted"
+                    // A step is progress, not a rating: done is an ink tick, the current step an ink outline.
+                    className={`flex size-8 shrink-0 items-center justify-center rounded-md type-code-strong ${
+                      step.done ? "bg-surface-sunken text-text" : current ? "border-[length:var(--border-1-5)] border-text text-text" : "bg-surface-sunken text-text-subtle"
                     }`}
                   >
                     {step.done ? <CheckIcon size={16} /> : i + 1}
                   </span>
                 }
                 title={step.title}
-                subtitle={<span className={step.warn ? "font-medium text-attention" : undefined}>{step.status}</span>}
+                subtitle={<span className={step.warn ? "type-caption-strong text-text" : undefined}>{step.status}</span>}
               />
             );
           })}
@@ -168,7 +169,7 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
       </section>
 
       <details className="group rounded-lg bg-surface shadow-card">
-        <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded-lg px-4 font-semibold transition-colors hover:bg-bg sm:px-6 [&::-webkit-details-marker]:hidden">
+        <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded-lg px-4 type-title-sm transition-colors hover:bg-surface-sunken sm:px-6 [&::-webkit-details-marker]:hidden">
           {t.car.details}
           <ChevronDownIcon size={20} className="text-text-subtle transition-transform duration-200 group-open:rotate-180" />
         </summary>
@@ -176,12 +177,12 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
           {rows.map((row) => (
             <div key={row.label} className="flex flex-wrap justify-between gap-x-4 py-3 type-body-sm">
               <dt className="text-text-muted">{row.label}</dt>
-              <dd className={`text-right font-medium ${row.warn ? "text-fail" : row.value ? "" : "text-text-subtle"}`}>{row.value ?? t.car.notSet}</dd>
+              <dd className={`text-right ${row.warn ? "type-label text-fail" : row.value ? "type-label" : "text-text-subtle"}`}>{row.value ?? t.car.notSet}</dd>
             </div>
           ))}
         </dl>
         <div className="border-t border-border px-4 py-2 sm:px-6">
-          <Link href={`${base}/edit`} className="-mx-2 inline-flex min-h-11 items-center gap-2 rounded-sm px-2 type-label text-accent transition-colors hover:bg-accent-tint">
+          <Link href={`${base}/edit`} className="-mx-2 inline-flex min-h-11 items-center gap-2 rounded-sm px-2 type-label text-button-ghost-fg transition-colors hover:bg-button-ghost-bg-hover">
             <PencilIcon size={16} />
             {t.car.editDetails}
           </Link>
@@ -196,7 +197,7 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
           {nextLabel[state.next]}
           <ArrowRightIcon size={20} />
         </LinkButton>
-        <p className="text-center type-body-sm text-text-muted">{t.car.nextHint[state.next]}</p>
+        <p className="text-center type-caption text-text-muted">{t.car.nextHint[state.next]}</p>
       </StickyBar>
     </div>
   );
