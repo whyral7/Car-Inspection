@@ -143,7 +143,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
         title={published ? t.report.publishedTitle : t.report.previewTitle}
         meta={
           <>
-            <span className="font-semibold tracking-wider text-text tabular">{view.car.regNumber}</span>
+            <span className="type-code-strong tracking-[var(--tracking-wide)] text-text">{view.car.regNumber}</span>
             {view.car.title && ` · ${view.car.title}`}
           </>
         }
@@ -173,7 +173,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
               <CheckIcon size={20} />
             </span>
             <div className="flex flex-col">
-              <h2 className="font-semibold">{t.report.published}</h2>
+              <h2 className="type-title-sm">{t.report.published}</h2>
               {view.publishedOn && <p className="type-body-sm text-text-muted">{t.report.publishedOn(view.publishedOn)}</p>}
             </div>
           </div>
@@ -263,7 +263,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
         {searching !== null ? (
           <div role="status" className="flex animate-rise-in flex-col gap-2 rounded-md bg-accent-tint p-4">
             <p className="flex items-center gap-2 type-label text-accent-hover">
-              <Spinner className="text-accent" />
+              <Spinner />
               {t.report.price.stages[stage]}
             </p>
             <ProgressBar value={Math.min(57, searching)} max={60} label={t.report.price.stages[stage]} size="sm" className="!bg-surface" />

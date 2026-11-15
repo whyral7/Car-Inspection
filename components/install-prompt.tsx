@@ -65,7 +65,7 @@ export function InstallPrompt({ eligible }: { eligible: boolean }) {
       {/* eslint-disable-next-line @next/next/no-img-element -- tiny static app icon */}
       <img src="/icons/icon-192.png" alt="" width={40} height={40} className="size-10 shrink-0 rounded-md" />
       <div className="min-w-0 flex-1">
-        <p className="font-semibold">{t.install.title}</p>
+        <p className="type-title-sm">{t.install.title}</p>
         <p className="type-body-sm text-text-muted">{t.install.body}</p>
         <Button size="sm" onClick={install} className="mt-4">
           {t.install.action}

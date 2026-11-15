@@ -36,7 +36,7 @@ function Details({ rows }: { rows: DetailRow[] }) {
       {rows.map((row) => (
         <div key={row.label} className="flex flex-wrap justify-between gap-x-4 py-3 type-body-sm">
           <dt className="text-text-muted">{row.label}</dt>
-          <dd className={`text-right font-semibold ${row.warn ? "text-fail" : ""}`}>{row.value}</dd>
+          <dd className={`text-right type-title-sm ${row.warn ? "text-fail" : ""}`}>{row.value}</dd>
         </div>
       ))}
     </dl>
@@ -183,7 +183,7 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
           </div>
           <ScoreBadge view={view} t={t} />
         </div>
-        {summary && <p className="mt-4 font-medium text-balance">{summary}</p>}
+        {summary && <p className="mt-4 type-title-sm text-balance">{summary}</p>}
         <Flagged view={view} t={t} />
         {inspectedOn && (
           <p className="mt-1 flex items-center gap-2 type-body-sm text-text-muted">
@@ -223,7 +223,7 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
                   <div className="flex flex-wrap items-start gap-2">
                     <SeverityBadge severity={f.severity} label={f.severityLabel} className="mt-px" />
                     <p className="min-w-0">
-                      <span className="font-semibold">{f.typeLabel}</span>
+                      <span className="type-title-sm">{f.typeLabel}</span>
                       {f.location && <span className="text-text"> · {f.location}</span>}
                     </p>
                   </div>
@@ -252,10 +252,10 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
                 <li key={c.url}>
                   <a href={c.url} target="_blank" rel="noopener noreferrer nofollow" className="-mx-2 flex min-h-12 items-center justify-between gap-4 rounded-sm px-2 py-1 type-body-sm transition-colors hover:bg-bg">
                     <span className="min-w-0">
-                      <span className="block truncate font-semibold text-accent underline">{c.title}</span>
+                      <span className="block truncate type-title-sm text-accent underline">{c.title}</span>
                       <span className="block type-caption text-text-muted">{[c.host, c.detail].filter(Boolean).join(" · ")}</span>
                     </span>
-                    {c.priceText && <span className="shrink-0 font-semibold">{c.priceText}</span>}
+                    {c.priceText && <span className="shrink-0 type-title-sm">{c.priceText}</span>}
                   </a>
                 </li>
               ))}
@@ -302,7 +302,7 @@ export function ReportView({ view, t, pdfHref, shareUrl }: ReportViewProps) {
 
       <footer className={cardClass("default", "md", "flex flex-col gap-1 type-body-sm")}>
         <p className="text-text-muted">{t.publicReport.inspectedBy}</p>
-        <p className="font-semibold">{view.dealer.name}</p>
+        <p className="type-title-sm">{view.dealer.name}</p>
         {view.dealer.ownerName && <p className="text-text">{view.dealer.ownerName}</p>}
         {place && <p className="text-text">{place}</p>}
         {phone && <p className="text-text">{phone}</p>}

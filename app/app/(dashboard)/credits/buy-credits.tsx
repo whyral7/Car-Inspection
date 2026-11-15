@@ -110,7 +110,7 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
     return (
       <Card role="status" className="flex animate-rise-in items-center gap-4">
         <Spinner className="size-5 text-accent" />
-        <p className="font-medium">{t.credits.confirming}</p>
+        <p className="type-title-sm">{t.credits.confirming}</p>
       </Card>
     );
   }
@@ -145,7 +145,7 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
     <div className="flex flex-1 flex-col gap-4">
       {phase.kind === "failed" && (
         <Card role="alert" tone="danger" className="flex animate-rise-in flex-col gap-1 type-body-sm text-fail">
-          <p className="font-semibold">{t.credits.failedTitle}</p>
+          <p className="type-title-sm">{t.credits.failedTitle}</p>
           <p>{t.credits.failedBody(phase.reason)}</p>
         </Card>
       )}

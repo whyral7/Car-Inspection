@@ -121,7 +121,7 @@ export default async function ProfilePage() {
       </Card>
 
       <Card as="section" className="flex flex-wrap items-center justify-between gap-4">
-        <h2 className="font-semibold">{t.common.language}</h2>
+        <h2 className="type-title-sm">{t.common.language}</h2>
         <LanguageToggle />
       </Card>
 
@@ -144,7 +144,7 @@ export default async function ProfilePage() {
                   </>
                 }
                 trailing={
-                  <span className={`shrink-0 font-semibold tabular ${entry.change > 0 ? "text-pass" : "text-text-muted"}`}>
+                  <span className={`shrink-0 type-title-sm tabular ${entry.change > 0 ? "text-pass" : "text-text-muted"}`}>
                     {entry.change > 0 ? `+${entry.change}` : entry.change}
                   </span>
                 }

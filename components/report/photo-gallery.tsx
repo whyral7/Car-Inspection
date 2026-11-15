@@ -56,7 +56,7 @@ function PhotoViewer({ photos, viewer }: { photos: ReportPhoto[]; viewer: Return
           <div className="flex items-center justify-between gap-4 px-4 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-2">
             <div className="min-w-0 type-body-sm">
               <p className="truncate">
-                <span className="font-semibold">{photo.label}</span>
+                <span className="type-title-sm">{photo.label}</span>
                 <span className="text-on-photo/75"> · {t.publicReport.photoPosition(index + 1, photos.length)}</span>
               </p>
               {photo.takenAt && <p className="type-caption text-on-photo/75">{t.publicReport.photoTaken(photo.takenAt)}</p>}

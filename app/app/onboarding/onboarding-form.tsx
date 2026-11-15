@@ -261,7 +261,7 @@ export function OnboardingForm({ profileId, initial, cancelHref }: { profileId: 
               )}
             </div>
             <div className="flex flex-col items-start gap-1">
-              <label className={`${buttonClass("secondary", "cursor-pointer has-focus-visible:outline-2 has-focus-visible:outline-accent", false, "sm")}`}>
+              <label className={`${buttonClass("secondary", "cursor-pointer has-focus-visible:outline-2 has-focus-visible:outline-focus-ring", false, "sm")}`}>
                 {preview ? t.onboarding.changeLogo : t.onboarding.chooseLogo}
                 <input ref={fileInput} id="logo_file" type="file" name="logo_file" accept={LOGO.mimeTypes.join(",")} onChange={onLogoChange} className="sr-only" />
               </label>
@@ -307,7 +307,7 @@ function ReportHeaderPreview({ logo, name, city }: { logo: string | null; name: 
           <span className="flex size-12 shrink-0 items-center justify-center rounded-md bg-surface-sunken type-title-sm text-text">{name.trim().charAt(0).toUpperCase() || "?"}</span>
         )}
         <div className="min-w-0">
-          <p className="font-semibold break-words">{name}</p>
+          <p className="type-title-sm break-words">{name}</p>
           {city && <p className="type-body-sm text-text-muted">{city}</p>}
         </div>
       </div>

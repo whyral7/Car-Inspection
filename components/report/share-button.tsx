@@ -31,7 +31,7 @@ export function ShareButton({ url, title, text, className = "", label }: { url: 
   }
 
   return (
-    <button type="button" onClick={() => void share()} className={`inline-flex min-h-11 items-center justify-center gap-2 font-semibold ${className}`}>
+    <button type="button" onClick={() => void share()} className={`inline-flex min-h-11 items-center justify-center gap-2 type-title-sm ${className}`}>
       <ShareIcon size={18} />
       {label ?? t.publicReport.share}
     </button>

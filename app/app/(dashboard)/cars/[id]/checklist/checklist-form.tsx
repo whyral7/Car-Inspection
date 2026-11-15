@@ -247,7 +247,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
         title={t.checklist.title}
         meta={
           <>
-            <span className="font-semibold tracking-wider text-text tabular">{regNumber}</span>
+            <span className="type-code-strong tracking-[var(--tracking-wide)] text-text">{regNumber}</span>
             {carTitle && ` · ${carTitle}`}
           </>
         }
@@ -330,7 +330,7 @@ export function ChecklistForm({ carId, regNumber, carTitle, finished, initial }:
         description={
           <>
             <span className="block">{t.checklist.markRestConfirm(restEligible.length)}</span>
-            <span className="mt-2 block font-medium text-text">{restEligible.map((k) => t.checklist.items[k].label).join(", ")}</span>
+            <span className="mt-2 block type-title-sm text-text">{restEligible.map((k) => t.checklist.items[k].label).join(", ")}</span>
           </>
         }
         confirmLabel={t.checklist.markRestYes}
@@ -380,7 +380,7 @@ function FoldedRow({ itemKey, item, onOpen, onRetry }: { itemKey: ChecklistKey; 
         className="flex min-h-14 min-w-0 flex-1 items-center gap-4 py-2 pl-4 text-left transition-colors hover:bg-bg sm:pl-6"
       >
         <span className="min-w-0 flex-1">
-          <span className="block font-medium break-words">{label}</span>
+          <span className="block type-title-sm break-words">{label}</span>
           {item.note.trim() && <span className="block truncate type-body-sm text-text-muted">{item.note}</span>}
         </span>
         <Badge tone={resultTone[result]}>{t.checklist.results[result]}</Badge>
@@ -417,7 +417,7 @@ function ChecklistRow({
     <div className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 flex-col gap-1">
-          <p className="font-semibold">{label}</p>
+          <p className="type-title-sm">{label}</p>
           <p className="type-body-sm text-text-muted">{hint}</p>
         </div>
         <SaveState state={item.save} onRetry={onRetry} />

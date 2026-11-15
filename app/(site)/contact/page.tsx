@@ -30,7 +30,7 @@ export default function ContactPage() {
         {rows.map((row) => (
           <div key={row.label} className="flex flex-col gap-1 p-4 sm:px-6">
             <dt className="type-body-sm text-text-muted">{row.label}</dt>
-            <dd className="font-medium break-words">
+            <dd className="type-title-sm break-words">
               {row.href ? (
                 <a href={row.href} className="text-accent underline" {...(row.href.startsWith("https:") ? { target: "_blank", rel: "noopener" } : {})}>
                   {row.value}

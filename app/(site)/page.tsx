@@ -119,13 +119,13 @@ export default async function HomePage() {
             <li key={step.title} className={cardClass("default", "md", "flex gap-4 md:flex-col")}>
               <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-surface-sunken type-reading text-text">{i + 1}</span>
               <div>
-                <h3 className="font-semibold">{step.title}</h3>
+                <h3 className="type-title-sm">{step.title}</h3>
                 <p className="mt-1 text-balance text-text-muted">{step.body}</p>
               </div>
             </li>
           ))}
         </ol>
-        <Link href={SAMPLE_REPORT_PATH} className="-mx-2 mt-4 inline-flex min-h-11 items-center rounded-sm px-2 font-semibold text-accent transition-colors hover:bg-accent-tint">
+        <Link href={SAMPLE_REPORT_PATH} className="-mx-2 mt-4 inline-flex min-h-11 items-center rounded-sm px-2 type-title-sm text-accent transition-colors hover:bg-accent-tint">
           {h.sample} →
         </Link>
       </section>
@@ -136,7 +136,7 @@ export default async function HomePage() {
           <ul className="mt-6 grid gap-4 md:grid-cols-3">
             {h.why.map((item) => (
               <li key={item.title} className="rounded-lg bg-bg p-4 sm:p-6">
-                <h3 className="font-semibold">{item.title}</h3>
+                <h3 className="type-title-sm">{item.title}</h3>
                 <p className="mt-1 text-balance text-text-muted">{item.body}</p>
               </li>
             ))}
@@ -149,7 +149,7 @@ export default async function HomePage() {
         <div className="mt-6 flex flex-col gap-4">
           {h.faq.map((item) => (
             <details key={item.q} className="group rounded-lg bg-surface shadow-card">
-              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded-lg px-4 font-semibold transition-colors hover:bg-bg sm:px-6 [&::-webkit-details-marker]:hidden">
+              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded-lg px-4 type-title-sm transition-colors hover:bg-bg sm:px-6 [&::-webkit-details-marker]:hidden">
                 {item.q}
                 <ChevronDownIcon size={20} className="shrink-0 text-text-subtle transition-transform group-open:rotate-180" />
               </summary>
@@ -164,7 +164,7 @@ export default async function HomePage() {
         <p className="mt-2 text-text-muted">{h.pricingSubtitle}</p>
         <ul className="mt-6 grid gap-4 md:grid-cols-3">
           <li className={cardClass("default", "md", "flex flex-col")}>
-            <h3 className="font-semibold">{h.free.title}</h3>
+            <h3 className="type-title-sm">{h.free.title}</h3>
             <p className="mt-2 type-display-lg tabular">{h.free.price}</p>
             <p className="mt-1 text-balance text-text-muted">{h.free.body(FREE_CREDITS)}</p>
             <LinkButton href="/login" className="mt-5">
@@ -176,7 +176,7 @@ export default async function HomePage() {
             return (
               <li key={pack.key} className={cardClass("default", "md", `flex flex-col ${best ? "ring-2 ring-accent" : ""}`)}>
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="font-semibold">{h.packTitle(pack.credits)}</h3>
+                  <h3 className="type-title-sm">{h.packTitle(pack.credits)}</h3>
                   {best && <span className="rounded-full bg-accent-tint px-2.5 py-1 type-caption-strong text-accent-hover">{h.bestValue}</span>}
                 </div>
                 <p className="mt-2 type-display-lg tabular">₹{formatRupees(pack.pricePaise)}</p>
@@ -204,7 +204,7 @@ export default async function HomePage() {
       </section>
 
       {/* Always-visible WhatsApp button, the way Indian dealers expect to ask a question. */}
-      <WhatsappLink h={h} className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-30 flex min-h-12 items-center gap-2 rounded-full bg-accent px-4 font-semibold text-white shadow-bar transition-colors hover:bg-accent-hover" />
+      <WhatsappLink h={h} className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-30 flex min-h-12 items-center gap-2 rounded-full bg-accent px-4 type-title-sm text-white shadow-bar transition-colors hover:bg-accent-hover" />
     </>
   );
 }

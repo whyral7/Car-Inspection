@@ -268,7 +268,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
         title={t.findings.title}
         meta={
           <>
-            <span className="font-semibold tracking-wider text-text tabular">{regNumber}</span>
+            <span className="type-code-strong tracking-[var(--tracking-wide)] text-text">{regNumber}</span>
             {carTitle && ` · ${carTitle}`}
           </>
         }
@@ -311,7 +311,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
         <details className="group rounded-lg bg-surface shadow-card">
           <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 rounded-lg px-4 py-2 transition-colors hover:bg-bg sm:px-6 [&::-webkit-details-marker]:hidden">
             <span>
-              <span className="block font-semibold">{t.findings.sections.quiet(quiet.length)}</span>
+              <span className="block type-title-sm">{t.findings.sections.quiet(quiet.length)}</span>
               <span className="block type-body-sm text-text-muted">{t.findings.sections.quietHint}</span>
             </span>
             <ChevronDownIcon size={20} className="shrink-0 text-text-subtle transition-transform duration-200 group-open:rotate-180" />
@@ -346,7 +346,7 @@ export function FindingsReview({ carId, regNumber, carTitle, odometerKm, initial
           <>
             <div className="flex flex-col gap-2">
               <p className="flex items-center justify-center gap-2 type-label tabular">
-                <Spinner className="text-accent" />
+                <Spinner />
                 {t.findings.analysing(photos.length - active, photos.length)}
               </p>
             </div>
@@ -393,8 +393,8 @@ function AnalysisProgress({ total, active, failed, onRetry }: { total: number; a
       {active > 0 ? (
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <p className="flex items-center gap-2 font-semibold tabular">
-              <Spinner className="text-accent" />
+            <p className="flex items-center gap-2 type-title-sm tabular">
+              <Spinner />
               {label}
             </p>
             <p className="type-body-sm text-text-muted">{t.findings.analysingHint}</p>
@@ -409,7 +409,7 @@ function AnalysisProgress({ total, active, failed, onRetry }: { total: number; a
           </Button>
         </div>
       ) : (
-        <p className="flex items-center gap-2 font-semibold text-pass">
+        <p className="flex items-center gap-2 type-title-sm text-pass">
           <span className="flex size-6 items-center justify-center rounded-full bg-pass-tint">
             <CheckIcon size={16} />
           </span>
@@ -456,7 +456,7 @@ function OdometerCard({ carId, initialKm, photo }: { carId: string; initialKm: n
       <Card as="section" className="flex items-center justify-between gap-4">
         <div className="flex min-w-0 flex-col gap-1">
           <h2 className="type-body-sm text-text-muted">{t.findings.odometer.title}</h2>
-          <p className="flex items-center gap-2 font-semibold tabular">
+          <p className="flex items-center gap-2 type-title-sm tabular">
             <CheckIcon size={18} className="text-pass" />
             {t.findings.odometer.confirmed(kmFormat.format(confirmed))}
           </p>
@@ -479,9 +479,9 @@ function OdometerCard({ carId, initialKm, photo }: { carId: string; initialKm: n
   return (
     <form onSubmit={onSubmit} className={`${cardClass("warning")} flex flex-col gap-4`} noValidate>
       <div className="flex flex-col gap-1">
-        <h2 className="font-semibold">{t.findings.odometer.title}</h2>
+        <h2 className="type-title-sm">{t.findings.odometer.title}</h2>
         <p className="flex items-center gap-2 type-body-sm text-text-muted">
-          {checking && <Spinner className="text-accent" />}
+          {checking && <Spinner />}
           {message}
         </p>
       </div>
@@ -535,7 +535,7 @@ function PhotoGroup({ photo, findings, onRetry, ...actions }: { photo: PhotoStat
             onClick={() => setExpanded((v) => !v)}
             aria-expanded={expanded}
             aria-label={`${label}: ${expanded ? t.findings.shrinkPhoto : t.findings.enlargePhoto}`}
-            className={`relative block shrink-0 overflow-hidden rounded-md transition-[width] ${expanded ? "bg-text" : "bg-surface-sunken"} duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${expanded ? "w-full" : "size-20"}`}
+            className={`relative block shrink-0 overflow-hidden rounded-md transition-[width] ${expanded ? "bg-text" : "bg-surface-sunken"} duration-200 ${expanded ? "w-full" : "size-20"}`}
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- private signed URL, not optimisable */}
             <img src={photo.url} alt="" loading="lazy" decoding="async" className={`size-full ${expanded ? "object-contain" : "object-cover"}`} />
@@ -560,7 +560,7 @@ function PhotoStatus({ photo, findingCount, carId, onRetry }: { photo: PhotoStat
   if (photo.run === "running")
     return (
       <p className="flex items-center gap-2 type-body-sm text-text-muted">
-        <Spinner className="text-accent" />
+        <Spinner />
         {s.pending}
       </p>
     );
@@ -628,7 +628,7 @@ function Group({
       <div className="flex flex-wrap items-start gap-4">
         {media}
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <h3 className="font-semibold">{title}</h3>
+          <h3 className="type-title-sm">{title}</h3>
           {subtitle && <p className="type-body-sm text-text-muted">{subtitle}</p>}
           {status}
         </div>
@@ -664,7 +664,7 @@ function FindingCard({ finding, onAccept, onEdit, onDelete }: { finding: Finding
       }`}
     >
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-semibold">{t.findings.types[finding.type]}</span>
+        <span className="type-title-sm">{t.findings.types[finding.type]}</span>
         <SeverityBadge severity={finding.severity} label={t.findings.severities[finding.severity]} />
         {finding.source === "ai" && (
           <Badge icon={<SparklesIcon size={12} />} className="!bg-surface ring-1 ring-border ring-inset">
