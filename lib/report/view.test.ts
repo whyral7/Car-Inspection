@@ -173,7 +173,7 @@ describe("summaryParts", () => {
     const view = buildReportView(withDocProblem, [], now);
     expect(checkCounts(view)).toEqual({ ok: 1, attention: 1, fail: 2, na: 1 });
     expect(flaggedChecks(view).fail).toHaveLength(2);
-    expect(summaryParts(view).at(-1)).toContain("2 problems");
+    expect(summaryParts(view).at(-1)).toContain("2 Fail");
   });
 
   it("names flagged items only from shown sections", () => {

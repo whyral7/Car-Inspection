@@ -436,15 +436,15 @@ export const hi: Strings = {
 
   checklist: {
     title: "चेकलिस्ट",
-    subtitle: "कार पर हर चीज़ जाँचें। जो लागू न हो उसके लिए \"लागू नहीं\" चुनें।",
-    legend: "ध्यान दें: चलता है, पर जल्द देखना या ठीक कराना होगा। खराबी: काम नहीं करता, या सुरक्षित नहीं है।",
+    subtitle: "गाड़ी की हर चीज़ जाँचकर रेटिंग दें। जो लागू न हो उसके लिए N/A चुनें।",
+    legend: "ठीक: जाँचा, कोई दिक़्क़त नहीं। ध्यान दें: मरम्मत या दोबारा जाँच चाहिए। ख़राब: काम नहीं करता, या सुरक्षित नहीं है।",
     backToCar: "कार पर वापस",
     progress: (done: number, total: number) => `${done}/${total} जाँचे`,
     results: {
-      ok: "OK",
+      ok: "ठीक",
       attention: "ध्यान दें",
-      fail: "खराबी",
-      na: "लागू नहीं",
+      fail: "ख़राब",
+      na: "N/A",
     },
     addNote: "नोट जोड़ें",
     noteLabel: "नोट (ज़रूरी नहीं)",
@@ -469,7 +469,7 @@ export const hi: Strings = {
     backToCarDone: "रिपोर्ट पर जाएँ",
     errors: {
       note: "नोट 300 अक्षरों से कम रखें।",
-      incomplete: "पहले हर चीज़ जाँचें (\"लागू नहीं\" भी चलेगा)।",
+      incomplete: "पहले हर चीज़ को रेटिंग दें। N/A भी चलेगा।",
     },
     groups: {
       engine: "इंजन और ड्राइविंग",
@@ -655,8 +655,8 @@ export const hi: Strings = {
     seenIn: (angle: string) => `फ़ोटो: ${angle}`,
     checklist: "चेकलिस्ट",
     checklistSummary: (ok: number, attention: number, fail: number) =>
-      [`${ok} OK`, attention ? `${attention} पर ध्यान दें` : "", fail ? `${fail} खराबी` : ""].filter(Boolean).join(" · "),
-    flagged: { attention: (items: string) => `ध्यान दें: ${items}`, fail: (items: string) => `खराबी: ${items}` },
+      [`${ok} ठीक`, attention ? `${attention} ध्यान दें` : "", fail ? `${fail} ख़राब` : ""].filter(Boolean).join(" · "),
+    flagged: { attention: (items: string) => `ध्यान दें: ${items}`, fail: (items: string) => `ख़राब: ${items}` },
     documents: "कागज़",
     price: "बाज़ार कीमत का अंदाज़ा",
     priceAdjusted: (market: string, adjustment: string | null, score: string) =>
@@ -700,7 +700,7 @@ export const hi: Strings = {
     inspectedOn: (date: string) => `${date} को जाँच हुई`,
     scoreHowTitle: "स्कोर कैसे बनता है",
     scoreHow:
-      "हर कार 10 से शुरू होती है। हर माना गया नुकसान नोट 0.3 (हल्का), 0.8 (मध्यम) या 1.5 (गंभीर) घटाता है। चेकलिस्ट में हर \"ध्यान दें\" 0.3 और हर \"खराबी\" 1.0 घटाती है। 8 या ज़्यादा अच्छी कंडीशन, 6 से 7.9 ठीक-ठाक, 6 से कम पर काम की ज़रूरत।",
+      "हर गाड़ी 10 से शुरू होती है। हर माना गया नुक़सान नोट 0.3 (हल्का), 0.8 (मध्यम) या 1.5 (गंभीर) घटाता है। चेकलिस्ट में हर \"ध्यान दें\" 0.3 और हर \"ख़राब\" 1.0 घटाता है। 9.0 से 10 बेहतरीन, 7.5 से 8.9 बहुत अच्छी, 6.0 से 7.4 अच्छी, 4.5 से 5.9 औसत से कम, 4.5 से नीचे ख़राब।",
     close: "बंद करें",
     previous: "पिछला फ़ोटो",
     next: "अगला फ़ोटो",

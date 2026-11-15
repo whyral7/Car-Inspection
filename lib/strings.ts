@@ -438,15 +438,15 @@ export const en = {
 
   checklist: {
     title: "Checklist",
-    subtitle: "Check each item on the car. Choose \"Doesn't apply\" if it isn't relevant.",
-    legend: "Needs attention: works, but needs a look or a repair soon. Problem: doesn't work, or isn't safe.",
+    subtitle: "Rate each item on the car. Choose N/A if it doesn't apply.",
+    legend: "Pass: checked, no issue. Attention: needs a repair or a closer look. Fail: doesn't work, or isn't safe.",
     backToCar: "Back to car",
     progress: (done: number, total: number) => `${done}/${total} checked`,
     results: {
-      ok: "OK",
-      attention: "Needs attention",
-      fail: "Problem",
-      na: "Doesn't apply",
+      ok: "Pass",
+      attention: "Attention",
+      fail: "Fail",
+      na: "N/A",
     },
     addNote: "Add note",
     noteLabel: "Note (optional)",
@@ -472,7 +472,7 @@ export const en = {
     backToCarDone: "Go to the report",
     errors: {
       note: "Keep the note under 300 characters.",
-      incomplete: "Check every item first (\"Doesn't apply\" is fine).",
+      incomplete: "Rate every item first. N/A counts.",
     },
     groups: {
       engine: "Engine and driving",
@@ -596,8 +596,8 @@ export const en = {
     seenIn: (angle: string) => `Photo: ${angle}`,
     checklist: "Checklist",
     checklistSummary: (ok: number, attention: number, fail: number) =>
-      [`${ok} OK`, attention ? `${attention} need${attention === 1 ? "s" : ""} attention` : "", fail ? `${fail} problem${fail === 1 ? "" : "s"}` : ""].filter(Boolean).join(" · "),
-    flagged: { attention: (items: string) => `Needs attention: ${items}`, fail: (items: string) => `Problem: ${items}` },
+      [`${ok} Pass`, attention ? `${attention} Attention` : "", fail ? `${fail} Fail` : ""].filter(Boolean).join(" · "),
+    flagged: { attention: (items: string) => `Attention: ${items}`, fail: (items: string) => `Fail: ${items}` },
     documents: "Documents",
     price: "Estimated market price",
     priceAdjusted: (market: string, adjustment: string | null, score: string) =>
@@ -642,7 +642,7 @@ export const en = {
     inspectedOn: (date: string) => `Inspected ${date}`,
     scoreHowTitle: "How the score works",
     scoreHow:
-      "Every car starts at 10. Each accepted damage note takes off 0.3 (minor), 0.8 (moderate) or 1.5 (major). Each checklist item that needs attention takes off 0.3, and each problem 1.0. 8 and above is good condition, 6 to 7.9 fair, below 6 needs work.",
+      "Every car starts at 10. Each accepted damage note takes off 0.3 (minor), 0.8 (moderate) or 1.5 (major). Each checklist item rated Attention takes off 0.3, and each Fail 1.0. 9.0 to 10 is Excellent, 7.5 to 8.9 Very good, 6.0 to 7.4 Good, 4.5 to 5.9 Below average, under 4.5 Poor.",
     close: "Close",
     previous: "Previous photo",
     next: "Next photo",
