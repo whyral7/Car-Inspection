@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { FlashToast } from "@/components/flash-toast";
 import { ClockIcon, CreditIcon, PencilIcon } from "@/components/icons";
-import { LanguageToggle } from "@/components/language-toggle";
 import { SignOut } from "@/components/sign-out";
 import { BackLink, Card, EmptyState, LinkButton, ListCard, ListRow } from "@/components/ui";
 import { accountDeletionHref } from "@/lib/site";
@@ -118,11 +117,6 @@ export default async function ProfilePage() {
         <LinkButton href="/app/credits" size="sm">
           {t.profile.buy}
         </LinkButton>
-      </Card>
-
-      <Card as="section" className="flex flex-wrap items-center justify-between gap-4">
-        <h2 className="type-title-sm">{t.common.language}</h2>
-        <LanguageToggle />
       </Card>
 
       <section id="history" aria-labelledby="history-title" className="flex scroll-mt-24 flex-col gap-2">

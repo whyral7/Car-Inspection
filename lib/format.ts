@@ -6,9 +6,9 @@ export function formatDateTime(iso: string) {
   return dateFormat.format(new Date(iso));
 }
 
-const timestampFormat = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" });
+const timestampFormat = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "Asia/Kolkata" });
 
-/** Date and time in Indian time, e.g. "29 Oct 2026, 2:14 pm". */
+/** Date and time in Indian time, 24-hour as the brand book sets it: "29 Oct 2026, 14:14". */
 export function formatTimestamp(iso: string) {
   return timestampFormat.format(new Date(iso));
 }

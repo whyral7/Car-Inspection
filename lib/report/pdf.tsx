@@ -170,7 +170,9 @@ export function ReportPdf({ view, reportUrl, logo, images }: Props) {
           </View>
           <View style={{ alignItems: "flex-end" }}>
             <Text style={s.reportTag}>{t.publicReport.heading}</Text>
-            {view.publishedOn ? <Text style={[s.small, s.muted]}>{t.publicReport.publishedOn(view.publishedOn)}</Text> : null}
+            {/* Report ID and time, top right, in mono. */}
+            {view.slug ? <Text style={[s.small, s.mono, { color: C.muted, fontWeight: 400 }]}>{t.publicReport.reportId(view.slug)}</Text> : null}
+            {view.publishedOn ? <Text style={[s.small, s.mono, { color: C.muted, fontWeight: 400 }]}>{view.publishedOn}</Text> : null}
           </View>
         </View>
 
@@ -199,11 +201,12 @@ export function ReportPdf({ view, reportUrl, logo, images }: Props) {
           <View style={s.section} wrap={false}>
             <Text style={s.reportTag}>{t.publicReport.flagsTitle(flags.length)}</Text>
             {flags.map((flag) => (
-              <View key={flag.key} style={s.flag}>
-                <Glyph kind="fail" color={VERDICT_COLORS.fail.fg} />
+              // Red for a fail or major damage, amber for "check before you buy"; the fact, then what to do.
+              <View key={flag.key} style={[s.flag, { backgroundColor: VERDICT_COLORS[flag.tone].bg }]}>
+                <Glyph kind={flag.tone} color={VERDICT_COLORS[flag.tone].fg} />
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontWeight: 700 }}>{flag.title}</Text>
-                  {flag.body ? <Text style={{ color: C.muted }}>{flag.body}</Text> : null}
+                  <Text style={{ color: C.muted }}>{flag.body ?? (flag.rated ? t.publicReport.flagRated(flag.rated) : "")}</Text>
                 </View>
               </View>
             ))}
@@ -307,10 +310,10 @@ export function ReportPdf({ view, reportUrl, logo, images }: Props) {
             <Text style={[s.small, s.muted]}>{t.publicReport.inspectedBy}</Text>
             <Text style={{ fontWeight: 700 }}>{view.dealer.name}</Text>
             <Text style={[s.small, s.muted, { marginTop: 4 }]}>
-              <Link src={reportUrl} style={{ color: C.olive }}>
-                {reportUrl}
+              {`${t.publicReport.verifyAt} `}
+              <Link src={reportUrl} style={{ color: C.olive, fontFamily: MONO }}>
+                {reportUrl.replace(/^https?:\/\//, "")}
               </Link>
-              {` · ${t.publicReport.madeWith}`}
             </Text>
           </View>
           <PdfPicture src={PDF_ART.seal} style={s.seal} />
