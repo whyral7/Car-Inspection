@@ -312,6 +312,8 @@ export const en = {
       checklist: `${checks} quick checks on the car. About 5 minutes.`,
       report: "Preview what buyers will see, then publish and share it.",
     }),
+    /** Under the main button once the report is out. */
+    publishedHint: "Edits show on the report straight away. No extra credit.",
     scoreProvisional: (done: number, total: number) => `Provisional: ${done} of ${total} checklist items done. It changes as you go.`,
     details: "Car details",
     notSet: "Not added",

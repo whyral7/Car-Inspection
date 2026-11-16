@@ -305,6 +305,7 @@ export const hi: Strings = {
       checklist: `गाड़ी की ${checks} छोटी जाँचें। लगभग 5 मिनट।`,
       report: "देखें कि खरीदार को क्या दिखेगा, फिर पब्लिश करके भेजें।",
     }),
+    publishedHint: "बदलाव रिपोर्ट पर तुरंत दिखते हैं। कोई और क्रेडिट नहीं लगता।",
     scoreProvisional: (done: number, total: number) => `अभी पक्का नहीं: चेकलिस्ट के ${total} में से ${done} काम पूरे। आगे बढ़ने पर बदलेगा।`,
     details: "गाड़ी की जानकारी",
     notSet: "नहीं भरा",

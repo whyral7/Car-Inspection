@@ -200,7 +200,7 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
           {nextLabel[state.next]}
           <ArrowRightIcon size={20} />
         </LinkButton>
-        <p className="text-center type-caption text-text-muted">{t.car.nextHint(ANGLE_KEYS.length, REQUIRED_ANGLE_COUNT, CHECKLIST_KEYS.length)[state.next]}</p>
+        <p className="text-center type-caption text-text-muted">{car.status === "published" ? t.car.publishedHint : t.car.nextHint(ANGLE_KEYS.length, REQUIRED_ANGLE_COUNT, CHECKLIST_KEYS.length)[state.next]}</p>
       </StickyBar>
     </div>
   );
