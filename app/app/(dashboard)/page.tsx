@@ -12,6 +12,7 @@ import { inspectionState, stepHref } from "@/lib/inspection";
 import { ANGLE_KEYS, smallPhotoPath } from "@/lib/photos/angles";
 import { getCurrentProfile } from "@/lib/profile";
 import { reportUrl } from "@/lib/report/share";
+import { maskReg } from "@/lib/report/view";
 import { formatScore } from "@/lib/score";
 import { appBaseUrl } from "@/lib/url";
 import { CarList, type CarCard } from "./car-list";
@@ -89,7 +90,7 @@ export default async function AppHome() {
       next: car.status === "published" ? null : { step: state.next, href: stepHref(car.id, state.next), stepsDone: state.stepsDone },
       thumbUrl: thumbs.get(smallPhotoPath(car.id, "front")) ?? null,
       score: state.score && !state.score.provisional ? { text: scoreText!, value: state.score.value } : null,
-      share: url ? { url, message: t.report.shareMessage(title || car.reg_number, car.reg_number, scoreText ?? "", url) } : null,
+      share: url ? { url, message: t.report.shareMessage(title || maskReg(car.reg_number), maskReg(car.reg_number), scoreText ?? "", url) } : null,
     };
   });
   const anyPublished = cards.some((c) => c.status === "published");

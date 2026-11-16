@@ -24,7 +24,7 @@ import { ContactButtons, ReportView } from "@/components/report/report-view";
 import { ShareButton } from "@/components/report/share-button";
 import { PRICE } from "@/lib/config";
 import { reportPdfPath, reportPath, whatsappShareUrl } from "@/lib/report/share";
-import { REPORT_SECTIONS, applyHidden, type ReportSection, type ReportView as View } from "@/lib/report/view";
+import { REPORT_SECTIONS, applyHidden, maskReg, type ReportSection, type ReportView as View } from "@/lib/report/view";
 import { estimatePrice, publishReport, saveHiddenSections } from "./actions";
 
 type Props = {
@@ -128,7 +128,7 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
   }
 
   const preview = applyHidden(view, hidden);
-  const shareText = published ? t.report.shareMessage(view.car.title || view.car.regNumber, view.car.regNumber, view.scoreText, published.url) : "";
+  const shareText = published ? t.report.shareMessage(view.car.title || maskReg(view.car.regNumber), maskReg(view.car.regNumber), view.scoreText, published.url) : "";
   const stage = searching === null ? 0 : PRICE_STAGES.filter((s) => searching >= s).length - 1;
   const canPublish = ready && !published;
 
