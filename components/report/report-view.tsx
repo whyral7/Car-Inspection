@@ -145,9 +145,11 @@ type ReportViewProps = {
   shareUrl?: string | null;
   /** The car's name is the page title on the public report; inside the owner's preview it is a section heading. */
   titleAs?: "h1" | "h2";
+  /** On a wide screen, keep the photos in view on the left while the findings scroll on the right. Full pages only. */
+  wide?: boolean;
 };
 
-export function ReportView({ view, t, pdfHref, shareUrl, titleAs: Title = "h1" }: ReportViewProps) {
+export function ReportView({ view, t, pdfHref, shareUrl, titleAs: Title = "h1", wide = false }: ReportViewProps) {
   const phone = formatPhone(view.dealer.phone);
   const place = dealerPlace(view.dealer);
   const takenOn = view.photos?.find((p) => p.takenAt)?.takenAt?.split(",")[0] ?? null;
@@ -160,9 +162,15 @@ export function ReportView({ view, t, pdfHref, shareUrl, titleAs: Title = "h1" }
   const issuer = [view.dealer.name, view.dealer.city].filter(Boolean).join(" · ");
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className={`flex flex-col gap-6 ${wide ? "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:items-start lg:gap-8" : ""}`}>
       {/* Proof before promise: the car itself, then what to check, then the score. The price comes later. */}
-      {view.photos && view.photos.length > 0 && <PhotoHero photos={view.photos} />}
+      {view.photos && view.photos.length > 0 && (
+        <div className={wide ? "lg:sticky lg:top-20" : undefined}>
+          <PhotoHero photos={view.photos} />
+        </div>
+      )}
+
+      <div className="flex min-w-0 flex-col gap-6">
 
       {flags.length > 0 && (
         <section aria-labelledby="flags-title" className="flex flex-col gap-2">
@@ -352,6 +360,7 @@ export function ReportView({ view, t, pdfHref, shareUrl, titleAs: Title = "h1" }
         {view.publishedOn && <p className="mt-2 type-caption text-text-muted">{t.publicReport.publishedOn(view.publishedOn)}</p>}
         <p className="type-caption text-text-muted">{t.publicReport.madeWith}</p>
       </footer>
+      </div>
     </div>
   );
 }

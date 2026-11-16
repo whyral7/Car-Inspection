@@ -57,16 +57,16 @@ export default async function PublicReportPage({ params }: PageProps<"/r/[slug]"
 
   return (
     <>
-      <BrandHeader homeLabel={`${t.appName}: ${t.common.goToSite}`}>
+      <BrandHeader homeLabel={`${t.appName}: ${t.common.goToSite}`} width="max-w-2xl lg:max-w-5xl">
         <ShareButton url={url} title={t.publicReport.ogTitle(view.car.title || view.car.regNumber, view.scoreText)} className={buttonClass("ghost", "shrink-0 !px-3", false, "sm")} />
       </BrandHeader>
-      <main className={`mx-auto w-full max-w-2xl flex-1 px-4 pt-4 ${canContact ? "pb-32" : "pb-8"}`}>
-        <ReportView view={view} t={t} pdfHref={reportPdfPath(slug)} shareUrl={url} />
+      <main className={`mx-auto w-full max-w-2xl flex-1 px-4 pt-4 lg:max-w-5xl ${canContact ? "pb-32" : "pb-8"}`}>
+        <ReportView view={view} t={t} pdfHref={reportPdfPath(slug)} shareUrl={url} wide />
       </main>
       {canContact && (
         // Always in reach while the buyer scrolls through the photos.
         <aside aria-label={t.publicReport.contactBar} className="fixed inset-x-0 bottom-0 z-10 border-t border-bottombar-border bg-bottombar-bg shadow-bar">
-          <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+          <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] lg:max-w-5xl">
             <ContactButtons view={view} t={t} />
           </div>
         </aside>
