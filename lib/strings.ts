@@ -113,6 +113,13 @@ export const en = {
     metaTitle: "Sample inspection report",
     banner: (photos: number) => `This is a sample report with made-up details. Drawings stand in for the ${photos} real photos buyers see and can zoom into.`,
     cta: "Make your own: start free",
+    /** The made-up findings on the sample, written the way a careful seller would write them. */
+    data: {
+      spareKey: "Only one key comes with the car.",
+      scratchRear: { location: "Rear bumper, lower left", note: "Surface scratch about 8 cm long. Paint not broken through." },
+      scuffDoor: { location: "Front-left door", note: "Scuff about 5 cm long near the handle." },
+      price: "2019 Swift VXi petrol manuals with 40,000 to 55,000 km are listed for ₹4.6 to 5.3 lakh in Pune, and usually sell a little below that.",
+    },
   },
 
 

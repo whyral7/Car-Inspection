@@ -113,6 +113,12 @@ export const hi: Strings = {
     metaTitle: en.sampleReport.metaTitle,
     banner: (photos: number) => `यह नमूना रिपोर्ट है, जानकारी काल्पनिक है। असली रिपोर्ट में ${photos} असली फ़ोटो होते हैं, जिन्हें खरीदार बड़ा करके देख सकते हैं। यहाँ उनकी जगह चित्र हैं।`,
     cta: "अपनी रिपोर्ट बनाएँ: मुफ़्त शुरू करें",
+    data: {
+      spareKey: "गाड़ी के साथ सिर्फ़ एक चाबी है।",
+      scratchRear: { location: "पिछला बंपर, नीचे बाईं तरफ़", note: "ऊपरी खरोंच, लगभग 8 cm लंबी। पेंट के नीचे तक नहीं गई।" },
+      scuffDoor: { location: "आगे का बायाँ दरवाज़ा", note: "हैंडल के पास लगभग 5 cm की रगड़।" },
+      price: "2019 Swift VXi पेट्रोल मैनुअल, 40,000 से 55,000 km चली, Pune में ₹4.6 से 5.3 लाख में लिस्ट हैं और आम तौर पर इससे थोड़ा कम में बिकती हैं।",
+    },
   },
 
   login: {
@@ -780,7 +786,7 @@ export const hi: Strings = {
     help: "भुगतान के बारे में पूछना हो तो पेमेंट ID के साथ हमसे संपर्क करें।",
     deleteAccount: "मेरा अकाउंट डिलीट करने को कहें",
     deleteAccountHint: "हम 30 दिन में आपका डेटा डिलीट कर देते हैं, सिवाय पेमेंट रिकॉर्ड के जो कानून रखने को कहता है।",
-    deleteAccountMessage: (phone: string) => `मेरा Treadmark अकाउंट${phone ? ` (${phone})` : ""} और उसका डेटा डिलीट करें।`,
+    deleteAccountMessage: (phone: string) => `मेरा Treadmark अकाउंट${phone ? ` (${phone})` : ""} और उसका डेटा डिलीट कर दें।`,
   },
 
   photos: {

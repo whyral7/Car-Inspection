@@ -7,7 +7,7 @@ describe("red flags", () => {
   it("lists failed checks and major damage above the score", () => {
     const flags = redFlags(sampleReportView());
     expect(flags.map((f) => f.title)).toContain("Spare key");
-    expect(flags.find((f) => f.title === "Spare key")?.body).toBe("Only one key available.");
+    expect(flags.find((f) => f.title === "Spare key")?.body).toBe("Only one key comes with the car.");
   });
 
   it("never shows a flag from a section the dealer hid", () => {
