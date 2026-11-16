@@ -811,11 +811,87 @@ Every screen is at 4 or more. Hindi stays at 4, not 5, because it was checked by
 | The "Inspected" seal on self-run reports | The voice rules ban "certified" without a seal. Today the seal goes on every published report |
 | A note required under Attention and Fail | The checklist spec blocks submission without evidence. That changes behaviour, so it wasn't done |
 | Native Hindi read-through | Rules and layout are checked; idiom needs a Hindi-first reader |
-| Dark mode stays pinned to light | Every screen passes contrast in dark, but photos, the PDF preview and the logo's reverse colourway need a look on a real phone before unpinning |
+| ~~Dark mode stays pinned to light~~ | Done in round 6 (section 9): the app follows the phone's setting |
 
 ### Proposals for the style guide (the book's own change process)
 
 - **Tier 1, clarification:** the rating control is specified as Good / Fair / Poor / N/A, but the rating colours and report exhibits say Pass / Attention / Fail. The app uses the second set.
 - **Tier 2, new patterns built from semantic tokens:** Toast (inverse ground), BottomSheet and ConfirmSheet, Skeleton, EmptyState, the checkbox-style Switch, StepHeader, a compact ScoreMeter for list rows, an info banner on `accent-tint`, and a 50% scrim behind sheets.
-- **Tier 2, fonts:** split Martel Sans into Latin and Devanagari files and preload only Regular and SemiBold. English readers would download about 150 KB less on first visit.
+- ~~**Tier 2, fonts:** split Martel Sans into Latin and Devanagari files.~~ Done in round 6 (section 9).
 - **Tier 2, header:** the book shows the lockup and the हिंदी toggle only; the app also needs credits and the account. A written rule for those two would settle it.
+
+## 9. Craft audit (round 6)
+
+Round 5 made every screen follow the brand book's rules. This round asked a different question: with the rules met, does each screen read well to someone using it for the first time, on a phone, at a car? It also covered what the rule checks can't see: every state, the copy line by line, desktop, dark mode, the PDF, speed, and the full flows.
+
+### How it was audited
+
+- **Every state, not only every screen:** 22 screens plus 16 states (sheets, toasts, form errors, offline, rated checklist rows, the photo viewer), in English and Hindi, at 360px and 1280px, in light and dark.
+- **Length:** how many phone screens each page takes at 360px. A buyer's report that needs six screens of scrolling to reach the checklist is a design problem even when every rule passes.
+- **Copy:** every line of `lib/strings.ts` and `lib/strings.hi.ts` read against `brand/reference/voice-profile.md`, not only pattern-matched.
+- **Flows:** onboarding, add a car, duplicate guard, 20 photos with a blurry photo and an offline retake, damage notes (edit, add, delete with undo), checklist, publish, share, the buyer's view, PDF, link preview, hiding a section, log out. Run in a real browser on a fresh demo account with the photo AI mocked.
+- **Speed:** production build, slow 4G and a 4x slower CPU.
+
+### Findings and fixes
+
+**Structure**
+
+| Screen | Finding | Fix |
+|---|---|---|
+| Buyer's report | 6.0 phone screens long; the 17 Pass rows buried the 2 that matter | Pass and N/A rows fold into one line with counts; Attention and Fail stay open |
+| Buyer's report, desktop | One narrow column on a wide screen | Two columns from 1024px: photos stay in view on the left, flags, score and notes scroll on the right |
+| Owner's report screen | 7.9 screens; four equal buttons; the preview sat between the owner and the share actions | Share on WhatsApp in the bottom bar, Copy link and Download PDF under the card, the rest behind "Share another way"; the preview folds away once published |
+| My cars | The car to continue appeared twice (a card, then its row) | One row, first in the list, marked "Continue here" with its progress |
+| Checklist | 5.1 screens; help text open on every row; nothing asked for evidence | Help behind a 44px button; "Add note" appears after rating; Attention and Fail ask for a note so buyers know what was found |
+| Damage notes | Three olive buttons in view | One primary action in the bottom bar; per-note actions are secondary |
+| Header | Language, credits and account chips crowded the logo at 360px | Logo, language and account only; credits moved onto My cars, where they are spent |
+| Car page | The score card mixed the grade, a caption and a hint | ScoreMeter on its own line, hint below |
+| Published car | The hint under the main button still said "then publish" | Says that edits show on the report straight away |
+| Report screen | "Download PDF" wrapped to two lines at 360px | Each button takes the width its label needs |
+
+**Things the rule checks missed**
+
+| Finding | Fix |
+|---|---|
+| Browser bar and Razorpay still used the old teal (`lib/config.ts`) | Paper for the bar, the night ground in dark mode, Olive Khaki for Razorpay |
+| The offline page was still teal with a boxed "T" | Rebuilt on brand, in both languages, light and dark; the logo is cached for it |
+| Checklist help said "Needs attention", "OK" and "a Problem": the old rating words | Pass, Attention, Fail in English; ठीक, ध्यान दें, ख़राब in Hindi |
+| The WhatsApp share text sent the full number plate while the report masks it | Masked in the share text too |
+| Counts typed into copy ("20 guided photos", "19 quick checks", "first 3 reports", "about ₹83") | All passed in from the config; the brand check now fails on a typed count |
+| "OTP" and "code" used for the same thing | "OTP" throughout |
+| Hindi errors padded with कृपया, and "लगता है आप ऑफ़लाइन हैं" | Say what happened and what to do; the brand check now fails on कृपया |
+| The sample report's notes stayed English for Hindi readers, and used adjectives ("Light scuff") | Sample notes come from the strings in both languages and give lengths |
+| PDF: 20 photos came before the damage notes; a heading and a price line were stranded at page breaks; the date had no time | Flags, then damage notes, then price, then photos; headings travel with their first row; "16 Nov 2026 · 10:54 · Jaipur" top right |
+| Header logo invisible on dark | The logo follows the theme (colour artwork on light, reverse on dark) |
+
+**Speed (production build, slow 4G, 4x CPU)**
+
+| Page | Before | After |
+|---|---|---|
+| Landing | 560 KB, first paint 1.0 s | 293 KB, 0.8 s |
+| Log in | 645 KB, 0.9 s | 381 KB, 0.8 s |
+| Sample report | first paint 0.9 s | 299 KB, 0.8 s |
+| Buyer's report | first paint 4.3 s | 434 KB, 3.4 s (most of it the database round trip from the test machine) |
+
+- **Fonts: 308 KB to 57 KB in English, 156 KB in Hindi.** Martel Sans and IBM Plex Mono are split by script (`brand/scripts/subset-fonts.py`) and loaded with a unicode-range, so Devanagari files load only on pages that show Hindi. The word "हिंदी" on the language switch has its own 2 KB file, so English pages don't fetch a full Hindi weight for five characters. Nothing was dropped: a "latin-ext" file holds every other glyph.
+- **Logo: 22 KB to 3 KB.** The supplied artwork draws the tyre mark as thousands of tiny straight segments. `brand/scripts/optimise-logos.py` writes light copies to `public/brand/web` with points on straight runs removed (tolerance 0.01 units on a 910-unit drawing). The supplied files are untouched.
+
+**Dark mode**
+
+All 22 screens and 16 states were reviewed in dark. With the logo fixed, nothing else needed changing, so the app is no longer pinned to light: it follows the phone's setting, the browser bar included. The PDF and the WhatsApp preview stay light.
+
+### Verified
+
+- Flows on a fresh account: all pass. Publishing took exactly 1 credit (3 to 2) and a reload took none; the offline retake uploaded after reconnecting; log out lands on `/login` with one redirect.
+- The audit script (axe WCAG 2.2 AA, sideways scroll, 44px targets, brand rules) across English, Hindi, desktop, dark and 200% text: 1 finding in 132 page loads, and it is a false alarm (on the Hindi car page, a list row that peeks a few pixels above the bottom bar before you scroll).
+- `npm run lint`, `npm run typecheck`, `npm test` (272 pass), `npm run brand:check`, `npx next build`: all pass.
+
+### Not checked here
+
+| Item | Why |
+|---|---|
+| Sunlight legibility, the camera, real upload speed | Needs a real phone at a real car. Checklist: read the capture instruction at arm's length outdoors; shoot 20 photos on mobile data; go into airplane mode mid-shoot and come back; open the report from WhatsApp on a second phone; print the PDF in black and white |
+| Hindi idiom | Vocabulary, tone rules and layout are checked; a Hindi-first reader should still read it through |
+| Real photo AI and price estimate | Mocked during the audit to avoid spending on API calls |
+| Dark mode on low-end Android screens | Reviewed in a desktop browser only |
+
