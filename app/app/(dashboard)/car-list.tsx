@@ -100,7 +100,7 @@ export function CarList({ cars }: { cars: CarCard[] }) {
               <Link href={resuming ? resuming.href : `/app/cars/${car.id}`} className="flex items-center gap-4 p-4 transition-colors hover:bg-surface-sunken active:bg-surface-sunken">
                 <Thumb url={car.thumbUrl} />
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
-                  {resuming && <p className="caps type-overline text-text-subtle">{t.dashboard.resumeTitle}</p>}
+                  {resuming && <p className="caps type-overline text-text-subtle">{t.dashboard.resumeHere}</p>}
                   <div className="flex flex-wrap items-center gap-2">
                     <Plate reg={car.reg} size="sm" />
                     {car.score && <ScoreChip score={car.score.value} scoreText={car.score.text} outOf={t.car.scoreOutOf} label={`${t.car.score} ${car.score.text}${t.car.scoreOutOf}`} />}

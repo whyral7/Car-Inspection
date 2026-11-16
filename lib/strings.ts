@@ -201,6 +201,8 @@ export const en = {
     noMatches: "No cars match.",
     shareAgain: "Share on WhatsApp",
     resumeTitle: "Pick up where you left off",
+    /** On the car's row in the list. */
+    resumeHere: "Continue here",
     continueStep: (step: string) => `Continue: ${step}`,
     carCount: (n: number) => (n === 1 ? "1 car" : `${n} cars`),
     stepsDone: (n: number) => `${n} of 4 steps done`,

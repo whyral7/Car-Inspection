@@ -192,10 +192,10 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
           </a>
           {/* Two everyday actions; WhatsApp is the primary one, in the bottom bar. */}
           <div className="grid grid-cols-2 gap-2">
-            <Button variant="secondary" size="sm" onClick={onCopy} icon={<CopyIcon size={18} />} className="!px-2">
+            <Button variant="secondary" size="sm" onClick={onCopy} icon={<CopyIcon size={18} />} className="!px-2 type-label">
               {t.report.copyLink}
             </Button>
-            <a href={reportPdfPath(published.slug)} className={buttonClass("secondary", "!px-2", false, "sm")}>
+            <a href={reportPdfPath(published.slug)} className={buttonClass("secondary", "!px-2 type-label", false, "sm")}>
               <DownloadIcon size={18} />
               {t.report.downloadPdf}
             </a>

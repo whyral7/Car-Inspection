@@ -201,6 +201,7 @@ export const hi: Strings = {
     noMatches: "कोई गाड़ी नहीं मिली।",
     shareAgain: "WhatsApp पर भेजें",
     resumeTitle: "जहाँ छोड़ा था, वहीं से शुरू करें",
+    resumeHere: "यहाँ से जारी रखें",
     continueStep: (step: string) => `जारी रखें: ${step}`,
     carCount: (n: number) => (n === 1 ? "1 गाड़ी" : `${n} गाड़ियाँ`),
     stepsDone: (n: number) => `4 में से ${n} काम पूरे`,
