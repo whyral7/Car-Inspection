@@ -280,6 +280,13 @@ export function redFlags(view: ReportView): ReportFlag[] {
   return [...findings, ...flag("fail"), ...flag("attention")];
 }
 
+/** Address and city on one line, without saying the city twice when the address already ends with it. */
+export function dealerPlace(dealer: { address: string | null; city: string | null }) {
+  const { address, city } = dealer;
+  if (address && city && address.toLowerCase().includes(city.toLowerCase())) return address;
+  return [address, city].filter(Boolean).join(", ");
+}
+
 /**
  * Hides the middle of a registration number for anyone but the owner: MH12AB1234 -> MH12AB••34
  * (brand book, ReportHeader). Enough is left to tell cars apart; the full number stays with the owner.

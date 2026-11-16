@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { hi } from "@/lib/strings.hi";
 import { sampleReportView } from "./sample";
-import { applyHidden, forPublic, maskReg, redFlags } from "./view";
+import { applyHidden, dealerPlace, forPublic, maskReg, redFlags } from "./view";
 
 describe("red flags", () => {
   it("lists failed checks and major damage above the score", () => {
@@ -29,5 +29,13 @@ describe("plate masking", () => {
 
   it("leaves very short numbers alone", () => {
     expect(maskReg("AB12")).toBe("AB12");
+  });
+});
+
+describe("dealer place", () => {
+  it("doesn't repeat the city when the address already has it", () => {
+    expect(dealerPlace({ address: "Shop 12, Tonk Road, Jaipur 302015", city: "Jaipur" })).toBe("Shop 12, Tonk Road, Jaipur 302015");
+    expect(dealerPlace({ address: "Shop 4, Baner Road", city: "Pune" })).toBe("Shop 4, Baner Road, Pune");
+    expect(dealerPlace({ address: null, city: "Pune" })).toBe("Pune");
   });
 });

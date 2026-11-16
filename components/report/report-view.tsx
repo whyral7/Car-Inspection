@@ -14,7 +14,7 @@ import { SeverityBadge } from "@/components/severity";
 import { VerdictBadge } from "@/components/verdict-badge";
 import { Badge, buttonClass, cardClass, type BadgeTone } from "@/components/ui";
 import { formatPhone, telHref, whatsappChatUrl } from "@/lib/report/share";
-import { checkCounts, redFlags, shownChecks, type DetailRow, type ReportCheckItem, type ReportView as View } from "@/lib/report/view";
+import { checkCounts, dealerPlace, redFlags, shownChecks, type DetailRow, type ReportCheckItem, type ReportView as View } from "@/lib/report/view";
 import type { Strings } from "@/lib/strings";
 import type { ChecklistResult } from "@/lib/supabase/database.types";
 
@@ -45,12 +45,12 @@ function Details({ rows }: { rows: DetailRow[] }) {
   );
 }
 
-function CheckList({ items }: { items: ReportCheckItem[] }) {
+function CheckRows({ items }: { items: ReportCheckItem[] }) {
   return (
     <ul className="divide-y divide-border">
       {items.map((item) => (
         <li key={item.key} className="flex flex-wrap items-start gap-x-4 gap-y-1 py-3">
-          <Badge tone={resultTone[item.result]} className="mt-px min-w-16 justify-center">
+          <Badge tone={resultTone[item.result]} className="mt-px min-w-20 justify-center">
             {item.resultLabel}
           </Badge>
           <span className="min-w-0 flex-1 type-body-sm">
@@ -60,6 +60,32 @@ function CheckList({ items }: { items: ReportCheckItem[] }) {
         </li>
       ))}
     </ul>
+  );
+}
+
+/**
+ * A buyer reads what needs attention first: Attention and Fail rows are always open, and the rows that
+ * passed (or don't apply) fold into one line with their count, so the report isn't a wall of "Pass".
+ */
+function CheckList({ items, t }: { items: ReportCheckItem[]; t: Strings }) {
+  const flagged = items.filter((i) => i.result === "attention" || i.result === "fail");
+  const rest = items.filter((i) => i.result === "ok" || i.result === "na");
+  const passed = rest.filter((i) => i.result === "ok").length;
+  const na = rest.length - passed;
+  return (
+    <>
+      {flagged.length > 0 && <CheckRows items={flagged} />}
+      {rest.length > 0 && (
+        <details className={`group ${flagged.length > 0 ? "border-t border-border" : ""}`}>
+          <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2 rounded-sm transition-colors hover:bg-surface-sunken [&::-webkit-details-marker]:hidden">
+            {passed > 0 && <Badge tone="success">{`${passed} ${t.checklist.results.ok}`}</Badge>}
+            {na > 0 && <Badge>{`${na} ${t.checklist.results.na}`}</Badge>}
+            <ChevronDownIcon size={18} className="ml-auto text-text-muted transition-transform group-open:rotate-180" />
+          </summary>
+          <CheckRows items={rest} />
+        </details>
+      )}
+    </>
   );
 }
 
@@ -122,7 +148,7 @@ type ReportViewProps = {
 
 export function ReportView({ view, t, pdfHref, shareUrl, titleAs: Title = "h1" }: ReportViewProps) {
   const phone = formatPhone(view.dealer.phone);
-  const place = [view.dealer.address, view.dealer.city].filter(Boolean).join(", ");
+  const place = dealerPlace(view.dealer);
   const takenOn = view.photos?.find((p) => p.takenAt)?.takenAt?.split(",")[0] ?? null;
   const inspectedOn = view.publishedOn ?? takenOn;
   const shareTitle = t.publicReport.ogTitle(view.car.title || view.car.regNumber, view.scoreText);
@@ -289,8 +315,8 @@ export function ReportView({ view, t, pdfHref, shareUrl, titleAs: Title = "h1" }
           <div className="flex flex-col gap-4">
             {view.checklist.groups.map((g) => (
               <div key={g.key}>
-                <h3 className="caps type-overline text-text-muted">{g.label}</h3>
-                <CheckList items={g.items} />
+                <h3 className="type-title-sm">{g.label}</h3>
+                <CheckList items={g.items} t={t} />
               </div>
             ))}
           </div>
@@ -300,7 +326,7 @@ export function ReportView({ view, t, pdfHref, shareUrl, titleAs: Title = "h1" }
       {view.documents && (
         <Section title={t.publicReport.documents}>
           <Details rows={view.documents.rows} />
-          {view.documents.items.length > 0 && <CheckList items={view.documents.items} />}
+          {view.documents.items.length > 0 && <CheckList items={view.documents.items} t={t} />}
         </Section>
       )}
 

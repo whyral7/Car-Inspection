@@ -687,7 +687,8 @@ function FindingCard({ finding, onAccept, onEdit, onDelete }: { finding: Finding
             {t.findings.unaccept}
           </Button>
         ) : (
-          <Button size="sm" onClick={() => onAccept(true)} icon={<CheckIcon size={16} />} className="min-w-0 flex-1 !px-2">
+          // Secondary: the screen's one primary action is "Accept all" in the bottom bar.
+          <Button variant="secondary" size="sm" onClick={() => onAccept(true)} icon={<CheckIcon size={16} />} className="min-w-0 flex-1 !px-2">
             {t.findings.accept}
           </Button>
         )}
@@ -695,7 +696,7 @@ function FindingCard({ finding, onAccept, onEdit, onDelete }: { finding: Finding
           <PencilIcon size={16} />
           {t.findings.edit}
         </Button>
-        <Button variant="secondary" size="sm" onClick={onDelete} className={`${compact} !text-fail`} aria-label={`${t.findings.delete}: ${t.findings.types[finding.type]}`}>
+        <Button variant="danger" size="sm" onClick={onDelete} className={compact} aria-label={`${t.findings.delete}: ${t.findings.types[finding.type]}`}>
           <TrashIcon size={16} />
           {t.findings.delete}
         </Button>

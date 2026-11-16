@@ -7,7 +7,7 @@ import { scoreBars } from "@/lib/score";
 import { en as t } from "@/lib/strings";
 import { FONT_FILES, PDF_ART } from "./brand-assets";
 import { C, RESULT_COLORS, SEVERITY_COLORS, VERDICT_COLORS, type Verdict } from "./colors";
-import { redFlags, type DetailRow, type ReportCheckItem, type ReportView } from "./view";
+import { dealerPlace, redFlags, type DetailRow, type ReportCheckItem, type ReportView } from "./view";
 
 // The same layout as the public page, on A4 Paper: header, car and score, photos, damage notes, checklist,
 // documents, disclaimer, seal. Treadmark brand: Martel Sans for text, IBM Plex Mono for plates, readings and prices.
@@ -143,7 +143,7 @@ function CheckRow({ item }: { item: ReportCheckItem }) {
 export function ReportPdf({ view, reportUrl, logo, images }: Props) {
   const filled = scoreBars(view.score);
   const phone = formatPhone(view.dealer.phone);
-  const place = [view.dealer.address, view.dealer.city].filter(Boolean).join(", ");
+  const place = dealerPlace(view.dealer);
   const photos = view.photos?.filter((p) => images.has(p.key)) ?? null;
   const flags = redFlags(view);
 

@@ -48,10 +48,11 @@ export function CarList({ cars }: { cars: CarCard[] }) {
   );
   const filters: Filter[] = ["all", "draft", "inspected", "published"];
   const resume = useResume(cars);
+  // The inspection to pick up again leads the list, marked as such: one row per car, never a second card for it.
+  const ordered = resume ? [...shown].sort((a, b) => Number(b.id === resume.car.id) - Number(a.id === resume.car.id)) : shown;
 
   return (
     <div className="flex flex-1 flex-col gap-6">
-      {resume && <Resume resume={resume} />}
 
       {cars.length >= SEARCH_FROM && (
         <div className="flex flex-col gap-4">
@@ -92,17 +93,21 @@ export function CarList({ cars }: { cars: CarCard[] }) {
         <Card className="text-center text-text-muted">{t.dashboard.noMatches}</Card>
       ) : (
         <ul className="flex flex-col gap-4">
-          {shown.map((car) => (
+          {ordered.map((car) => {
+            const resuming = resume?.car.id === car.id ? resume : null;
+            return (
             <li key={car.id} className="overflow-hidden rounded-lg bg-surface shadow-card">
-              <Link href={`/app/cars/${car.id}`} className="flex items-center gap-4 p-4 transition-colors hover:bg-surface-sunken active:bg-surface-sunken">
+              <Link href={resuming ? resuming.href : `/app/cars/${car.id}`} className="flex items-center gap-4 p-4 transition-colors hover:bg-surface-sunken active:bg-surface-sunken">
                 <Thumb url={car.thumbUrl} />
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
+                  {resuming && <p className="caps type-overline text-text-subtle">{t.dashboard.resumeTitle}</p>}
                   <div className="flex flex-wrap items-center gap-2">
                     <Plate reg={car.reg} size="sm" />
                     {car.score && <ScoreChip score={car.score.value} scoreText={car.score.text} outOf={t.car.scoreOutOf} label={`${t.car.score} ${car.score.text}${t.car.scoreOutOf}`} />}
                   </div>
                   {car.title && <p className="line-clamp-2 type-title-sm break-words">{car.title}</p>}
                   <p className={car.attention ? "type-label text-text" : "type-body-sm text-text-muted"}>{car.progress}</p>
+                  {resuming && <ProgressBar value={resuming.next.stepsDone} max={4} size="sm" label={t.dashboard.stepsDone(resuming.next.stepsDone)} className="mt-1" />}
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <span className="hidden min-[420px]:inline-flex">
@@ -123,7 +128,8 @@ export function CarList({ cars }: { cars: CarCard[] }) {
                 </a>
               )}
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
 
@@ -160,35 +166,6 @@ function useResume(cars: CarCard[]) {
   const order: InspectionStep[] = ["photos", "findings", "checklist", "report"];
   const step = remembered && last && order.indexOf(last.step) >= order.indexOf(car.next.step) ? last.step : car.next.step;
   return { car, next: car.next, step, href: stepHref(car.id, step) };
-}
-
-/** "Pick up where you left off": a plain card that opens the inspection where it stopped. The button is in the bottom bar. */
-function Resume({ resume }: { resume: NonNullable<ReturnType<typeof useResume>> }) {
-  const t = useT();
-  const { car, next, href } = resume;
-  return (
-    <section aria-labelledby="resume-title" className="animate-rise-in overflow-hidden rounded-lg bg-surface shadow-card">
-      <Link href={href} className="flex flex-col gap-3 p-4 transition-colors hover:bg-surface-sunken sm:p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex min-w-0 flex-col gap-2">
-            <h2 id="resume-title" className="caps type-overline text-text-subtle">
-              {t.dashboard.resumeTitle}
-            </h2>
-            <Plate reg={car.reg} size="sm" className="self-start" />
-            {car.title && <p className="type-title-sm break-words">{car.title}</p>}
-          </div>
-          <Thumb url={car.thumbUrl} size="sm" />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <div className="flex justify-between gap-4 type-caption text-text-muted">
-            <span>{car.progress}</span>
-            <span className="tabular">{t.dashboard.stepsDone(next.stepsDone)}</span>
-          </div>
-          <ProgressBar value={next.stepsDone} max={4} size="sm" label={t.dashboard.stepsDone(next.stepsDone)} />
-        </div>
-      </Link>
-    </section>
-  );
 }
 
 function Thumb({ url, size = "md" }: { url: string | null; size?: "sm" | "md" }) {
