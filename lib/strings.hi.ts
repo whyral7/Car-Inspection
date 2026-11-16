@@ -647,7 +647,7 @@ export const hi: Strings = {
       poor: "ख़राब",
     },
     flagsTitle: (n: number) => (n === 1 ? "ख़रीदने से पहले 1 बात जाँचें" : `ख़रीदने से पहले ${n} बातें जाँचें`),
-    flagsSub: (red: number, amber: number) => (red + amber === 0 ? "कोई लाल या पीला संकेत नहीं" : [red ? `${red} लाल संकेत` : "कोई लाल संकेत नहीं", amber ? `${amber} पीले संकेत` : "कोई पीला संकेत नहीं"].join(", ")),
+    flagsSub: (red: number, amber: number) => (red + amber === 0 ? "कोई संकेत नहीं" : `${[red ? `${red} लाल` : "", amber ? `${amber} पीले` : ""].filter(Boolean).join(", ")} संकेत`),
     reportId: (id: string) => `रिपोर्ट ${id}`,
     verifyAt: "यह रिपोर्ट यहाँ जाँचें:",
     flagRated: (rating: string) => `चेकलिस्ट में रेटिंग: ${rating}। बेचने वाले से इसके बारे में पूछें।`,

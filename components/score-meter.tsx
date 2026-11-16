@@ -17,14 +17,17 @@ const BAR_HEIGHT = {
   sm: ["h-2", "h-2.5", "h-3", "h-3.5", "h-4"],
 } as const;
 
-export function ScoreBars({ score, size = "lg", className = "" }: { score: number; size?: "lg" | "sm"; className?: string }) {
+// Each bar starts a little after the one before it.
+const BAR_DELAY = ["", "[animation-delay:60ms]", "[animation-delay:120ms]", "[animation-delay:180ms]", "[animation-delay:240ms]"];
+
+export function ScoreBars({ score, size = "lg", animate = false, className = "" }: { score: number; size?: "lg" | "sm"; /** Fill once on arrival (the report). */ animate?: boolean; className?: string }) {
   const filled = scoreBars(score);
   return (
     <span aria-hidden="true" className={`flex shrink-0 items-end ${size === "lg" ? "gap-[var(--score-bar-gap)]" : "gap-0.5"} ${className}`}>
       {BAR_HEIGHT[size].map((height, i) => (
         <span
           key={height}
-          className={`${size === "lg" ? "w-[var(--score-bar-width)]" : "w-1"} rounded-2xs ${height} ${i + 1 === filled ? "bg-score-bar-tip" : i < filled ? "bg-score-bar-on" : "bg-score-bar"}`}
+          className={`${size === "lg" ? "w-[var(--score-bar-width)]" : "w-1"} rounded-2xs ${height} ${i + 1 === filled ? "bg-score-bar-tip" : i < filled ? "bg-score-bar-on" : "bg-score-bar"} ${animate ? `origin-bottom animate-bar-in ${BAR_DELAY[i]}` : ""}`}
         />
       ))}
     </span>
@@ -43,18 +46,20 @@ type MeterProps = {
   sub?: ReactNode;
   /** Spoken name: "Score 8.4 out of 10, very good". */
   label: string;
+  /** Fill the bars once on arrival. Used on the report; skipped with reduced motion. */
+  animate?: boolean;
   className?: string;
 };
 
 /** Number, bars, then grade and one line of context. */
-export function ScoreMeter({ score, scoreText, outOf, grade, sub, label, className = "" }: MeterProps) {
+export function ScoreMeter({ score, scoreText, outOf, grade, sub, label, animate, className = "" }: MeterProps) {
   return (
     <div role="img" aria-label={label} className={`flex items-end gap-[var(--score-gap)] ${className}`}>
       <span className="flex shrink-0 items-baseline tabular text-score-fg">
         <span className="tracking-[var(--score-tracking)] [font:var(--score-font)]">{scoreText}</span>
         <span className="text-score-sub [font:var(--score-unit-font)]">{outOf}</span>
       </span>
-      <ScoreBars score={score} />
+      <ScoreBars score={score} animate={animate} />
       <span className="flex min-w-0 flex-col pb-0.5">
         <span className="type-title-sm text-score-fg">{grade}</span>
         {sub && <span className="type-caption text-score-sub">{sub}</span>}

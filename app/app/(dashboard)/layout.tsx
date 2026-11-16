@@ -2,7 +2,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { BrandHeader } from "@/components/brand-header";
 import { ConnectionBanner } from "@/components/connection-banner";
-import { CreditsBadge } from "@/components/credits-badge";
 import { getT } from "@/lib/i18n.server";
 import { displayName, getCurrentProfile, isProfileComplete } from "@/lib/profile";
 import { logoUrl } from "@/lib/storage";
@@ -18,9 +17,6 @@ export default async function DashboardLayout({ children }: LayoutProps<"/app">)
   return (
     <div className="flex flex-1 flex-col">
       <BrandHeader href="/app" homeLabel={`${t.appName}: ${t.dashboard.myCars}`}>
-        <Link href="/app/credits" className="flex min-h-11 items-center rounded-sm">
-          <CreditsBadge credits={profile.credits} t={t} compact />
-        </Link>
         {/* Profile, language and log out live behind this; the name shows on the profile page. */}
         <Link href="/app/profile" aria-label={`${name}, ${t.profile.title}`} className="flex size-11 shrink-0 items-center justify-center rounded-md transition-colors hover:bg-surface-sunken">
           {logo ? (

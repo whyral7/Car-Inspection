@@ -123,15 +123,16 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
       )}
 
       {state.score && (
-        <Card>
+        <Card className="flex flex-col gap-3">
           <ScoreMeter
             score={state.score.value}
             scoreText={formatScore(state.score.value)}
             outOf={t.car.scoreOutOf}
             grade={t.publicReport.bands[state.score.band]}
-            sub={state.score.provisional ? t.car.scoreProvisional(state.checklist.done, state.checklist.total) : t.car.scoreHint}
+            sub={t.car.score}
             label={`${t.car.score} ${formatScore(state.score.value)}${t.car.scoreOutOf}, ${t.publicReport.bands[state.score.band]}`}
           />
+          <p className="type-caption text-text-muted">{state.score.provisional ? t.car.scoreProvisional(state.checklist.done, state.checklist.total) : t.car.scoreHint}</p>
         </Card>
       )}
 

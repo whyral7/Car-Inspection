@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { FlashToast } from "@/components/flash-toast";
 import { CarIcon, PlusIcon } from "@/components/icons";
 import { InstallPrompt } from "@/components/install-prompt";
-import { Card, EmptyState, LinkButton, PageHeader, StickyBar } from "@/components/ui";
+import Link from "next/link";
+import { CreditsBadge } from "@/components/credits-badge";
+import { Card, EmptyState, LinkButton, StickyBar } from "@/components/ui";
 import { PHOTO, STORAGE_BUCKETS } from "@/lib/config";
 import { carTitle, formatDateTime } from "@/lib/format";
 import { getT } from "@/lib/i18n.server";
@@ -96,7 +98,16 @@ export default async function AppHome() {
   return (
     <div className="flex flex-1 flex-col gap-6">
       <FlashToast param="deleted" message={t.car.deleted} />
-      <PageHeader title={t.dashboard.myCars} meta={cards.length > 0 ? t.dashboard.carCount(cards.length) : undefined} />
+      <header className="flex items-end justify-between gap-4">
+        <div className="flex min-w-0 flex-col gap-1">
+          <h1 className="type-heading-1">{t.dashboard.myCars}</h1>
+          {cards.length > 0 && <p className="type-body-sm text-text-muted">{t.dashboard.carCount(cards.length)}</p>}
+        </div>
+        {/* Credits are shown where they are spent or bought: here, on the report screen and in the profile. */}
+        <Link href="/app/credits" className="flex min-h-11 shrink-0 items-center rounded-sm">
+          <CreditsBadge credits={profile.credits} t={t} />
+        </Link>
+      </header>
 
       {noCredits && (
         <Card tone="brand" className="flex flex-col gap-4">

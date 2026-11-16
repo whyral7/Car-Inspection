@@ -100,6 +100,7 @@ export function ScoreBadge({ view, t, sub, className = "" }: { view: Pick<View, 
       grade={grade}
       sub={sub}
       label={`${t.publicReport.score} ${view.scoreText}${t.publicReport.outOf}, ${grade}`}
+      animate
       className={className}
     />
   );

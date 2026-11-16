@@ -19,6 +19,7 @@
   --animate-sheet-in: sheet-in var(--dur-base) var(--ease-standard);
   --animate-pop: pop var(--dur-fast) var(--ease-standard);
   --animate-spin: spin var(--dur-spin) linear infinite;
+  --animate-bar-in: bar-in var(--dur-slow) var(--ease-standard) both;
 
   @keyframes fade-in {
     from {
@@ -34,6 +35,11 @@
   @keyframes sheet-in {
     from {
       transform: translateY(100%);
+    }
+  }
+  @keyframes bar-in {
+    from {
+      transform: scaleY(0);
     }
   }
   @keyframes pop {

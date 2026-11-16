@@ -100,8 +100,8 @@ export default async function HomePage() {
 
       {/* Paper ground, ink type, one olive action. */}
       <section>
-        <div className="mx-auto grid w-full max-w-5xl items-center gap-12 px-4 pt-12 pb-12 md:grid-cols-2 md:pt-16 md:pb-16">
-          <div className="flex flex-col gap-6">
+        <div className="mx-auto grid w-full max-w-5xl items-center gap-8 px-4 pt-8 pb-12 md:grid-cols-2 md:gap-12 md:pt-16 md:pb-16">
+          <div className="flex flex-col gap-4 md:gap-6">
             <p className="caps type-overline text-text-muted">{h.eyebrow}</p>
             <h1 className="type-display-lg text-balance sm:type-display-xl">{h.headline}</h1>
             <p className="type-body-lg text-text-muted">{h.subhead(PHOTOS, CHECKS)}</p>

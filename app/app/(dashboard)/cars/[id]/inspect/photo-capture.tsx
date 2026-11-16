@@ -363,7 +363,8 @@ function WaitingNote({ count }: { count: number }) {
 
 /**
  * Brand PhotoSlot (brand/reference/components/PhotoSlot.md): a 4:3 tile labelled with its angle, in one
- * of four states. Empty: dashed edge, camera glyph and the angle drawing. Uploading: solid accent edge.
+ * of four states. Empty: dashed edge, camera glyph and the angle's name (the drawing is on the guide
+ * screen, where it is large enough to read). Uploading: solid accent edge.
  * Done: the photo under a scrim with a pass tick. Retake: a 2px fail edge with the reason.
  */
 function Tile({ angle, slot, onOpen }: { angle: Angle; slot: Slot | undefined; onOpen: () => void }) {
@@ -396,9 +397,7 @@ function Tile({ angle, slot, onOpen }: { angle: Angle; slot: Slot | undefined; o
           <img src={src} alt="" loading="lazy" decoding="async" onError={() => setThumbBroken(true)} className="absolute inset-0 size-full object-cover" />
           <span aria-hidden="true" className="absolute inset-0 bg-linear-to-b from-photo-scrim-top from-40% to-photo-scrim-bottom" />
         </>
-      ) : (
-        !retake && <AngleHint angle={angle} className="absolute inset-0 size-full p-3 pb-6 opacity-40" />
-      )}
+      ) : null}
       <span aria-hidden="true" className="absolute top-[var(--photo-padding)] left-[var(--photo-padding)]">
         {retake ? <AlertIcon size={20} /> : !src && !busy ? <CameraIcon size={20} /> : null}
       </span>
