@@ -13,7 +13,9 @@ import { BackLink, Card, ListCard, ListRow, LinkButton, StickyBar } from "@/comp
 import { isFuel, isTransmission } from "@/lib/cars";
 import { carTitle, formatDate, formatDateTime, isPastDate } from "@/lib/format";
 import { getT } from "@/lib/i18n.server";
+import { CHECKLIST_KEYS } from "@/lib/checklist";
 import { inspectionState, type InspectionStep } from "@/lib/inspection";
+import { ANGLE_KEYS, REQUIRED_ANGLE_COUNT } from "@/lib/photos/angles";
 import { getCurrentProfile } from "@/lib/profile";
 import { formatScore } from "@/lib/score";
 
@@ -198,7 +200,7 @@ export default async function CarPage({ params }: PageProps<"/app/cars/[id]">) {
           {nextLabel[state.next]}
           <ArrowRightIcon size={20} />
         </LinkButton>
-        <p className="text-center type-caption text-text-muted">{t.car.nextHint[state.next]}</p>
+        <p className="text-center type-caption text-text-muted">{t.car.nextHint(ANGLE_KEYS.length, REQUIRED_ANGLE_COUNT, CHECKLIST_KEYS.length)[state.next]}</p>
       </StickyBar>
     </div>
   );

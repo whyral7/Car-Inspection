@@ -9,7 +9,7 @@ import { PHOTO, STORAGE_BUCKETS } from "@/lib/config";
 import { carTitle, formatDateTime } from "@/lib/format";
 import { getT } from "@/lib/i18n.server";
 import { inspectionState, stepHref } from "@/lib/inspection";
-import { smallPhotoPath } from "@/lib/photos/angles";
+import { ANGLE_KEYS, smallPhotoPath } from "@/lib/photos/angles";
 import { getCurrentProfile } from "@/lib/profile";
 import { reportUrl } from "@/lib/report/share";
 import { formatScore } from "@/lib/score";
@@ -127,7 +127,7 @@ export default async function AppHome() {
         <>
           <EmptyState icon={<CarIcon size={24} />} title={t.dashboard.emptyTitle} body={t.dashboard.emptyBody}>
             <ol className="flex flex-col gap-2 text-left">
-              {t.dashboard.emptySteps.map((step, i) => (
+              {t.dashboard.emptySteps(ANGLE_KEYS.length).map((step, i) => (
                 <li key={step} className="flex items-center gap-3 rounded-md bg-surface-sunken px-3 py-2 type-body-sm">
                   <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-surface type-code-strong text-text">{i + 1}</span>
                   {step}

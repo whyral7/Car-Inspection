@@ -25,6 +25,9 @@ const copyRules = [
   [/\b(?:oops|sorry|trusted|honest report|revolutionary)\b/gi, "Banned copy (see brand/reference/voice-profile.md)"],
   [/वाहन|निरीक्षण/g, "Formal Hindi: write गाड़ी and जाँच"],
   [/(?<![\u0900-\u097F])कार(?:ें|ों)?(?![\u0900-\u097F])/g, "Hindi: write गाड़ी, not कार"],
+  [/कृपया|\bkindly\b/gi, "No 'please' padding: say what to do"],
+  [/\b(?:19|20|12)[ -](?:guided |real |quick |required )?(?:point|photos?|checks?)\b|\b(?:19|20|12) (?:असली |छोटी |ज़रूरी )?(?:फ़ोटो|जाँचें)/g, "Hard-coded count: pass it in from the config (photo angles, checklist items)"],
+  [/Needs attention|\bis a Problem\b|\\"खराबी\\"/g, "Old rating word: the ratings are Pass, Attention, Fail and N/A"],
 ];
 let n = 0;
 const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name);

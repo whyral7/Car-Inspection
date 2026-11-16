@@ -155,7 +155,7 @@ export default async function HomePage() {
       <section className="mx-auto w-full max-w-5xl px-4 py-12">
         <h2 className={sectionTitle}>{h.faqTitle}</h2>
         <div className="mt-6 flex flex-col gap-2">
-          {h.faq.map((item) => (
+          {h.faq(FREE_CREDITS, String(Math.floor(cheapest / 100))).map((item) => (
             <details key={item.q} className="group rounded-lg bg-surface shadow-card">
               <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded-lg px-4 py-3 type-title-sm transition-colors hover:bg-surface-sunken sm:px-6 [&::-webkit-details-marker]:hidden">
                 {item.q}
