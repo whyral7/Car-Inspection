@@ -2,11 +2,16 @@
    Maps the brand font stacks onto the next/font variables from brand/next/fonts.ts,
    and adds one class per type style so components never hand-set font sizes. */
 :root {
+  /* brand/next/fonts.ts loads each font in parts (Latin, Devanagari, accented Latin); joined here. */
+  --font-martel-sans: var(--font-martel-latin), var(--font-martel-devanagari), var(--font-martel-ext);
+  --font-plex-mono: var(--font-plex-latin), var(--font-plex-ext);
   --font-sans: var(--font-martel-sans), system-ui, sans-serif;
   --font-display: var(--font-martel-sans), system-ui, sans-serif;
   --font-hindi: var(--font-martel-sans), "Noto Sans Devanagari", sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, Menlo, monospace;
 }
+/* The language switch: its one Hindi word comes from a 2 KB file, so English pages skip the full Devanagari font. */
+.tm-lang-switch { font-family: var(--font-martel-toggle), var(--font-sans); }
 html { background: var(--bg); color: var(--text); font: var(--type-body); -webkit-font-smoothing: antialiased; }
 :lang(hi) { line-height: 1.6; }                       /* Devanagari needs room for matras */
 /* The type styles set their own line height, so Hindi pages loosen them: headings to 1.35, text to 1.6.

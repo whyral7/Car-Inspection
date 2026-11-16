@@ -32,7 +32,7 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
       }
       className={`inline-flex min-h-11 shrink-0 items-center rounded-md border border-button-secondary-border bg-button-secondary-bg px-3 type-label text-button-ghost-fg transition-colors hover:bg-button-secondary-bg-hover disabled:opacity-[var(--button-disabled-opacity)] ${className}`}
     >
-      {t.common.switchTo}
+      <span className="tm-lang-switch">{t.common.switchTo}</span>
     </button>
   );
 }

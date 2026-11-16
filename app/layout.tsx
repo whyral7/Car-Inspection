@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { martelSans, plexMono } from "@/brand/next/fonts";
+import { fontVariables } from "@/brand/next/fonts";
 import { ServiceWorkerRegister } from "@/components/sw-register";
 import { APP_NAME, THEME_COLOR } from "@/lib/config";
 import { publicEnv } from "@/lib/env";
@@ -38,7 +38,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     // Each section sets its own language (components/locale-root.tsx). Light only until every screen is checked in dark.
-    <html lang="en" data-theme="light" className={`h-full ${martelSans.variable} ${plexMono.variable}`}>
+    <html lang="en" data-theme="light" className={`h-full ${fontVariables}`}>
       <body className="flex min-h-full flex-col">
         {children}
         <ServiceWorkerRegister />

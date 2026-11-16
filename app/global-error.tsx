@@ -1,6 +1,6 @@
 "use client";
 
-import { martelSans, plexMono } from "@/brand/next/fonts";
+import { fontVariables } from "@/brand/next/fonts";
 import { buttonClass } from "@/components/ui/button";
 import "./globals.css";
 
@@ -8,7 +8,7 @@ import "./globals.css";
 // stylesheet and fonts itself. English only: the reader's language can't be read here.
 export default function GlobalError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
-    <html lang="en" data-theme="light" className={`h-full ${martelSans.variable} ${plexMono.variable}`}>
+    <html lang="en" data-theme="light" className={`h-full ${fontVariables}`}>
       <body className="flex min-h-full flex-col items-center justify-center gap-4 bg-bg p-6 text-center text-text">
         <h1 className="type-heading-1">This page didn&apos;t load</h1>
         <p className="type-body text-text-muted">Check your internet and try again in a minute.</p>

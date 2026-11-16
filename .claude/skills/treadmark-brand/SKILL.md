@@ -9,7 +9,7 @@ Treadmark should look like the stamp at the end of a proper inspection: measured
 
 ## Where things are
 - Tokens: `brand/tokens/treadmark-tokens.css` (all CSS variables, light + dark), mapped onto Tailwind v4 utilities by `treadmark-tailwind-v4.css`, imported in `app/globals.css`. Type classes (`type-label`, `type-heading-1` ...) and font mapping: `treadmark-base.css`. W3C token JSON for design tools: `design-tokens.json`.
-- Fonts: `brand/next/fonts.ts` (next/font/local from `brand/fonts/web`: Martel Sans incl. Devanagari, IBM Plex Mono). The PDF and link previews read the TTFs in `assets/fonts` via `lib/report/brand-assets.ts`.
+- Fonts: `brand/next/fonts.ts` (next/font/local from `brand/fonts/web/subsets`, split by script with `brand/scripts/subset-fonts.py`: Martel Sans incl. Devanagari, IBM Plex Mono). The PDF and link previews read the TTFs in `assets/fonts` via `lib/report/brand-assets.ts`.
 - Score: `lib/score.ts` (`conditionScore`, `scoreBand` = brand grade, `scoreBars`). Labels in `lib/strings.ts` (`publicReport.bands`).
 - Icons: `components/icons.tsx` (square-ended, 2px). Never use emoji in the UI.
 - PDF and link previews: `lib/report/pdf.tsx`, `lib/report/og-image.tsx`, `app/(site)/opengraph-image.tsx`; their hex values live only in `lib/report/colors.ts` (the tokens resolved for light).
