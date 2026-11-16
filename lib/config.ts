@@ -1,6 +1,11 @@
 export const APP_NAME = "Treadmark";
-export const THEME_COLOR = "#0f5e58";
-export const BACKGROUND_COLOR = "#ffffff";
+/** Browser and PWA chrome: Paper, so the status bar matches the page (the olive lives in the app icon). Brand style guide, section 3. */
+export const THEME_COLOR = "#F6F4EF";
+/** The same bar when the phone is in dark mode: the night ground. */
+export const THEME_COLOR_DARK = "#17141F";
+export const BACKGROUND_COLOR = "#F6F4EF";
+/** Olive Khaki, for third-party surfaces that take one accent colour (Razorpay Checkout). */
+export const ACCENT_COLOR = "#556B1F";
 
 export const FREE_CREDITS = 3;
 

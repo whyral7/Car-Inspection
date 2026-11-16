@@ -2,25 +2,38 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0f5e58">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F6F4EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17141F" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
 <title>Offline · Treadmark</title>
+<!-- Shown by the service worker when a page can't load. A static file, so the brand colours are written
+     out here (Paper, Ink, Olive Khaki; the night ground in dark mode) and the text uses the phone's font. -->
 <style>
-  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #f4f6f8; color: #0b1220; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Devanagari", sans-serif; }
-  main { max-width: 360px; padding: 24px 16px; text-align: center; }
-  .mark { width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 16px; background: #0f5e58; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; }
-  h1 { font-size: 20px; margin: 0 0 8px; }
-  p { margin: 0 0 8px; color: #334155; line-height: 1.5; }
-  button { margin-top: 16px; width: 100%; min-height: 48px; border: 0; border-radius: 12px; background: #0f5e58; color: #fff; font-size: 16px; font-weight: 600; }
+  :root { --bg: #F6F4EF; --text: #1D1B24; --muted: #4A4753; --button: #556B1F; --on-button: #FFFFFF; --ring: #556B1F; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #17141F; --text: #F6F4EF; --muted: #C2BDCB; --button: #C8D67B; --on-button: #17141F; --ring: #D6E29A; }
+    .on-light { display: none; }
+  }
+  @media (prefers-color-scheme: light) { .on-dark { display: none; } }
+  body { margin: 0; min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Devanagari", sans-serif; }
+  main { width: 100%; max-width: 360px; box-sizing: border-box; padding: 24px 16px; }
+  img { display: block; height: 26px; width: auto; margin-bottom: 32px; }
+  h1 { font-size: 24px; line-height: 1.25; font-weight: 700; margin: 0 0 8px; }
+  p { margin: 0 0 16px; font-size: 16px; line-height: 1.5; color: var(--muted); }
+  p[lang="hi"] { line-height: 1.6; }
+  button { margin-top: 8px; width: 100%; min-height: 52px; border: 0; border-radius: 10px; background: var(--button); color: var(--on-button); font: inherit; font-size: 17px; font-weight: 600; }
+  button:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 </style>
 </head>
 <body>
 <main>
-  <div class="mark" aria-hidden="true">T</div>
+  <img class="on-light" src="/brand/web/treadmark-lockup-small-color.svg" alt="Treadmark" width="127" height="26">
+  <img class="on-dark" src="/brand/web/treadmark-lockup-small-reverse.svg" alt="Treadmark" width="127" height="26">
   <h1>You're offline</h1>
-  <p>Check your internet and try again. Photos and checklist answers you already took are safe on this phone.</p>
-  <p lang="hi">आप ऑफ़लाइन हैं। इंटरनेट चालू करके फिर से कोशिश करें। जो फ़ोटो और चेकलिस्ट जवाब आपने ले लिए हैं, वे इस फ़ोन पर सुरक्षित हैं।</p>
-  <button type="button" onclick="location.reload()">Try again · फिर से कोशिश करें</button>
+  <p>Photos and checklist answers you have already taken are saved on this phone. Reconnect, then try again.</p>
+  <p lang="hi">आप ऑफ़लाइन हैं। जो फ़ोटो और चेकलिस्ट के जवाब आप ले चुके हैं, वे इस फ़ोन पर सुरक्षित हैं। इंटरनेट चालू करके दोबारा कोशिश करें।</p>
+  <button type="button" onclick="location.reload()">Try again · दोबारा कोशिश करें</button>
 </main>
 </body>
 </html>

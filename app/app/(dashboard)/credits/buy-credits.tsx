@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ChatIcon, CheckIcon, ClockIcon, ShieldCheckIcon, Spinner } from "@/components/icons";
 import { Badge, Button, Card, FormError, LinkButton, StickyBar } from "@/components/ui";
-import { THEME_COLOR } from "@/lib/config";
+import { ACCENT_COLOR } from "@/lib/config";
 import { formatRupees } from "@/lib/format";
 import { loadCheckout } from "@/lib/razorpay/checkout";
 import { useT } from "@/components/i18n-provider";
@@ -91,7 +91,7 @@ export function BuyCredits({ packs, next, supportHref }: { packs: Pack[]; next: 
       description: order.description,
       image: `${window.location.origin}/icons/icon-192.png`,
       prefill: order.prefill,
-      theme: { color: THEME_COLOR },
+      theme: { color: ACCENT_COLOR },
       retry: { enabled: true },
       // Checkout's own success callback. It proves nothing on its own: we wait for the webhook to credit.
       handler: () => void waitForCredits(order.orderId),

@@ -50,11 +50,22 @@
   }
 }
 
-:root {
-  /* Light only for now: <html data-theme="light"> in app/layout.tsx. Remove that attribute to let dark mode
-     follow the phone once every screen has been checked in dark. */
-  color-scheme: light;
+/* The logo shows its colour artwork on light grounds and the reverse artwork on dark ones (components/logo.tsx). */
+.tm-logo-light { display: var(--logo-light, block); }
+.tm-logo-dark { display: var(--logo-dark, none); }
+[data-theme="light"] { --logo-light: block; --logo-dark: none; }
+[data-theme="dark"] { --logo-light: none; --logo-dark: block; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --logo-light: none; --logo-dark: block; }
 }
+
+:root {
+  /* The app follows the phone's light or dark setting (the brand tokens switch on prefers-color-scheme).
+     This line makes the browser's own parts follow too: date pickers, select lists, scrollbars. */
+  color-scheme: light dark;
+}
+[data-theme="light"] { color-scheme: light; }
+[data-theme="dark"] { color-scheme: dark; }
 
 html {
   -webkit-tap-highlight-color: transparent;

@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { fontVariables } from "@/brand/next/fonts";
 import { ServiceWorkerRegister } from "@/components/sw-register";
-import { APP_NAME, THEME_COLOR } from "@/lib/config";
+import { APP_NAME, THEME_COLOR, THEME_COLOR_DARK } from "@/lib/config";
 import { publicEnv } from "@/lib/env";
 import { en as t } from "@/lib/strings";
 import "./globals.css";
@@ -32,13 +32,16 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: THEME_COLOR,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: THEME_COLOR },
+    { media: "(prefers-color-scheme: dark)", color: THEME_COLOR_DARK },
+  ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    // Each section sets its own language (components/locale-root.tsx). Light only until every screen is checked in dark.
-    <html lang="en" data-theme="light" className={`h-full ${fontVariables}`}>
+    // Each section sets its own language (components/locale-root.tsx). Light or dark follows the phone.
+    <html lang="en" className={`h-full ${fontVariables}`}>
       <body className="flex min-h-full flex-col">
         {children}
         <ServiceWorkerRegister />
