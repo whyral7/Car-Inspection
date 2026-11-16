@@ -191,11 +191,12 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
             </span>
           </a>
           {/* Two everyday actions; WhatsApp is the primary one, in the bottom bar. */}
-          <div className="grid grid-cols-2 gap-2">
-            <Button variant="secondary" size="sm" onClick={onCopy} icon={<CopyIcon size={18} />} className="!px-2 type-label">
+          {/* Each button is as wide as its label needs, then they share what is left: both stay on one line at 360px. */}
+          <div className="flex gap-2">
+            <Button variant="secondary" size="sm" onClick={onCopy} icon={<CopyIcon size={18} />} className="flex-auto !px-2 type-label">
               {t.report.copyLink}
             </Button>
-            <a href={reportPdfPath(published.slug)} className={buttonClass("secondary", "!px-2 type-label", false, "sm")}>
+            <a href={reportPdfPath(published.slug)} className={buttonClass("secondary", "flex-auto !px-2 type-label", false, "sm")}>
               <DownloadIcon size={18} />
               {t.report.downloadPdf}
             </a>
