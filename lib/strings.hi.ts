@@ -622,7 +622,7 @@ export const hi: Strings = {
     shareWhatsApp: "WhatsApp पर भेजें",
     shareOther: "दूसरे ऐप",
     previewCard: "खरीदार को WhatsApp में यह कार्ड दिखता है।",
-    downloadPdf: "PDF डाउनलोड करें",
+    downloadPdf: "PDF डाउनलोड",
     pdfHint: "पहली बार PDF बनने में कुछ सेकंड लग सकते हैं।",
     shareMessage: (title: string, reg: string, score: string, url: string) => `${title} (${reg}) की जाँच रिपोर्ट। कंडीशन ${score}/10। फ़ोटो और पूरी जानकारी: ${url}`,
     errors: {
@@ -687,7 +687,7 @@ export const hi: Strings = {
       buyer: { call: "कॉल करें", whatsapp: "WhatsApp करें" },
     },
     contactMessage: (title: string, reg: string, selling: boolean) => `नमस्ते, मैंने ${title} (${reg}) की जाँच रिपोर्ट देखी।${selling ? " क्या यह अभी बिकाऊ है?" : ""}`,
-    downloadPdf: "PDF डाउनलोड करें",
+    downloadPdf: "PDF डाउनलोड",
     inspectedBy: "जाँच और रिपोर्ट",
     publishedOn: (date: string) => `रिपोर्ट की तारीख: ${date}`,
     madeWith: "Treadmark से बनी",

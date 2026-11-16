@@ -284,8 +284,8 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
       </Card>
 
       {/* The buyer's view, set off by a dashed rule rather than another box around the report's own cards. */}
-      <section aria-label={t.report.previewLabel} className="flex flex-col gap-4 border-t-2 border-dashed border-border-control/40 pt-4">
-        <p className="text-center type-overline tracking-wide text-text-muted uppercase">{t.report.previewLabel}</p>
+      <section aria-label={t.report.previewLabel} className="flex flex-col gap-4 border-t border-dashed border-border-control pt-4">
+        <p className="caps text-center type-overline text-text-muted">{t.report.previewLabel}</p>
         <div>
           <ReportView view={preview} t={t} pdfHref={null} titleAs="h2" />
           <div className="mt-4">
