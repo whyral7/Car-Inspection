@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useOnline } from "@/components/connection-banner";
 import { useT } from "@/components/i18n-provider";
-import { ArrowRightIcon, CheckIcon, ChevronDownIcon, CloudUploadIcon, HelpIcon, PlusIcon } from "@/components/icons";
+import { ArrowRightIcon, CheckIcon, ChevronDownIcon, CloudUploadIcon, HelpIcon, PencilIcon, PlusIcon } from "@/components/icons";
 import { RememberStep } from "@/components/remember-step";
 import { Badge, Button, Card, ConfirmSheet, FormError, ProgressBar, Segmented, StepHeader, StickyBar, TextAreaField, TextButton, useToast, type BadgeTone, type SegmentOption } from "@/components/ui";
 import { CHECKLIST_GROUPS, CHECKLIST_KEYS, checklistProgress, isMustAnswer, type ChecklistKey } from "@/lib/checklist";
@@ -414,13 +414,26 @@ function ChecklistRow({
   const { label, hint, how } = t.checklist.items[itemKey];
   const helpId = `how-${itemKey}`;
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex min-w-0 flex-col gap-1">
-          <p className="type-title-sm">{label}</p>
-          <p className="type-body-sm text-text-muted">{hint}</p>
+    <div className="flex flex-col gap-[var(--check-gap)]">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <p className="[font:var(--check-name-font)]">{label}</p>
+          <p className="type-caption text-check-hint">{hint}</p>
         </div>
-        <SaveState state={item.save} onRetry={onRetry} />
+        <div className="-mt-2.5 -mr-2 flex shrink-0 items-center gap-1">
+          <SaveState state={item.save} onRetry={onRetry} />
+          {/* "How to check" is one tap away on every item without taking a row of its own. */}
+          <button
+            type="button"
+            onClick={onToggleHelp}
+            aria-expanded={item.helpOpen}
+            aria-controls={helpId}
+            aria-label={`${t.checklist.howToCheck}: ${label}`}
+            className={`flex size-11 items-center justify-center rounded-md transition-colors hover:bg-surface-sunken ${item.helpOpen ? "bg-accent-tint text-text" : "text-text-muted"}`}
+          >
+            <HelpIcon size={20} />
+          </button>
+        </div>
       </div>
       {item.helpOpen && (
         <p id={helpId} className="animate-rise-in rounded-md bg-accent-tint p-4 type-body-sm text-text">
@@ -428,18 +441,13 @@ function ChecklistRow({
         </p>
       )}
       <Segmented label={label} options={resultOptions(t)} value={item.result} onChange={onChoose} />
-      <div className="-my-2 flex flex-wrap gap-x-6">
-        {!item.noteOpen && (
-          <TextButton onClick={onOpenNote}>
-            <PlusIcon size={16} />
-            {t.checklist.addNote}
-          </TextButton>
-        )}
-        <TextButton onClick={onToggleHelp} aria-expanded={item.helpOpen} aria-controls={helpId}>
-          <HelpIcon size={16} />
-          {t.checklist.howToCheck}
+      {/* A note is offered once there is a rating to explain; Attention and Fail open it straight away. */}
+      {item.result && !item.noteOpen && (
+        <TextButton onClick={onOpenNote} className="-my-2 self-start">
+          <PlusIcon size={16} />
+          {t.checklist.addNote}
         </TextButton>
-      </div>
+      )}
       {item.noteOpen && (
         <TextAreaField
           label={t.checklist.noteLabel}
@@ -450,6 +458,13 @@ function ChecklistRow({
           placeholder={t.checklist.notePlaceholder}
           maxLength={FINDING_LIMITS.noteChars}
         />
+      )}
+      {(item.result === "attention" || item.result === "fail") && !item.note.trim() && (
+        // The brand's evidence line: a rating below Pass should say what was found.
+        <p className="-mt-1 flex items-center gap-2 type-caption-strong text-check-evidence">
+          <PencilIcon size={16} />
+          {t.checklist.evidence}
+        </p>
       )}
     </div>
   );

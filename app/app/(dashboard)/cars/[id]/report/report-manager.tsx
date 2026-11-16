@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useT } from "@/components/i18n-provider";
-import { AlertIcon, ArrowRightIcon, ChatIcon, CheckIcon, CopyIcon, DownloadIcon, ExternalIcon, RefreshIcon, SearchIcon, Spinner } from "@/components/icons";
+import { AlertIcon, ArrowRightIcon, ChatIcon, CheckIcon, ChevronDownIcon, CopyIcon, DownloadIcon, ExternalIcon, RefreshIcon, SearchIcon, Spinner } from "@/components/icons";
 import { RememberStep } from "@/components/remember-step";
 import {
   Button,
@@ -178,26 +178,29 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
               {view.publishedOn && <p className="type-body-sm text-text-muted">{t.report.publishedOn(view.publishedOn)}</p>}
             </div>
           </div>
-          {/* What the buyer sees in WhatsApp before tapping the link. */}
-          <figure className="overflow-hidden rounded-md border border-border bg-bg">
+          {/* What the buyer sees in WhatsApp before tapping the link; tapping it opens the report. */}
+          <a href={reportPath(published.slug)} target="_blank" rel="noopener" className="block overflow-hidden rounded-md border border-border bg-bg transition-colors hover:border-border-control">
             {/* eslint-disable-next-line @next/next/no-img-element -- generated link preview image */}
             <img src={`${reportPath(published.slug)}/og.png`} alt="" width={1200} height={630} loading="lazy" className="aspect-[1200/630] w-full bg-surface object-cover" />
-            <figcaption className="px-4 py-2 type-caption text-text-muted">{t.report.previewCard}</figcaption>
-          </figure>
+            <span className="flex min-h-11 items-center justify-between gap-2 px-4 type-caption text-text-muted">
+              {t.report.previewCard}
+              <span className="inline-flex shrink-0 items-center gap-1 type-label text-button-ghost-fg">
+                {t.report.openReport}
+                <ExternalIcon size={16} />
+              </span>
+            </span>
+          </a>
+          {/* Two everyday actions; WhatsApp is the primary one, in the bottom bar. */}
           <div className="grid grid-cols-2 gap-2">
-            <ShareButton url={published.url} title={shareText} text={shareText} label={t.report.shareOther} className={buttonClass("secondary", "!px-2", false, "sm")} />
             <Button variant="secondary" size="sm" onClick={onCopy} icon={<CopyIcon size={18} />} className="!px-2">
               {t.report.copyLink}
             </Button>
-            <a href={reportPath(published.slug)} target="_blank" rel="noopener" className={buttonClass("secondary", "!px-2", false, "sm")}>
-              <ExternalIcon size={18} />
-              {t.report.openReport}
-            </a>
             <a href={reportPdfPath(published.slug)} className={buttonClass("secondary", "!px-2", false, "sm")}>
               <DownloadIcon size={18} />
               {t.report.downloadPdf}
             </a>
           </div>
+          <ShareButton url={published.url} title={shareText} text={shareText} label={t.report.shareOther} className={buttonClass("ghost", "self-center", false, "sm")} />
           <label className="flex flex-col gap-[var(--field-gap)] type-label">
             {t.report.link}
             <input
@@ -283,16 +286,22 @@ export function ReportManager({ carId, ready, unreviewed, credits, view, initial
         <FormError message={priceError} />
       </Card>
 
-      {/* The buyer's view, set off by a dashed rule rather than another box around the report's own cards. */}
-      <section aria-label={t.report.previewLabel} className="flex flex-col gap-4 border-t border-dashed border-border-control pt-4">
-        <p className="caps text-center type-overline text-text-muted">{t.report.previewLabel}</p>
-        <div>
+      {/*
+        The buyer's view. Before publishing it is the thing to check, so it is open; once the report is
+        published it folds away (the link above opens the real one), which keeps this screen short.
+      */}
+      <details {...(published ? {} : { open: true })} className="group border-t border-dashed border-border-control pt-2">
+        <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-4 rounded-sm type-title-sm transition-colors hover:bg-surface-sunken [&::-webkit-details-marker]:hidden">
+          {t.report.previewLabel}
+          <ChevronDownIcon size={20} className="text-text-muted transition-transform group-open:rotate-180" />
+        </summary>
+        <div className="pt-2">
           <ReportView view={preview} t={t} pdfHref={null} titleAs="h2" />
           <div className="mt-4">
             <ContactButtons view={preview} t={t} preview />
           </div>
         </div>
-      </section>
+      </details>
 
       <ConfirmSheet
         open={confirmPublish}
