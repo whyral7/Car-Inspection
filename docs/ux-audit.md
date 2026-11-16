@@ -719,3 +719,103 @@ The photo AI was mocked so no paid calls were made. Afterwards the axe, sideways
 **Not bugs:**
 - The header's credit count updates about 4 seconds after "Report published" in dev mode. That's one extra round trip to the remote database, and it's near-instant in production.
 - An in-app "not found" page returns HTTP 200 because the page streams. People see the right screen, and these pages aren't indexed.
+
+## 8. Brand-book audit and port (round 5)
+
+Two lines of work had split: master carried the Treadmark rebrand (PR #3) and `design-system` carried the UX work from sections 5 to 7. This round joined them on `brand-ux-port` and audited the result against the **Treadmark Brand Book** (Style Guide 1.1, Design System 13). Master's brand is the look; the behaviour comes from `design-system`.
+
+### How it was audited
+
+- **Captured:** 22 screens and states in English and Hindi at 360px, in English at 1280px, in dark mode and at 200% text, plus the PDF and the WhatsApp preview. Demo accounts were temporary and the photo AI was mocked.
+- **Automated, same script on master and on the port:** axe (WCAG 2.2 AA), sideways scroll, 44px tap targets, and the brand's own rules: one olive focal point in view, at most one sandstone highlight, no pill shapes, type sizes, fonts, uppercase or letter-spaced Hindi, one `h1`, 16px inputs, and the share of olive on screen.
+- **By hand:** every screen against the book's exhibits and component specs, and every string in `lib/strings.ts` and `lib/strings.hi.ts` against the voice tables.
+- **Behaviour:** a browser smoke run after the port (language toggle, resume, checklist rating saves, duplicate-car guard, report toggles and copy link, sheets and Esc, buyer's photo viewer, form-error focus): all pass, no console errors.
+
+### Measured, before and after
+
+Phone screens, English and Hindi (44 page loads each side):
+
+| Check | master | `brand-ux-port` |
+|---|---|---|
+| Tap targets under 44px | 36 | 0 |
+| Accessibility errors (axe) | 4 (progress bars with no name) | 0 |
+| More than one olive action in view | 4 (damage notes, credits) | 0 |
+| Uppercase or letter-spaced Hindi | 8 | 0 |
+| Pill shapes | 2 | 0 |
+| Screens without exactly one `h1` | 2 | 0 |
+| Unbranded "not found" screen | yes (system font) | no |
+| **Total findings** | **60** | **0** |
+
+The port is also clean at 1280px, in dark mode (contrast included) and at 200% text. Olive covers 4% to 6% of the first screenful on every app screen; the book's limit is 8%.
+
+**Speed** (production build, slow 4G, 4× slower CPU):
+
+| Page | First paint | Largest paint | Layout shift | Download |
+|---|---|---|---|---|
+| Landing | 1.0 s | 1.0 s | 0.007 | 560 KB |
+| Login | 0.9 s | 1.1 s | 0.003 | 645 KB |
+| Sample report | 0.9 s | 1.6 s | 0.002 | 564 KB |
+| Public report | 4.3 s | 5.5 s | 0.002 | 699 KB |
+
+Fonts are 308 KB of every first visit, the largest single cost (see proposals). The public report's slow first paint here is the database round trip from this test machine, not the page; it needs measuring again on the live host.
+
+### Scorecard
+
+Scored 1 to 5 by hand against the book; the bar is 4 on every dimension. "m → p" is master → port.
+
+| Screen | Brand | Layout | Copy (EN) | Hindi | Interaction | Access. | Honesty |
+|---|---|---|---|---|---|---|---|
+| Landing | 3 → 5 | 3 → 4 | 3 → 5 | 3 → 4 | 3 → 4 | 3 → 5 | 4 → 5 |
+| Login, onboarding | 4 → 5 | 4 → 4 | 4 → 5 | 4 → 4 | 3 → 5 | 4 → 5 | n/a |
+| My cars | 3 → 5 | 3 → 4 | 4 → 4 | 3 → 4 | 2 → 5 | 3 → 5 | n/a |
+| Add a car | 4 → 5 | 4 → 4 | 3 → 5 | 4 → 4 | 3 → 5 | 4 → 5 | n/a |
+| Car overview | 4 → 5 | 3 → 4 | 4 → 4 | 4 → 4 | 3 → 5 | 4 → 5 | 3 → 5 |
+| Photos | 4 → 5 | 4 → 4 | 4 → 5 | 3 → 4 | 3 → 5 | 3 → 5 | n/a |
+| Damage notes | 3 → 5 | 3 → 4 | 4 → 4 | 3 → 4 | 3 → 5 | 4 → 5 | 4 → 5 |
+| Checklist | 4 → 5 | 2 → 4 | 3 → 5 | 3 → 4 | 2 → 5 | 3 → 5 | 3 → 5 |
+| Report (owner) | 4 → 5 | 3 → 4 | 3 → 5 | 3 → 4 | 3 → 5 | 4 → 5 | 4 → 5 |
+| Public report | 4 → 5 | 3 → 5 | 4 → 5 | 3 → 4 | 3 → 4 | 4 → 5 | 3 → 5 |
+| PDF | 4 → 5 | 4 → 4 | 4 → 5 | n/a (English) | n/a | n/a | 3 → 5 |
+| Credits, profile | 3 → 5 | 4 → 4 | 4 → 5 | 4 → 4 | 3 → 4 | 3 → 5 | n/a |
+
+Every screen is at 4 or more. Hindi stays at 4, not 5, because it was checked by rule and by eye here but not yet read by a native reviewer.
+
+### What changed, by finding
+
+**Critical and high**
+- ✅ **Two codebases.** Merged; 271 unit tests pass; `npm run brand:check`, lint, typecheck and the build pass.
+- ✅ **Logo retyped and boxed, and squeezed in the app header.** Every screen now has one `BrandHeader`: the small lockup (never shrunk below its minimum) with the हिंदी toggle beside it. Credits are a compact mono chip; the account opens from the avatar.
+- ✅ **Olive used for more than the one action.** Filled cards (resume, credits), avatars, numbered steps and icon chips are ink on white or a sunken ground. My cars has one primary button in the bottom bar: "Continue" when an inspection is open, otherwise "Add car".
+- ✅ **Rating colours used for things that aren't ratings.** Progress, prompts, "saved" and "accepted" are ink. Pass, Attention and Fail are kept for ratings, always with their word and glyph.
+- ✅ **Report order.** Photos, then red and amber flags (each with the photo it was seen in), then the header card with the ScoreMeter and at most three rating badges, and only then price and details.
+- ✅ **Registration shown in full to anyone with the link.** Public page, PDF and link preview show `MH12AB••34`; the owner sees it in full.
+- ✅ **Ratings named four different ways.** Pass / Attention / Fail / N/A everywhere (ठीक / ध्यान दें / ख़राब / N/A).
+- ✅ **Tap targets and accessibility.** 36 small targets and 4 axe errors on master; none now.
+
+**Medium**
+- ✅ **Pills, soft rings, loose font weights.** Badges are `radius-sm`, controls `radius-md`, cards have a shadow or a hairline; text uses the `type-*` styles only.
+- ✅ **Photo tiles** follow the PhotoSlot spec (empty, uploading, done, needs retake). The capture instruction is `body-lg` in full ink for reading at the car.
+- ✅ **Copy.** Errors say the fix without "please" or "something went wrong"; no hook questions; the publish button names its cost ("Publish report · 1 credit"); counts of photos, checklist points and free reports come from config.
+- ✅ **Landing.** Speaks to dealers and people selling their own car; paper ground, no gradient; one sandstone highlight; the floating WhatsApp pill that covered content is gone.
+- ✅ **Hindi.** गाड़ी, not कार; overlines drop capitals and tracking; the toggle is one button naming the language you switch to.
+- ✅ **Times** are 24-hour ("29 Oct 2026, 14:14").
+- ✅ **PDF.** Flags are red or amber by rating and state a fact; report ID and time top right in mono; a "Verify this report at" line beside the seal.
+- ✅ **The brand check enforces more.** It now also fails on pill shapes, exclamation marks, banned words and formal Hindi in the strings files, so these can't creep back.
+
+### Left open: needs the owner
+
+| Item | Why it's open |
+|---|---|
+| Report ID in the book's `TM-2611-04821` format | Needs a sequence column in the database. The link code is shown in mono until then |
+| QR code on the PDF and sticker | Needs a small new dependency |
+| The "Inspected" seal on self-run reports | The voice rules ban "certified" without a seal. Today the seal goes on every published report |
+| A note required under Attention and Fail | The checklist spec blocks submission without evidence. That changes behaviour, so it wasn't done |
+| Native Hindi read-through | Rules and layout are checked; idiom needs a Hindi-first reader |
+| Dark mode stays pinned to light | Every screen passes contrast in dark, but photos, the PDF preview and the logo's reverse colourway need a look on a real phone before unpinning |
+
+### Proposals for the style guide (the book's own change process)
+
+- **Tier 1, clarification:** the rating control is specified as Good / Fair / Poor / N/A, but the rating colours and report exhibits say Pass / Attention / Fail. The app uses the second set.
+- **Tier 2, new patterns built from semantic tokens:** Toast (inverse ground), BottomSheet and ConfirmSheet, Skeleton, EmptyState, the checkbox-style Switch, StepHeader, a compact ScoreMeter for list rows, an info banner on `accent-tint`, and a 50% scrim behind sheets.
+- **Tier 2, fonts:** split Martel Sans into Latin and Devanagari files and preload only Regular and SemiBold. English readers would download about 150 KB less on first visit.
+- **Tier 2, header:** the book shows the lockup and the हिंदी toggle only; the app also needs credits and the account. A written rule for those two would settle it.
