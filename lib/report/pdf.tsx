@@ -146,6 +146,7 @@ export function ReportPdf({ view, reportUrl, logo, images }: Props) {
   const place = dealerPlace(view.dealer);
   const photos = view.photos?.filter((p) => images.has(p.key)) ?? null;
   const flags = redFlags(view);
+  const redCount = flags.filter((f) => f.tone === "fail").length;
 
   return (
     <Document
@@ -172,7 +173,9 @@ export function ReportPdf({ view, reportUrl, logo, images }: Props) {
             <Text style={s.reportTag}>{t.publicReport.heading}</Text>
             {/* Report ID and time, top right, in mono. */}
             {view.slug ? <Text style={[s.small, s.mono, { color: C.muted, fontWeight: 400 }]}>{t.publicReport.reportId(view.slug)}</Text> : null}
-            {view.publishedOn ? <Text style={[s.small, s.mono, { color: C.muted, fontWeight: 400 }]}>{view.publishedOn}</Text> : null}
+            {view.publishedStamp ? (
+              <Text style={[s.small, s.mono, { color: C.muted, fontWeight: 400 }]}>{[view.publishedStamp, view.dealer.city].filter(Boolean).join(" · ")}</Text>
+            ) : null}
           </View>
         </View>
 
@@ -194,6 +197,7 @@ export function ReportPdf({ view, reportUrl, logo, images }: Props) {
               </View>
             </View>
             <Text style={{ fontWeight: 700, marginTop: 4 }}>{t.publicReport.bands[view.band]}</Text>
+            <Text style={[s.small, s.muted]}>{t.publicReport.flagsSub(redCount, flags.length - redCount)}</Text>
           </View>
         </View>
 
@@ -213,44 +217,7 @@ export function ReportPdf({ view, reportUrl, logo, images }: Props) {
           </View>
         ) : null}
 
-        {view.price ? (
-          <View style={s.section} wrap={false}>
-            <SectionTitle title={t.publicReport.price} />
-            <Text style={[s.mono, { fontSize: 15 }]}>{view.price.rangeText}</Text>
-            <Text style={[s.small, { color: C.muted, marginTop: 3 }]}>
-              {view.price.adjusted
-              ? t.publicReport.priceAdjusted(view.price.marketRangeText, view.price.adjustmentText, view.scoreText)
-              : t.publicReport.priceUnadjusted(view.price.marketRangeText)}
-            </Text>
-            {view.price.summary ? <Text style={[s.small, { marginTop: 4 }]}>{view.price.summary}</Text> : null}
-            <Text style={[s.small, s.muted, { marginTop: 6 }]}>{t.publicReport.priceBasedOn(view.price.comparables.length, view.price.searchedOn)}</Text>
-            {view.price.comparables.map((c) => (
-              <View key={c.url} style={[s.row, { paddingVertical: 3 }]}>
-                <Link src={c.url} style={[s.small, { flex: 1, color: C.olive }]}>
-                  {c.title}
-                  {` (${[c.host, c.detail].filter(Boolean).join(" · ")})`}
-                </Link>
-                {c.priceText ? <Text style={[s.small, s.mono]}>{c.priceText}</Text> : null}
-              </View>
-            ))}
-            <Text style={[s.small, s.muted, { marginTop: 6 }]}>{t.publicReport.priceDisclaimer}</Text>
-          </View>
-        ) : null}
-
-        {photos && photos.length > 0 ? (
-          <View style={s.section}>
-            <SectionTitle title={t.publicReport.photos} aside={t.publicReport.photoCount(photos.length)} />
-            <View style={s.photoGrid}>
-              {photos.map((p) => (
-                <View key={p.key} style={s.photoCell} wrap={false}>
-                  <PdfPicture src={images.get(p.key)!} style={s.photo} />
-                  <Text style={s.photoLabel}>{p.label}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        ) : null}
-
+        {/* Proof before promise: the damage notes come before the price and the photo pages. */}
         {view.findings ? (
           <View style={s.section}>
             <SectionTitle title={t.publicReport.findings} aside={t.publicReport.findingCount(view.findings.length)} />
@@ -273,6 +240,50 @@ export function ReportPdf({ view, reportUrl, logo, images }: Props) {
           </View>
         ) : null}
 
+        {view.price ? (
+          <View style={s.section}>
+            {/* The range, how it was reached and its caveat stay together. */}
+            <View wrap={false}>
+              <SectionTitle title={t.publicReport.price} />
+              <Text style={[s.mono, { fontSize: 15 }]}>{view.price.rangeText}</Text>
+              <Text style={[s.small, { color: C.muted, marginTop: 3 }]}>
+                {view.price.adjusted
+                  ? t.publicReport.priceAdjusted(view.price.marketRangeText, view.price.adjustmentText, view.scoreText)
+                  : t.publicReport.priceUnadjusted(view.price.marketRangeText)}
+              </Text>
+              {view.price.summary ? <Text style={[s.small, { marginTop: 4 }]}>{view.price.summary}</Text> : null}
+              <Text style={[s.small, s.muted, { marginTop: 4 }]}>{t.publicReport.priceDisclaimer}</Text>
+            </View>
+            {/* The listings stay in one piece: on this page if they fit, otherwise together on the next. */}
+            <View wrap={false}>
+              <Text style={[s.small, s.muted, { marginTop: 6 }]}>{t.publicReport.priceBasedOn(view.price.comparables.length, view.price.searchedOn)}</Text>
+              {view.price.comparables.map((c) => (
+                <View key={c.url} style={[s.row, { paddingVertical: 3 }]} wrap={false}>
+                  <Link src={c.url} style={[s.small, { flex: 1, color: C.olive }]}>
+                    {c.title}
+                    {` (${[c.host, c.detail].filter(Boolean).join(" · ")})`}
+                  </Link>
+                  {c.priceText ? <Text style={[s.small, s.mono]}>{c.priceText}</Text> : null}
+                </View>
+              ))}
+            </View>
+          </View>
+        ) : null}
+
+        {photos && photos.length > 0 ? (
+          <View style={s.section}>
+            <SectionTitle title={t.publicReport.photos} aside={t.publicReport.photoCount(photos.length)} />
+            <View style={s.photoGrid}>
+              {photos.map((p) => (
+                <View key={p.key} style={s.photoCell} wrap={false}>
+                  <PdfPicture src={images.get(p.key)!} style={s.photo} />
+                  <Text style={s.photoLabel}>{p.label}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        ) : null}
+
         {view.checklist ? (
           <View style={s.section}>
             <SectionTitle
@@ -281,10 +292,14 @@ export function ReportPdf({ view, reportUrl, logo, images }: Props) {
             />
             {view.checklist.groups.map((g) => (
               <View key={g.key}>
-                <Text style={s.groupTitle} minPresenceAhead={30}>
-                  {g.label}
-                </Text>
-                {g.items.map((item) => (
+                {/* A group's heading never sits alone at the foot of a page: it travels with its first row. */}
+                <View wrap={false}>
+                  <Text style={s.groupTitle}>{g.label}</Text>
+                  {g.items.slice(0, 1).map((item) => (
+                    <CheckRow key={item.key} item={item} />
+                  ))}
+                </View>
+                {g.items.slice(1).map((item) => (
                   <CheckRow key={item.key} item={item} />
                 ))}
               </View>

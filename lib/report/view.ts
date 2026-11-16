@@ -85,6 +85,8 @@ export type ReportView = {
   slug: string | null;
   /** "19 Oct 2026", or null before the first publish. */
   publishedOn: string | null;
+  /** Date and 24-hour time for the printed report's header: "9 Nov 2026 · 11:42". */
+  publishedStamp: string | null;
   /**
    * Whoever shared the report. `name` is a dealer's business name, otherwise the person's name, and
    * `ownerName` is set only when it differs from `name`. Address and logo are for dealers only.
@@ -206,6 +208,7 @@ export function buildReportView(input: ReportInput, hidden: readonly ReportSecti
   const full: ReportView = {
     slug: input.slug,
     publishedOn: input.publishedAt ? formatDateTime(input.publishedAt) : null,
+    publishedStamp: input.publishedAt ? formatTimestamp(input.publishedAt).replace(", ", " · ") : null,
     dealer: {
       userType,
       name,
